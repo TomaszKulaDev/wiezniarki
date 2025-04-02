@@ -132,29 +132,59 @@ export default function FAQ() {
         </div>
       </section>
 
-      {/* Główna treść */}
-      <div className="container mx-auto px-4 py-5">
-        <div className="max-w-4xl mx-auto">
-          {/* Krótkie wprowadzenie */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <h2 className="text-xl font-bold text-primary mb-3">
-              Masz pytania? Jesteśmy tu, by pomóc!
-            </h2>
-            <p className="text-gray-700 mb-4">
-              Zebraliśmy odpowiedzi na najczęściej zadawane pytania dotyczące
-              programu &quot;Więźniarki&quot;. Jeśli nie znajdziesz tu
-              odpowiedzi na swoje pytanie, zachęcamy do
-              <Link
-                href="/contact"
-                className="text-primary font-medium hover:underline"
-              >
-                {" "}
-                kontaktu z nami
-              </Link>
-              .
-            </p>
+      {/* Grafika ilustracyjna */}
+      <div className="w-full overflow-hidden bg-gray-50 border-b border-gray-200 py-6 md:py-10">
+        <div className="container mx-auto px-4">
+          <div className="relative w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center rounded-lg bg-white shadow-sm overflow-hidden p-6 md:p-8 mb-8 mt-8">
+            <div className="w-full md:w-1/3 flex justify-center mb-6 md:mb-0">
+              <div className="rounded-full bg-blue-50 p-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-20 w-20 text-primary"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="w-full md:w-2/3 text-center md:text-left md:pl-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">
+                Centrum Wiedzy i Informacji
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Znajdź odpowiedzi na najczęstsze pytania dotyczące programu
+                &quot;Więźniarki&quot; oraz procesu resocjalizacji i
+                reintegracji społecznej.
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Informacje
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Wsparcie
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Procedury
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Pomoc
+                </span>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
+      {/* Główna treść */}
+      <div className="container mx-auto px-4 py-8 md:py-10">
+        <div className="max-w-4xl mx-auto">
           {/* Kategorie FAQ */}
           <div className="space-y-6">
             {faqData.map((category, categoryIndex) => (
