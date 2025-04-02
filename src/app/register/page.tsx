@@ -60,8 +60,12 @@ export default function RegisterPage() {
       setTimeout(() => {
         router.push("/login");
       }, 3000);
-    } catch (err: any) {
-      setError(err.message || "Wystąpił błąd podczas rejestracji");
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Wystąpił błąd podczas rejestracji";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -71,8 +75,8 @@ export default function RegisterPage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <main className="flex-grow container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+      <main className="flex-grow container mx-auto px-4 py-16 mb-16">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mb-20 mt-8">
           <h1 className="text-2xl font-bold mb-6 text-center">
             Zarejestruj się
           </h1>

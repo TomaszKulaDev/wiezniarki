@@ -49,8 +49,10 @@ export default function LoginPage() {
 
       // Przekieruj na stronę główną
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Wystąpił błąd podczas logowania");
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Wystąpił błąd podczas logowania";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -60,8 +62,8 @@ export default function LoginPage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <main className="flex-grow container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+      <main className="flex-grow container mx-auto px-4 py-20 mb-24">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-10 mb-28">
           <h1 className="text-2xl font-bold mb-6 text-center">Zaloguj się</h1>
 
           {error && (
