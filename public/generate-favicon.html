@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generator favicon</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .preview {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #1e50a0;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #1a4080;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Generator favicon dla Więźniarki</h1>
+    <p>Ten narzędzie pomoże wygenerować plik favicon.ico na podstawie SVG.</p>
+
+    <div class="preview">
+      <h3>Podgląd ikony:</h3>
+      <svg
+        id="favicon-svg"
+        width="64"
+        height="64"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Białe tło -->
+        <rect width="32" height="32" rx="4" fill="#FFFFFF" />
+
+        <!-- Czerwony sześciokąt z białym środkiem (logo z navbaru) -->
+        <path d="M16 2L3 9V23L16 30L29 23V9L16 2Z" fill="#D1213D" />
+        <path d="M16 5L7 10V21L16 26L25 21V10L16 5Z" fill="#FFFFFF" />
+      </svg>
+    </div>
+
+    <div class="buttons">
+      <button id="generate-ico">Wygeneruj favicon.ico</button>
+      <button id="generate-png">Wygeneruj apple-touch-icon.png</button>
+    </div>
+
+    <div id="download-links"></div>
+
+    <h2>Instrukcja:</h2>
+    <ol>
+      <li>Kliknij "Wygeneruj favicon.ico", aby stworzyć plik ico</li>
+      <li>
+        Kliknij "Wygeneruj apple-touch-icon.png", aby stworzyć ikonę dla
+        urządzeń Apple
+      </li>
+      <li>Pobierz pliki i umieść je w folderze <code>public</code> projektu</li>
+    </ol>
+
+    <script>
+      document
+        .getElementById("generate-ico")
+        .addEventListener("click", function () {
+          generateFavicon(32, "favicon.ico", "image/x-icon");
+        });
+
+      document
+        .getElementById("generate-png")
+        .addEventListener("click", function () {
+          generateFavicon(180, "apple-touch-icon.png", "image/png");
+        });
+
+      function generateFavicon(size, filename, type) {
+        const svg = document.getElementById("favicon-svg");
+        const svgData = new XMLSerializer().serializeToString(svg);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+
+        const img = new Image();
+        const svgBlob = new Blob([svgData], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = function () {
+          ctx.drawImage(img, 0, 0, size, size);
+          URL.revokeObjectURL(url);
+
+          const downloadLink = document.createElement("a");
+          downloadLink.download = filename;
+
+          if (type === "image/x-icon") {
+            // Dla formatu .ico konwersja jest bardziej skomplikowana
+            // Tutaj używamy prostego przekształcenia do PNG jako alternatywy
+            downloadLink.href = canvas.toDataURL("image/png");
+          } else {
+            downloadLink.href = canvas.toDataURL(type);
+          }
+
+          downloadLink.innerHTML = `Pobierz ${filename}`;
+          downloadLink.className = "download-link";
+          downloadLink.style.display = "block";
+          downloadLink.style.margin = "10px 0";
+
+          const downloadLinks = document.getElementById("download-links");
+          downloadLinks.appendChild(downloadLink);
+        };
+
+        img.src = url;
+      }
+    </script>
+  </body>
+</html>

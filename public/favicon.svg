@@ -5,13 +5,10 @@
   fill="none" 
   xmlns="http://www.w3.org/2000/svg"
 >
-  <!-- Czerwone tło dla lepszej widoczności na białych kartach -->
+  <!-- Białe tło -->
   <rect width="32" height="32" rx="4" fill="#FFFFFF"/>
   
-  <!-- Główny symbol -->
-  <path d="M16 4L5 10V22L16 28L27 22V10L16 4Z" fill="#D1213D" />
-  <path d="M16 8L9 12V20L16 24L23 20V12L16 8Z" fill="#FFFFFF" />
-  
-  <!-- Dodatkowy kontur dla lepszej widoczności -->
-  <path d="M16 8L9 12V20L16 24L23 20V12L16 8Z" fill="none" stroke="#D1213D" stroke-width="0.5" />
+  <!-- Czerwony sześciokąt z białym środkiem (logo z navbaru) -->
+  <path d="M16 2L3 9V23L16 30L29 23V9L16 2Z" fill="#D1213D" />
+  <path d="M16 5L7 10V21L16 26L25 21V10L16 5Z" fill="#FFFFFF" />
 </svg> 
