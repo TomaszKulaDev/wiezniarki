@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Breadcrumbs from "./Breadcrumbs";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -107,11 +108,11 @@ export default function Navbar() {
               className="hover:opacity-80 flex items-center"
               aria-label="Biuletyn Informacji Publicznej"
             >
-              <img
+              <Image
                 src="/bip_simple.svg"
                 alt="BIP"
-                width="24"
-                height="10"
+                width={24}
+                height={10}
                 className="h-4"
               />
             </a>
@@ -394,12 +395,8 @@ export default function Navbar() {
                 <li>
                   <Link
                     href="/register"
-                    className="block mt-3 flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded-full font-medium hover:bg-primary-dark transition shadow-sm transform hover:scale-105 w-fit group"
+                    className="inline-flex items-center gap-2 bg-primary text-white font-medium py-1.5 px-4 border border-primary hover:bg-primary-dark transition-colors duration-200 rounded mt-3"
                     onClick={() => setMenuOpen(false)}
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #1e50a0 0%, #0e3a7e 100%)",
-                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -411,12 +408,11 @@ export default function Navbar() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="transition-transform group-hover:rotate-12"
                     >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                      <line x1="20" y1="8" x2="20" y2="14" />
+                      <line x1="23" y1="11" x2="17" y2="11" />
                     </svg>
                     <span>Rejestracja</span>
                   </Link>

@@ -245,115 +245,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Wyróżnione profile */}
-      <section className="py-12 bg-accent">
+      {/* Komunikaty i statystyki */}
+      <section className="py-14 bg-gray-800 text-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-8">
-            Wyróżnione profile
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((profile) => (
-              <div
-                key={profile}
-                className="bg-white rounded-lg shadow-sm border border-border overflow-hidden"
-              >
-                <div className="h-48 bg-gray-200 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-gray-500">Zdjęcie profilowe</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div>
+              <h2 className="text-2xl font-bold mb-6 text-gray-300">
+                Skuteczna resocjalizacja poprzez relacje społeczne
+              </h2>
+              <div className="space-y-4">
+                <p className="text-gray-300 leading-relaxed">
+                  Program Więźniarki jest oficjalną inicjatywą wspierającą
+                  proces resocjalizacji kobiet poprzez budowanie wartościowych
+                  relacji społecznych.
+                </p>
+                <p className="text-gray-300 leading-relaxed">
+                  Wnioski z przeprowadzonych analiz potwierdzają, że osoby
+                  osadzone utrzymujące regularny, pozytywny kontakt ze światem
+                  zewnętrznym zwiększają swoje szanse na skuteczną reintegrację
+                  społeczną po odbyciu kary o 40%.
+                </p>
+                <div className="mt-8">
+                  <Link
+                    href="/about"
+                    className="inline-flex items-center bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded hover:bg-gray-300 transition"
+                  >
+                    <span>Szczegółowe informacje o programie</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 ml-2"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-700 rounded-lg border border-gray-600 p-8">
+              <h3 className="text-xl font-semibold mb-8 text-center text-gray-300 border-b border-gray-600 pb-4">
+                Bieżące statystyki programu
+              </h3>
+              <div className="grid grid-cols-2 gap-8">
+                <div className="text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl font-bold mb-1 text-gray-300">
+                      247
+                    </div>
+                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
+                    <p className="text-sm text-gray-400">
+                      Aktywnych uczestniczek
+                    </p>
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-lg font-bold">Anna K.</h3>
-                    <span className="text-xs text-gray-500">
-                      ID: AK-{profile}24
-                    </span>
+                <div className="text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl font-bold mb-1 text-gray-300">
+                      1452
+                    </div>
+                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
+                    <p className="text-sm text-gray-400">
+                      Nawiązanych kontaktów
+                    </p>
                   </div>
-                  <div className="mb-3">
-                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
-                      Malarstwo
-                    </span>
-                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
-                      Literatura
-                    </span>
-                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                      Pszczoły
-                    </span>
+                </div>
+                <div className="text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl font-bold mb-1 text-gray-300">
+                      83%
+                    </div>
+                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
+                    <p className="text-sm text-gray-400">Pozytywnych opinii</p>
                   </div>
-                  <p className="text-gray-600 mb-4 text-sm">
-                    Interesuje się sztuką, literaturą i przyrodą. Szuka osób, z
-                    którymi mogłaby dzielić się swoimi pasjami i pomysłami na
-                    przyszłość.
-                  </p>
-                  <div className="pt-3 border-t border-border">
-                    <Link
-                      href={`/profiles/${profile}`}
-                      className="text-primary font-medium hover:underline text-sm"
-                    >
-                      Zobacz profil →
-                    </Link>
+                </div>
+                <div className="text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl font-bold mb-1 text-gray-300">
+                      124
+                    </div>
+                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
+                    <p className="text-sm text-gray-400">
+                      Jednostek penitencjarnych
+                    </p>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/profiles"
-              className="bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition"
-            >
-              Zobacz wszystkie profile
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Komunikaty i statystyki */}
-      <section className="py-12 bg-primary text-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-2xl font-bold mb-6 text-white">
-                Resocjalizacja poprzez relacje
-              </h2>
-              <p className="mb-6 text-white">
-                Program Więźniarki to oficjalna inicjatywa mająca na celu
-                wsparcie procesu resocjalizacji poprzez budowanie zdrowych
-                relacji społecznych.
-              </p>
-              <p className="mb-6 text-white">
-                Badania pokazują, że osoby osadzone, które utrzymują pozytywne
-                relacje ze światem zewnętrznym, mają większe szanse na udaną
-                reintegrację społeczną po odbyciu kary.
-              </p>
-              <Link
-                href="/about"
-                className="inline-block bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-100 transition"
-              >
-                Pełna informacja o projekcie
-              </Link>
-            </div>
-            <div className="bg-white/10 rounded-lg p-8">
-              <h3 className="text-xl font-bold mb-6 text-center text-white">
-                Statystyki projektu
-              </h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold mb-2 text-white">247</div>
-                  <p className="text-sm text-white">Aktywnych profili</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold mb-2 text-white">1452</div>
-                  <p className="text-sm text-white">Nawiązanych kontaktów</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold mb-2 text-white">83%</div>
-                  <p className="text-sm text-white">Pozytywnych opinii</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold mb-2 text-white">124</div>
-                  <p className="text-sm text-white">Zakładów karnych</p>
-                </div>
+              <div className="mt-8 text-center text-xs text-gray-400 font-medium">
+                Stan na dzień: 3.04.2025
               </div>
             </div>
           </div>
@@ -386,17 +369,6 @@ export default function Home() {
               style={{ color: "#1e50a0", backgroundColor: "white" }}
             >
               Najczęstsze pytania
-            </Link>
-            <Link
-              href="/next-steps"
-              className="bg-secondary text-white font-extrabold py-3 px-6 rounded hover:bg-red-800 transition shadow-md text-base"
-              style={{
-                color: "white",
-                backgroundColor: "#d1213d",
-                border: "2px solid #d1213d",
-              }}
-            >
-              Dalej
             </Link>
           </div>
         </div>
