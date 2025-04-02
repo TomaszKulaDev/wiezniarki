@@ -387,13 +387,22 @@ export default function Privacy() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-block bg-primary text-gray-600 font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
+                className="inline-block bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
+                style={{
+                  backgroundColor: "#1e50a0",
+                  color: "white",
+                }}
               >
                 Skontaktuj się z nami
               </Link>
               <Link
                 href="/faq"
-                className="inline-block bg-white text-gray-600 font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm"
+                className="inline-block bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm"
+                style={{
+                  backgroundColor: "white",
+                  color: "#1e50a0",
+                  border: "1px solid #1e50a0",
+                }}
               >
                 Najczęściej zadawane pytania
               </Link>
