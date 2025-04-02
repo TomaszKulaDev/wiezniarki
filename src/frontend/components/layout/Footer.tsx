@@ -163,7 +163,7 @@ export default function Footer() {
       {/* Secondary footer with links */}
       <div className="bg-accent py-6 border-t border-border mt-6">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-between items-center gap-4">
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-3">
             <ul className="flex flex-wrap gap-6 text-xs">
               <li>
                 <Link
@@ -197,16 +197,12 @@ export default function Footer() {
               </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Bottom bar */}
-      <div className="bg-primary text-white py-3">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs text-white font-medium">
-            Więźniarki to oficjalny projekt wspierający resocjalizację i
-            reintegrację społeczną
-          </p>
+          <div className="pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              Więźniarki to oficjalny projekt wspierający resocjalizację i
+              reintegrację społeczną
+            </p>
+          </div>
         </div>
       </div>
     </footer>
