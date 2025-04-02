@@ -366,15 +366,32 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             <Link
               href="/contact"
-              className="bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition"
+              className="bg-primary text-white font-extrabold py-3 px-6 rounded hover:bg-primary-dark transition shadow-md text-base"
+              style={{
+                color: "white",
+                backgroundColor: "#1e50a0",
+                border: "2px solid #1e50a0",
+              }}
             >
               Kontakt
             </Link>
             <Link
               href="/faq"
-              className="bg-white text-primary border border-primary font-semibold py-2 px-6 rounded hover:bg-gray-50 transition"
+              className="bg-white text-primary font-extrabold py-3 px-6 rounded hover:bg-gray-50 transition shadow-md border-2 border-primary text-base"
+              style={{ color: "#1e50a0", backgroundColor: "white" }}
             >
               Najczęstsze pytania
+            </Link>
+            <Link
+              href="/next-steps"
+              className="bg-secondary text-white font-extrabold py-3 px-6 rounded hover:bg-red-800 transition shadow-md text-base"
+              style={{
+                color: "white",
+                backgroundColor: "#d1213d",
+                border: "2px solid #d1213d",
+              }}
+            >
+              Dalej
             </Link>
           </div>
         </div>

@@ -128,7 +128,7 @@ export default function Footer() {
           <div>
             <h3 className="text-base font-bold mb-4">Kontakt</h3>
             <address className="not-italic text-sm text-gray-600 space-y-2">
-              <p>Biuro Projektu "Więźniarki"</p>
+              <p>Biuro Projektu &quot;Więźniarki&quot;</p>
               <p>ul. Przykładowa 123</p>
               <p>00-001 Warszawa</p>
               <p className="mt-3">
@@ -148,6 +148,14 @@ export default function Footer() {
                 </a>
               </p>
             </address>
+            <div className="mt-4">
+              <Link
+                href="/contact"
+                className="inline-block bg-primary text-white font-medium py-2 px-4 rounded hover:bg-primary-dark transition"
+              >
+                Kontakt
+              </Link>
+            </div>
           </div>
         </div>
       </div>
