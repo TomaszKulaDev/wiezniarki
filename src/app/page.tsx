@@ -356,14 +356,14 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-10 bg-accent border-t border-border">
+      <section className="py-14 bg-accent border-t border-border mt-8">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-4">Masz pytania?</h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6">Masz pytania?</h2>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             Jeśli chcesz dowiedzieć się więcej o programie Więźniarki lub
             potrzebujesz pomocy, skontaktuj się z naszym biurem obsługi.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
             <Link
               href="/contact"
               className="bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition"

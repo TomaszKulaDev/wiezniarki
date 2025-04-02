@@ -153,7 +153,7 @@ export default function Footer() {
       </div>
 
       {/* Secondary footer with links */}
-      <div className="bg-accent py-4 border-t border-border">
+      <div className="bg-accent py-6 border-t border-border mt-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
             <ul className="flex flex-wrap gap-6 text-xs">
