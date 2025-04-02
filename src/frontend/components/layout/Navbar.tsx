@@ -108,13 +108,15 @@ export default function Navbar() {
               className="hover:opacity-80 flex items-center"
               aria-label="Biuletyn Informacji Publicznej"
             >
-              <Image
-                src="/bip_simple.svg"
-                alt="BIP"
-                width={24}
-                height={10}
-                className="h-4"
-              />
+              <div className="bg-white rounded px-1 py-0.5 flex items-center justify-center">
+                <Image
+                  src="/bip_simple.svg"
+                  alt="BIP"
+                  width={24}
+                  height={10}
+                  className="h-4"
+                />
+              </div>
             </a>
             <span style={{ color: "white" }}>|</span>
             <div className="flex items-center gap-3">
