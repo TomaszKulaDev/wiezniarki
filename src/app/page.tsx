@@ -164,7 +164,7 @@ export default function Home() {
               <div className="relative mb-10">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-primary text-white shadow">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-gray-500 text-white shadow">
                       <span className="text-xl font-bold">1</span>
                     </div>
                   </div>
@@ -184,7 +184,7 @@ export default function Home() {
               <div className="relative mb-10">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-primary text-white shadow">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-gray-500 text-white shadow">
                       <span className="text-xl font-bold">2</span>
                     </div>
                   </div>
@@ -204,7 +204,7 @@ export default function Home() {
               <div className="relative mb-10">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-primary text-white shadow">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-gray-500 text-white shadow">
                       <span className="text-xl font-bold">3</span>
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export default function Home() {
               <div className="relative">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-primary text-white shadow">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-gray-500 text-white shadow">
                       <span className="text-xl font-bold">4</span>
                     </div>
                   </div>
