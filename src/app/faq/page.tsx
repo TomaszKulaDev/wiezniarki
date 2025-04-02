@@ -227,7 +227,11 @@ export default function FAQ() {
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-accent text-gray-600 font-semibold py-2 px-6 rounded hover:bg-accent-dark transition shadow-sm"
+              className="inline-block bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
+              style={{
+                backgroundColor: "#1e50a0",
+                color: "white",
+              }}
             >
               Skontaktuj się z nami
             </Link>
