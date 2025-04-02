@@ -7,14 +7,14 @@ export default function Home() {
   return (
     <MainLayout>
       {/* Hero Section - bardziej oficjalny styl */}
-      <section className="bg-primary py-12">
+      <section className="bg-gray-800 py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="text-white">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+            <div className="text-gray-300">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-300">
                 Więźniarki - Program Reintegracji Społecznej
               </h1>
-              <p className="text-lg mb-6 text-white">
+              <p className="text-lg mb-6 text-gray-300">
                 Oficjalny program umożliwiający kobietom przebywającym w
                 zakładach karnych nawiązanie relacji z osobami z zewnątrz w celu
                 lepszej reintegracji ze społeczeństwem.
@@ -22,22 +22,22 @@ export default function Home() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/profiles"
-                  className="bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-100 transition"
+                  className="bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded hover:bg-gray-300 transition"
                 >
                   Przeglądaj profile
                 </Link>
                 <Link
                   href="/about"
-                  className="bg-transparent text-white border border-white font-semibold py-2 px-6 rounded hover:bg-white/10 transition"
+                  className="bg-transparent text-gray-300 border border-gray-300 font-semibold py-2 px-6 rounded hover:bg-gray-700 transition"
                 >
                   Dowiedz się więcej
                 </Link>
               </div>
             </div>
             <div className="hidden md:block">
-              <div className="bg-white/10 rounded-lg p-8">
-                <div className="aspect-video bg-white/20 rounded flex items-center justify-center">
-                  <span className="text-white font-medium text-lg">
+              <div className="bg-gray-700 rounded-lg p-8">
+                <div className="aspect-video bg-gray-600 rounded flex items-center justify-center">
+                  <span className="text-gray-300 font-medium text-lg">
                     Grafika informacyjna
                   </span>
                 </div>
