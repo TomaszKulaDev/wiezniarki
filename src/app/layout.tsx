@@ -14,9 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Więźniarki - Profile kobiet z więzienia",
+  title: "Więźniarki - Program Reintegracji Społecznej",
   description:
-    "Platforma umożliwiająca kobietom w więzieniu pokazanie swojego profilu w sieci",
+    "Oficjalny program umożliwiający kobietom przebywającym w zakładach karnych nawiązanie relacji z osobami z zewnątrz w celu lepszej reintegracji ze społeczeństwem",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

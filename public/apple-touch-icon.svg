@@ -1,0 +1,17 @@
+<svg
+  width="180"
+  height="180"
+  viewBox="0 0 180 180"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Białe tło -->
+  <rect width="180" height="180" rx="40" fill="#FFFFFF"/>
+  
+  <!-- Czerwony symbol (powiększony dla lepszej widoczności) -->
+  <path d="M90 30L30 60V120L90 150L150 120V60L90 30Z" fill="#D1213D" />
+  <path d="M90 50L50 70V110L90 130L130 110V70L90 50Z" fill="#FFFFFF" />
+  
+  <!-- Dodatkowy kontur -->
+  <path d="M90 50L50 70V110L90 130L130 110V70L90 50Z" fill="none" stroke="#D1213D" stroke-width="2" />
+</svg> 
