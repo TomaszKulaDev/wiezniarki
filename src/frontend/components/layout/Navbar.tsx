@@ -290,7 +290,7 @@ export default function Navbar() {
                 <li>
                   <Link
                     href="/register"
-                    className="block text-sm font-medium text-primary hover:text-primary-dark transition font-bold"
+                    className="block text-sm text-primary hover:text-primary-dark transition font-bold"
                     onClick={() => setMenuOpen(false)}
                   >
                     Rejestracja
