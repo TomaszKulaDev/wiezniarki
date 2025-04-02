@@ -1,0 +1,9 @@
+Instrukcja generowania favicon.ico:
+
+1. Użyj pliku favicon.svg jako źródło
+2. Wygeneruj plik ico za pomocą jednego z darmowych narzędzi online, takich jak:
+   - https://convertio.co/svg-ico/
+   - https://favicon.io/favicon-converter/
+   - https://realfavicongenerator.net/
+3. Zapisz wygenerowany plik jako "favicon.ico" w folderze "public"
+4. Wygeneruj również plik "apple-touch-icon.png" z pliku "apple-touch-icon.svg" 
