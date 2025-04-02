@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -43,10 +42,17 @@ export default function Navbar() {
   return (
     <header className="border-b border-border">
       {/* Top bar */}
-      <div className="bg-primary text-white py-1">
+      <div style={{ backgroundColor: "#1e50a0" }} className="py-1">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="text-sm font-semibold">
-            <span className="mr-4 text-white">
+            <span
+              className="mr-4"
+              style={{
+                color: "white",
+                fontWeight: "bold",
+                textShadow: "0 1px 1px rgba(0,0,0,0.2)",
+              }}
+            >
               Serwis Resocjalizacji Społecznej
             </span>
           </div>
@@ -54,17 +60,22 @@ export default function Navbar() {
             {isMounted && isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="text-white hover:underline"
+                style={{ color: "white" }}
+                className="hover:underline"
               >
                 Wyloguj
               </button>
             ) : (
-              <Link href="/login" className="text-white hover:underline">
+              <Link
+                href="/login"
+                style={{ color: "white" }}
+                className="hover:underline"
+              >
                 Logowanie
               </Link>
             )}
-            <span>|</span>
-            <a href="#" className="text-white hover:underline">
+            <span style={{ color: "white" }}>|</span>
+            <a href="#" style={{ color: "white" }} className="hover:underline">
               BIP
             </a>
           </div>
@@ -107,7 +118,9 @@ export default function Navbar() {
                 <Link
                   href="/"
                   className={`text-sm font-medium hover:text-primary transition ${
-                    pathname === "/" ? "text-primary" : "text-gray-700"
+                    pathname === "/"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                 >
                   Strona główna
@@ -117,7 +130,9 @@ export default function Navbar() {
                 <Link
                   href="/profiles"
                   className={`text-sm font-medium hover:text-primary transition ${
-                    pathname === "/profiles" ? "text-primary" : "text-gray-700"
+                    pathname === "/profiles"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                 >
                   Profile
@@ -127,7 +142,9 @@ export default function Navbar() {
                 <Link
                   href="/about"
                   className={`text-sm font-medium hover:text-primary transition ${
-                    pathname === "/about" ? "text-primary" : "text-gray-700"
+                    pathname === "/about"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                 >
                   O projekcie
@@ -137,7 +154,9 @@ export default function Navbar() {
                 <Link
                   href="/contact"
                   className={`text-sm font-medium hover:text-primary transition ${
-                    pathname === "/contact" ? "text-primary" : "text-gray-700"
+                    pathname === "/contact"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                 >
                   Kontakt
@@ -149,7 +168,7 @@ export default function Navbar() {
                     href="/dashboard"
                     className={`text-sm font-medium hover:text-primary transition ${
                       pathname === "/dashboard"
-                        ? "text-primary"
+                        ? "text-primary font-bold"
                         : "text-gray-700"
                     }`}
                   >
@@ -192,7 +211,9 @@ export default function Navbar() {
                 <Link
                   href="/"
                   className={`block text-sm font-medium hover:text-primary transition ${
-                    pathname === "/" ? "text-primary" : "text-gray-700"
+                    pathname === "/"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -203,7 +224,9 @@ export default function Navbar() {
                 <Link
                   href="/profiles"
                   className={`block text-sm font-medium hover:text-primary transition ${
-                    pathname === "/profiles" ? "text-primary" : "text-gray-700"
+                    pathname === "/profiles"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -214,7 +237,9 @@ export default function Navbar() {
                 <Link
                   href="/about"
                   className={`block text-sm font-medium hover:text-primary transition ${
-                    pathname === "/about" ? "text-primary" : "text-gray-700"
+                    pathname === "/about"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -225,7 +250,9 @@ export default function Navbar() {
                 <Link
                   href="/contact"
                   className={`block text-sm font-medium hover:text-primary transition ${
-                    pathname === "/contact" ? "text-primary" : "text-gray-700"
+                    pathname === "/contact"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -239,7 +266,7 @@ export default function Navbar() {
                       href="/dashboard"
                       className={`block text-sm font-medium hover:text-primary transition ${
                         pathname === "/dashboard"
-                          ? "text-primary"
+                          ? "text-primary font-bold"
                           : "text-gray-700"
                       }`}
                       onClick={() => setMenuOpen(false)}
@@ -263,7 +290,7 @@ export default function Navbar() {
                 <li>
                   <Link
                     href="/register"
-                    className="block text-sm font-medium text-primary hover:text-primary-dark transition"
+                    className="block text-sm font-medium text-primary hover:text-primary-dark transition font-bold"
                     onClick={() => setMenuOpen(false)}
                   >
                     Rejestracja
@@ -276,14 +303,21 @@ export default function Navbar() {
       )}
 
       {/* Secondary navigation */}
-      <div className="bg-accent border-y border-border">
-        <div className="container mx-auto px-4 py-2">
+      <div
+        style={{
+          backgroundColor: "#f6f9fc",
+          borderTop: "1px solid #e5e5e5",
+          borderBottom: "1px solid #e5e5e5",
+        }}
+        className="py-2"
+      >
+        <div className="container mx-auto px-4">
           <nav>
             <ul className="flex flex-wrap gap-4 md:gap-8 text-xs">
               <li>
                 <Link
                   href="/faq"
-                  className="text-gray-700 hover:text-primary transition"
+                  className="text-gray-700 hover:text-primary transition font-medium"
                 >
                   Najczęściej zadawane pytania
                 </Link>
@@ -291,7 +325,7 @@ export default function Navbar() {
               <li>
                 <Link
                   href="/regulations"
-                  className="text-gray-700 hover:text-primary transition"
+                  className="text-gray-700 hover:text-primary transition font-medium"
                 >
                   Regulamin
                 </Link>
@@ -299,7 +333,7 @@ export default function Navbar() {
               <li>
                 <Link
                   href="/privacy"
-                  className="text-gray-700 hover:text-primary transition"
+                  className="text-gray-700 hover:text-primary transition font-medium"
                 >
                   Polityka prywatności
                 </Link>
@@ -308,7 +342,7 @@ export default function Navbar() {
                 <li className="ml-auto">
                   <Link
                     href="/register"
-                    className="text-primary font-semibold hover:text-primary-dark transition"
+                    className="text-primary font-bold hover:text-primary-dark transition"
                   >
                     Zarejestruj się
                   </Link>
