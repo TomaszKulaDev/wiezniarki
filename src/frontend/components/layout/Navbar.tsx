@@ -83,15 +83,15 @@ export default function Navbar() {
       </div>
 
       {/* Main navbar */}
-      <div className="bg-white py-3">
+      <div className="bg-white py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center">
-            <div className="mr-3">
+            <div className="mr-4">
               {/* Placeholder for Polish Eagle logo - w rzeczywistym projekcie użyj właściwego godła */}
-              <div className="w-12 h-12 bg-white flex items-center justify-center">
+              <div className="w-14 h-14 bg-white flex items-center justify-center">
                 <svg
-                  width="32"
-                  height="32"
+                  width="40"
+                  height="40"
                   viewBox="0 0 32 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -102,10 +102,10 @@ export default function Navbar() {
               </div>
             </div>
             <div>
-              <Link href="/" className="text-xl font-bold text-primary">
+              <Link href="/" className="text-2xl font-bold text-primary">
                 Więźniarki
               </Link>
-              <div className="text-xs text-gray-600">
+              <div className="text-sm text-gray-600">
                 Projekt integracji społecznej
               </div>
             </div>
