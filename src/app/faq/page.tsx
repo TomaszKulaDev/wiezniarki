@@ -120,42 +120,30 @@ export default function FAQ() {
   return (
     <MainLayout>
       {/* Nagłówek strony */}
-      <section className="bg-primary py-8">
+      <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
             Najczęściej zadawane pytania
           </h1>
           <p className="text-white/80">
-            Odpowiedzi na najczęstsze pytania dotyczące programu "Więźniarki"
+            Odpowiedzi na najczęstsze pytania dotyczące programu
+            &quot;Więźniarki&quot;
           </p>
         </div>
       </section>
 
-      {/* Breadcrumbs */}
-      <div className="bg-accent py-2 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="text-xs text-gray-600">
-            <Link href="/" className="hover:text-primary transition">
-              Strona główna
-            </Link>{" "}
-            &gt;{" "}
-            <span className="text-gray-800">Najczęściej zadawane pytania</span>
-          </div>
-        </div>
-      </div>
-
       {/* Główna treść */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-5">
         <div className="max-w-4xl mx-auto">
           {/* Krótkie wprowadzenie */}
-          <div className="bg-white rounded-lg shadow-sm border border-border p-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <h2 className="text-xl font-bold text-primary mb-3">
               Masz pytania? Jesteśmy tu, by pomóc!
             </h2>
             <p className="text-gray-700 mb-4">
               Zebraliśmy odpowiedzi na najczęściej zadawane pytania dotyczące
-              programu "Więźniarki". Jeśli nie znajdziesz tu odpowiedzi na swoje
-              pytanie, zachęcamy do
+              programu &quot;Więźniarki&quot;. Jeśli nie znajdziesz tu
+              odpowiedzi na swoje pytanie, zachęcamy do
               <Link
                 href="/contact"
                 className="text-primary font-medium hover:underline"
@@ -172,9 +160,9 @@ export default function FAQ() {
             {faqData.map((category, categoryIndex) => (
               <div
                 key={categoryIndex}
-                className="bg-white rounded-lg shadow-sm border border-border overflow-hidden"
+                className="bg-white rounded-lg shadow-sm overflow-hidden"
               >
-                <h3 className="text-lg font-bold bg-accent p-4 border-b border-border">
+                <h3 className="text-lg font-bold bg-accent p-4">
                   {category.category}
                 </h3>
                 <div className="p-4">
@@ -229,7 +217,7 @@ export default function FAQ() {
           </div>
 
           {/* CTA na dole strony */}
-          <div className="mt-12 bg-accent rounded-lg shadow-sm border border-border p-6 text-center">
+          <div className="mt-12 mb-16 bg-accent rounded-lg shadow-sm p-6 text-center">
             <h3 className="text-lg font-bold text-gray-800 mb-2">
               Nie znalazłeś/aś odpowiedzi na swoje pytanie?
             </h3>
@@ -239,7 +227,7 @@ export default function FAQ() {
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
+              className="inline-block bg-accent text-gray-600 font-semibold py-2 px-6 rounded hover:bg-accent-dark transition shadow-sm"
             >
               Skontaktuj się z nami
             </Link>

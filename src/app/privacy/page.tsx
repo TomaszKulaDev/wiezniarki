@@ -7,9 +7,9 @@ export default function Privacy() {
   return (
     <MainLayout>
       {/* Nagłówek strony */}
-      <section className="bg-primary py-8">
+      <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
             Polityka Prywatności
           </h1>
           <p className="text-white/80">
@@ -19,23 +19,11 @@ export default function Privacy() {
         </div>
       </section>
 
-      {/* Breadcrumbs */}
-      <div className="bg-accent py-2 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="text-xs text-gray-600">
-            <Link href="/" className="hover:text-primary transition">
-              Strona główna
-            </Link>{" "}
-            &gt; <span className="text-gray-800">Polityka Prywatności</span>
-          </div>
-        </div>
-      </div>
-
       {/* Główna treść */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-5">
         <div className="max-w-4xl mx-auto">
           {/* Krótkie wprowadzenie */}
-          <div className="bg-white rounded-lg shadow-sm border border-border p-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <h2 className="text-xl font-bold text-primary mb-3">
               Polityka Prywatności programu &quot;Więźniarki&quot;
             </h2>
@@ -51,7 +39,7 @@ export default function Privacy() {
           </div>
 
           {/* Treść polityki prywatności */}
-          <div className="bg-white rounded-lg shadow-sm border border-border p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-6">
               <section>
                 <h3 className="text-lg font-bold text-gray-800 mb-3">
@@ -388,8 +376,8 @@ export default function Privacy() {
           </div>
 
           {/* CTA na dole strony */}
-          <div className="mt-12 bg-accent rounded-lg shadow-sm border border-border p-6 text-center">
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
+          <div className="mt-12 mb-16 bg-accent rounded-lg shadow-sm p-6 text-center">
+            <h3 className="text-lg font-bold text-gray-600 mb-2">
               Masz pytania dotyczące ochrony Twoich danych?
             </h3>
             <p className="text-gray-600 mb-4">
@@ -399,13 +387,13 @@ export default function Privacy() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-block bg-primary text-white font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
+                className="inline-block bg-primary text-gray-600 font-semibold py-2 px-6 rounded hover:bg-primary-dark transition shadow-sm"
               >
                 Skontaktuj się z nami
               </Link>
               <Link
                 href="/faq"
-                className="inline-block bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm border border-primary"
+                className="inline-block bg-white text-gray-600 font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm"
               >
                 Najczęściej zadawane pytania
               </Link>

@@ -3,12 +3,34 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import Breadcrumbs from "./Breadcrumbs";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  // Funkcja do pobierania nazwy strony na podstawie ścieżki
+  const getPageNameFromPath = (path: string) => {
+    if (path === "/") return "";
+
+    const pathSegments = {
+      "/regulamin": "Regulamin",
+      "/privacy": "Polityka Prywatności",
+      "/faq": "Najczęściej zadawane pytania",
+      "/about": "O projekcie",
+      "/contact": "Kontakt",
+      "/profiles": "Profile",
+      "/dashboard": "Mój panel",
+      "/login": "Logowanie",
+      "/register": "Rejestracja",
+    };
+
+    return pathSegments[path as keyof typeof pathSegments] || "";
+  };
+
+  const pageName = getPageNameFromPath(pathname);
 
   useEffect(() => {
     setIsMounted(true);
@@ -40,7 +62,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="border-b border-border">
+    <header className="border-t border-border">
       {/* Top bar */}
       <div style={{ backgroundColor: "#1e50a0" }} className="py-1">
         <div className="container mx-auto px-4 flex justify-between items-center">
@@ -306,8 +328,8 @@ export default function Navbar() {
       <div
         style={{
           backgroundColor: "#f6f9fc",
-          borderTop: "1px solid #e5e5e5",
-          borderBottom: "1px solid #e5e5e5",
+          borderTop: "1px solid #f0f0f0",
+          borderBottom: "1px solid #f0f0f0",
         }}
         className="py-2"
       >
@@ -352,6 +374,9 @@ export default function Navbar() {
           </nav>
         </div>
       </div>
+
+      {/* Breadcrumbs - tylko na podstronach */}
+      {pathname !== "/" && pageName && <Breadcrumbs pageName={pageName} />}
     </header>
   );
 }

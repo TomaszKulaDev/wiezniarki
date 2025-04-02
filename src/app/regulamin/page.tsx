@@ -7,9 +7,9 @@ export default function Regulamin() {
   return (
     <MainLayout>
       {/* Nagłówek strony */}
-      <section className="bg-primary py-8">
+      <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
             Regulamin
           </h1>
           <p className="text-white/80">
@@ -18,23 +18,11 @@ export default function Regulamin() {
         </div>
       </section>
 
-      {/* Breadcrumbs */}
-      <div className="bg-accent py-2 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="text-xs text-gray-600">
-            <Link href="/" className="hover:text-primary transition">
-              Strona główna
-            </Link>{" "}
-            &gt; <span className="text-gray-800">Regulamin</span>
-          </div>
-        </div>
-      </div>
-
       {/* Główna treść */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-5">
         <div className="max-w-4xl mx-auto">
           {/* Krótkie wprowadzenie */}
-          <div className="bg-white rounded-lg shadow-sm border border-border p-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <h2 className="text-xl font-bold text-primary mb-3">
               Regulamin programu &quot;Więźniarki&quot;
             </h2>
@@ -47,7 +35,7 @@ export default function Regulamin() {
           </div>
 
           {/* Treść regulaminu */}
-          <div className="bg-white rounded-lg shadow-sm border border-border p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-6">
               <section>
                 <h3 className="text-lg font-bold text-gray-800 mb-3">
@@ -247,8 +235,14 @@ export default function Regulamin() {
                   </p>
                   <p>
                     6.3. Szczegółowe informacje dotyczące przetwarzania danych
-                    osobowych znajdują się w Polityce Prywatności dostępnej na
-                    Platformie.
+                    osobowych znajdują się w{" "}
+                    <Link
+                      href="/privacy"
+                      className="text-primary hover:underline"
+                    >
+                      Polityce Prywatności
+                    </Link>{" "}
+                    dostępnej na Platformie.
                   </p>
                   <p>
                     6.4. Podanie danych osobowych jest dobrowolne, ale niezbędne
@@ -283,7 +277,7 @@ export default function Regulamin() {
           </div>
 
           {/* CTA na dole strony */}
-          <div className="mt-12 bg-accent rounded-lg shadow-sm border border-border p-6 text-center">
+          <div className="mt-12 mb-16 bg-accent rounded-lg shadow-sm p-6 text-center">
             <h3 className="text-lg font-bold text-gray-800 mb-2">
               Masz pytania dotyczące regulaminu?
             </h3>
@@ -300,7 +294,7 @@ export default function Regulamin() {
               </Link>
               <Link
                 href="/faq"
-                className="inline-block bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm border border-primary"
+                className="inline-block bg-white text-primary font-semibold py-2 px-6 rounded hover:bg-gray-50 transition shadow-sm"
               >
                 Najczęściej zadawane pytania
               </Link>
