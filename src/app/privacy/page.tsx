@@ -9,35 +9,72 @@ export default function Privacy() {
       {/* Nagłówek strony */}
       <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-700 mb-1">
             Polityka Prywatności
           </h1>
-          <p className="text-white/80">
+          <p className="text-gray-600">
             Zasady przetwarzania danych osobowych w programie
             &quot;Więźniarki&quot;
           </p>
         </div>
       </section>
 
+      {/* Grafika ilustracyjna */}
+      <div className="w-full overflow-hidden bg-gray-50 border-b border-gray-200 py-6 md:py-10">
+        <div className="container mx-auto px-4">
+          <div className="relative w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center rounded-lg bg-white shadow-sm overflow-hidden p-6 md:p-8 mb-8 mt-8">
+            <div className="w-full md:w-1/3 flex justify-center mb-6 md:mb-0">
+              <div className="rounded-full bg-blue-50 p-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-20 w-20 text-primary"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="w-full md:w-2/3 text-center md:text-left md:pl-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">
+                Ochrona Danych Osobowych
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Ochrona Twoich danych osobowych jest dla nas priorytetem.
+                Zapoznaj się z informacjami o tym, jak przetwarzamy Twoje dane
+                oraz jakie prawa Ci przysługują zgodnie z obowiązującymi przepisami.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Polityka Prywatności obowiązuje od dnia 01.01.2023 r.
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  RODO
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Bezpieczeństwo
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Prywatność
+                </span>
+                <span className="bg-blue-100 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                  Ochrona danych
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Główna treść */}
       <div className="container mx-auto px-4 py-5">
         <div className="max-w-4xl mx-auto">
-          {/* Krótkie wprowadzenie */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <h2 className="text-xl font-bold text-primary mb-3">
-              Polityka Prywatności programu &quot;Więźniarki&quot;
-            </h2>
-            <p className="text-gray-700 mb-4">
-              Ochrona Twoich danych osobowych jest dla nas priorytetem. Poniżej
-              znajdziesz informacje o tym, jakie dane zbieramy, w jakim celu
-              oraz jakie przysługują Ci prawa w związku z przetwarzaniem danych
-              osobowych.
-            </p>
-            <p className="text-gray-700">
-              Niniejsza Polityka Prywatności obowiązuje od dnia 01.01.2023 r.
-            </p>
-          </div>
-
           {/* Treść polityki prywatności */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-6">
