@@ -122,10 +122,10 @@ export default function FAQ() {
       {/* Nagłówek strony */}
       <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-700 mb-1">
             Najczęściej zadawane pytania
           </h1>
-          <p className="text-white/80">
+          <p className="text-gray-600">
             Odpowiedzi na najczęstsze pytania dotyczące programu
             &quot;Więźniarki&quot;
           </p>
