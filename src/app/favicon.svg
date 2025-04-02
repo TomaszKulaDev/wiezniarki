@@ -1,10 +1,14 @@
-<svg
-  width="32"
-  height="32"
-  viewBox="0 0 32 32"
-  fill="none"
+<svg 
+  width="32" 
+  height="32" 
+  viewBox="0 0 32 32" 
+  fill="none" 
   xmlns="http://www.w3.org/2000/svg"
 >
+  <!-- Białe tło -->
+  <rect width="32" height="32" rx="4" fill="#FFFFFF"/>
+  
+  <!-- Czerwony sześciokąt z białym środkiem (logo z navbaru) -->
   <path d="M16 2L3 9V23L16 30L29 23V9L16 2Z" fill="#D1213D" />
   <path d="M16 5L7 10V21L16 26L25 21V10L16 5Z" fill="#FFFFFF" />
 </svg> 
