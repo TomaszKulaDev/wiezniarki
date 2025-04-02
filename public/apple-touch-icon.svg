@@ -1,14 +1,10 @@
-<svg
-  width="180"
-  height="180"
-  viewBox="0 0 180 180"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <!-- Białe tło z zaokrągleniem -->
-  <rect width="180" height="180" rx="45" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Tło -->
+  <rect width="180" height="180" fill="white"/>
   
-  <!-- Czerwony sześciokąt z białym środkiem (logo z navbaru) -->
-  <path d="M90 20L20 55V125L90 160L160 125V55L90 20Z" fill="#D1213D" />
-  <path d="M90 40L40 65V115L90 140L140 115V65L90 40Z" fill="#FFFFFF" />
+  <!-- Czerwony sześciokąt -->
+  <polygon points="90,20 160,55 160,125 90,160 20,125 20,55" fill="#ff3333"/>
+  
+  <!-- Biały wewnętrzny sześciokąt -->
+  <polygon points="90,50 130,70 130,110 90,130 50,110 50,70" fill="white"/>
 </svg> 
