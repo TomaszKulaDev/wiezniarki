@@ -394,7 +394,7 @@ export default function Home() {
               Dalej
             </Link>
           </div>
-        </div>
+    </div>
       </section>
     </MainLayout>
   );

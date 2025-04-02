@@ -199,7 +199,7 @@ export default function Footer() {
           </div>
           <div className="pt-3 border-t border-gray-200">
             <p className="text-xs text-gray-500">
-              Więźniarki to oficjalny projekt wspierający resocjalizację i
+              Więźniarki.pl to oficjalny projekt wspierający resocjalizację i
               reintegrację społeczną
             </p>
           </div>
