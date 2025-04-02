@@ -324,7 +324,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  href="/regulations"
+                  href="/regulamin"
                   className="text-gray-700 hover:text-primary transition font-medium"
                 >
                   Regulamin

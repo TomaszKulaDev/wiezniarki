@@ -39,8 +39,8 @@ export default function About() {
                 O programie Więźniarki
               </h2>
               <p className="mb-4">
-                Program "Więźniarki" to oficjalna inicjatywa mająca na celu
-                wsparcie procesu resocjalizacji kobiet odbywających karę
+                Program &quot;Więźniarki&quot; to oficjalna inicjatywa mająca na
+                celu wsparcie procesu resocjalizacji kobiet odbywających karę
                 pozbawienia wolności poprzez umożliwienie im nawiązania
                 wartościowych relacji z osobami spoza zakładów karnych.
               </p>
@@ -102,7 +102,7 @@ export default function About() {
                 Struktura i organizacja
               </h2>
               <p className="mb-4">
-                Program "Więźniarki" jest koordynowany przez zespół
+                Program &quot;Więźniarki&quot; jest koordynowany przez zespół
                 specjalistów, w skład którego wchodzą:
               </p>
               <ul className="list-disc pl-6 space-y-2 mb-4">
@@ -132,7 +132,7 @@ export default function About() {
                 Dane kontaktowe
               </h3>
               <address className="not-italic text-sm">
-                <p className="mb-2">Biuro Projektu "Więźniarki"</p>
+                <p className="mb-2">Biuro Projektu &quot;Więźniarki&quot;</p>
                 <p className="mb-2">ul. Przykładowa 123</p>
                 <p className="mb-4">00-001 Warszawa</p>
                 <p className="mb-2">
@@ -160,7 +160,7 @@ export default function About() {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/regulations" className="flex items-center group">
+                  <Link href="/regulamin" className="flex items-center group">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-5 w-5 text-primary mr-2"

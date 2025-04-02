@@ -54,7 +54,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/regulations"
+                  href="/regulamin"
                   className="text-gray-600 hover:text-primary transition"
                 >
                   Regulamin

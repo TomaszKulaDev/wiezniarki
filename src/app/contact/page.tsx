@@ -72,7 +72,7 @@ export default function Contact() {
             Kontakt
           </h1>
           <p className="text-white/80">
-            Skontaktuj się z Biurem Projektu "Więźniarki"
+            Skontaktuj się z Biurem Projektu &quot;Więźniarki&quot;
           </p>
         </div>
       </section>
@@ -270,7 +270,7 @@ export default function Contact() {
                           >
                             Akceptuję{" "}
                             <Link
-                              href="/regulations"
+                              href="/regulamin"
                               className="text-primary hover:underline"
                             >
                               regulamin
@@ -332,7 +332,7 @@ export default function Contact() {
                   </svg>
                   <div>
                     <p className="font-medium">Adres:</p>
-                    <p>Biuro Projektu "Więźniarki"</p>
+                    <p>Biuro Projektu &quot;Więźniarki&quot;</p>
                     <p>ul. Przykładowa 123</p>
                     <p>00-001 Warszawa</p>
                   </div>
