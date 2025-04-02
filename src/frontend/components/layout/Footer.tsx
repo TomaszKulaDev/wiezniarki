@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -22,11 +23,11 @@ export default function Footer() {
               <div className="flex flex-col space-y-4 mb-3">
                 <div className="flex items-center">
                   {/* Oficjalne logo Ministerstwa Sprawiedliwości */}
-                  <img
+                  <Image
                     src="/godlo.jpg"
                     alt="Godło Rzeczypospolitej Polskiej"
-                    width="32"
-                    height="32"
+                    width={32}
+                    height={32}
                     className="mr-3 flex-shrink-0"
                   />
                   <span className="text-xs font-medium text-gray-700">
@@ -35,11 +36,11 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center">
                   {/* Logo Ministerstwa Rodziny, Pracy i Polityki Społecznej */}
-                  <img
+                  <Image
                     src="/godlo.jpg"
                     alt="Godło Rzeczypospolitej Polskiej"
-                    width="32"
-                    height="32"
+                    width={32}
+                    height={32}
                     className="mr-3 flex-shrink-0"
                   />
                   <span className="text-xs font-medium text-gray-700">
@@ -346,9 +347,16 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-primary transition"
+                  className="text-gray-600 hover:text-primary transition flex items-center"
+                  aria-label="Biuletyn Informacji Publicznej"
                 >
-                  BIP
+                  <Image
+                    src="/bip_simple.svg"
+                    alt="BIP - Biuletyn Informacji Publicznej"
+                    width={40}
+                    height={18}
+                    className="h-5 w-auto"
+                  />
                 </a>
               </li>
             </ul>
