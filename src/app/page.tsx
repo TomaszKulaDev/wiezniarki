@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import MainLayout from "./MainLayout";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -36,10 +37,14 @@ export default function Home() {
             </div>
             <div className="hidden md:block">
               <div className="bg-gray-700 rounded-lg p-8">
-                <div className="aspect-video bg-gray-600 rounded flex items-center justify-center">
-                  <span className="text-gray-300 font-medium text-lg">
-                    Grafika informacyjna
-                  </span>
+                <div className="aspect-video bg-gray-600 rounded flex items-center justify-center overflow-hidden">
+                  <Image
+                    src="/prison-integration.svg"
+                    alt="Program reintegracji społecznej dla kobiet w zakładach karnych"
+                    width={600}
+                    height={400}
+                    priority
+                  />
                 </div>
               </div>
             </div>
@@ -394,7 +399,7 @@ export default function Home() {
               Dalej
             </Link>
           </div>
-    </div>
+        </div>
       </section>
     </MainLayout>
   );

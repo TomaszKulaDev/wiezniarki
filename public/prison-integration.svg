@@ -1,0 +1,116 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Eleganckie tło z subtelnym gradientem -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcf4f7" />
+      <stop offset="100%" stop-color="#f8e9ed" />
+    </linearGradient>
+    <!-- Delikatne cienie dla elementów -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+  
+  <!-- Tło z zaokrąglonymi rogami - zmniejszone -->
+  <rect width="600" height="380" fill="url(#bgGradient)" rx="6"/>
+  
+  <!-- Główne elementy graficzne - przesunięte wyżej -->
+  
+  <!-- Lewa strona - symbolizuje reintegrację -->
+  <circle cx="150" cy="160" r="70" fill="#ffffff" opacity="0.9" filter="url(#softShadow)"/>
+  
+  <!-- Prawa strona - symbolizuje społeczeństwo -->
+  <circle cx="450" cy="160" r="70" fill="#ffffff" opacity="0.9" filter="url(#softShadow)"/>
+  
+  <!-- Centralne połączenie - most - przesunięty wyżej -->
+  <rect x="150" y="155" width="300" height="10" rx="5" fill="#ffffff" opacity="0.9" filter="url(#softShadow)"/>
+  
+  <!-- Eleganckie Sylwetki Kobiet - Lewa strona (reintegracja) - przesunięte wyżej -->
+  <!-- Kobieta 1 -->
+  <g transform="translate(130, 130)">
+    <!-- Głowa -->
+    <circle cx="0" cy="0" r="12" fill="#d13f58"/>
+    <!-- Ciało -->
+    <path d="M0,12 C-6,12 -10,25 -8,45 C-7,55 7,55 8,45 C10,25 6,12 0,12" fill="#d13f58"/>
+    <!-- Ręce -->
+    <path d="M-8,30 C-18,24 -22,26 -25,28 M8,30 C18,24 22,26 25,28" stroke="#d13f58" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Kobieta 2 -->
+  <g transform="translate(170, 140)">
+    <!-- Głowa -->
+    <circle cx="0" cy="0" r="10" fill="#d13f58"/>
+    <!-- Ciało -->
+    <path d="M0,10 C-5,10 -8,22 -6,38 C-5,45 5,45 6,38 C8,22 5,10 0,10" fill="#d13f58"/>
+    <!-- Ręce -->
+    <path d="M-6,25 C-14,20 -17,22 -20,23 M6,25 C14,20 17,22 20,23" stroke="#d13f58" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Eleganckie Sylwetki Kobiet - Prawa strona (społeczeństwo) - przesunięte wyżej -->
+  <!-- Kobieta 3 -->
+  <g transform="translate(430, 130)">
+    <!-- Głowa -->
+    <circle cx="0" cy="0" r="12" fill="#e88973"/>
+    <!-- Ciało -->
+    <path d="M0,12 C-6,12 -10,25 -8,45 C-7,55 7,55 8,45 C10,25 6,12 0,12" fill="#e88973"/>
+    <!-- Ręce -->
+    <path d="M-8,30 C-18,24 -22,26 -25,28 M8,30 C18,24 22,26 25,28" stroke="#e88973" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Kobieta 4 -->
+  <g transform="translate(470, 140)">
+    <!-- Głowa -->
+    <circle cx="0" cy="0" r="10" fill="#e88973"/>
+    <!-- Ciało -->
+    <path d="M0,10 C-5,10 -8,22 -6,38 C-5,45 5,45 6,38 C8,22 5,10 0,10" fill="#e88973"/>
+    <!-- Ręce -->
+    <path d="M-6,25 C-14,20 -17,22 -20,23 M6,25 C14,20 17,22 20,23" stroke="#e88973" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Kobieta 5 - w centrum mostu, symbolizująca przejście - przesunięta wyżej -->
+  <g transform="translate(300, 120)">
+    <!-- Głowa -->
+    <circle cx="0" cy="0" r="14" fill="#eb9f87"/>
+    <!-- Ciało -->
+    <path d="M0,14 C-7,14 -12,28 -10,52 C-8,64 8,64 10,52 C12,28 7,14 0,14" fill="#eb9f87"/>
+    <!-- Ręce - rozpostarte, symbolizujące możliwości -->
+    <path d="M-10,35 C-20,28 -30,32 -35,35 M10,35 C20,28 30,32 35,35" stroke="#eb9f87" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Eleganckie ikony koncepcyjne - przesunięte wyżej -->
+  
+  <!-- Ikona Edukacji -->
+  <g transform="translate(120, 240)">
+    <circle cx="0" cy="0" r="22" fill="white" filter="url(#softShadow)"/>
+    <path d="M-15,-5 L0,-12 L15,-5 L0,2 Z M-15,-5 L-15,5 M0,2 L0,12 M-15,5 L0,12 L15,5" stroke="#d13f58" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Ikona Pracy -->
+  <g transform="translate(300, 240)">
+    <circle cx="0" cy="0" r="22" fill="white" filter="url(#softShadow)"/>
+    <rect x="-10" y="-12" width="20" height="15" rx="2" stroke="#eb9f87" stroke-width="2" fill="none"/>
+    <path d="M-6,-12 L-6,-15 C-6,-17 -4,-19 -2,-19 L2,-19 C4,-19 6,-17 6,-15 L6,-12 M-12,10 L12,10" stroke="#eb9f87" stroke-width="2"/>
+  </g>
+  
+  <!-- Ikona Wsparcia -->
+  <g transform="translate(480, 240)">
+    <circle cx="0" cy="0" r="22" fill="white" filter="url(#softShadow)"/>
+    <path d="M-8,-8 C-12,-12 -12,-4 -8,0 C-4,4 4,4 8,0 C12,-4 12,-12 8,-8 C6,-10 2,-10 0,-8 C-2,-10 -6,-10 -8,-8 Z" stroke="#e88973" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Łączące linie symbolizujące sieć wsparcia - przesunięte wyżej -->
+  <path d="M150,230 C200,210 250,220 300,210 C350,200 400,210 450,230" stroke="#e88973" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/>
+  
+  <!-- Elegancki baner tytułowy - przesunięty wyżej i zmniejszony -->
+  <rect x="90" y="300" width="420" height="60" rx="8" fill="white" filter="url(#softShadow)"/>
+  
+  <!-- Tytuł z profesjonalną typografią -->
+  <text x="300" y="325" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600" text-anchor="middle" fill="#d13f58">Program Reintegracji Społecznej dla Kobiet</text>
+  <text x="300" y="347" font-family="'Segoe UI', Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">Profesjonalne wsparcie w powrocie do społeczeństwa</text>
+  
+  <!-- Delikatne elementy dekoracyjne - przesunięte odpowiednio -->
+  <circle cx="80" cy="60" r="30" fill="#ffd1d8" opacity="0.4"/>
+  <circle cx="520" cy="80" r="40" fill="#ffdfba" opacity="0.3"/>
+  <circle cx="120" cy="310" r="20" fill="#ffd1d8" opacity="0.2"/>
+  <circle cx="480" cy="310" r="20" fill="#ffdfba" opacity="0.2"/>
+</svg> 
