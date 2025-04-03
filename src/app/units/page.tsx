@@ -196,10 +196,10 @@ export default function Units() {
       {/* Nagłówek strony */}
       <section className="bg-primary py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
             Jednostki penitencjarne dla kobiet
           </h1>
-          <p className="text-white/80">
+          <p className="text-gray-600">
             Zakłady karne i areszty śledcze uczestniczące w programie Więźniarki
           </p>
         </div>
@@ -369,8 +369,200 @@ export default function Units() {
                     height={600}
                     className="w-full h-auto rounded-lg shadow-sm"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/80 flex items-end justify-center pb-4">
-                    <span className="text-sm text-gray-500 italic">
+
+                  {/* Overlay z lokalizacjami jednostek penitencjarnych */}
+                  <div className="absolute inset-0">
+                    {/* Województwo dolnośląskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "26%", top: "69%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Wrocław
+                      </span>
+                    </div>
+                    <div
+                      className="absolute"
+                      style={{ left: "23%", top: "71%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Świdnica
+                      </span>
+                    </div>
+
+                    {/* Województwo kujawsko-pomorskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "36%", top: "37%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Grudziądz
+                      </span>
+                    </div>
+                    <div
+                      className="absolute"
+                      style={{ left: "33%", top: "35%" }}
+                    >
+                      <div className="w-5 h-5 bg-green-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-green-50 hover:border-green-300 transition-colors duration-200 cursor-pointer">
+                        Czersk
+                      </span>
+                    </div>
+
+                    {/* Województwo lubelskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "64%", top: "61%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Lublin
+                      </span>
+                    </div>
+
+                    {/* Województwo lubuskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "22%", top: "54%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Krzywaniec
+                      </span>
+                    </div>
+
+                    {/* Województwo łódzkie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "45%", top: "60%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Łódź
+                      </span>
+                    </div>
+
+                    {/* Województwo małopolskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "45%", top: "81%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Kraków
+                      </span>
+                    </div>
+
+                    {/* Województwo mazowieckie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "53%", top: "52%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Warszawa
+                      </span>
+                    </div>
+                    <div
+                      className="absolute"
+                      style={{ left: "61%", top: "49%" }}
+                    >
+                      <div className="w-5 h-5 bg-green-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-green-50 hover:border-green-300 transition-colors duration-200 cursor-pointer">
+                        Siedlce
+                      </span>
+                    </div>
+
+                    {/* Województwo opolskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "35%", top: "74%" }}
+                    >
+                      <div className="w-5 h-5 bg-green-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-green-50 hover:border-green-300 transition-colors duration-200 cursor-pointer">
+                        Opole
+                      </span>
+                    </div>
+
+                    {/* Województwo podlaskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "70%", top: "38%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Białystok
+                      </span>
+                    </div>
+
+                    {/* Województwo śląskie */}
+                    <div
+                      className="absolute"
+                      style={{ left: "36%", top: "76%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Lubliniec
+                      </span>
+                    </div>
+                    <div
+                      className="absolute"
+                      style={{ left: "39%", top: "75%" }}
+                    >
+                      <div className="w-5 h-5 bg-green-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-green-50 hover:border-green-300 transition-colors duration-200 cursor-pointer">
+                        Bytom
+                      </span>
+                    </div>
+
+                    {/* Dodajmy pozostałe ważne miasta z mapy */}
+                    <div
+                      className="absolute"
+                      style={{ left: "18%", top: "28%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Szczecin
+                      </span>
+                    </div>
+
+                    <div
+                      className="absolute"
+                      style={{ left: "31%", top: "21%" }}
+                    >
+                      <div className="w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors duration-200 cursor-pointer">
+                        Gdańsk
+                      </span>
+                    </div>
+
+                    <div
+                      className="absolute"
+                      style={{ left: "33%", top: "46%" }}
+                    >
+                      <div className="w-5 h-5 bg-green-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-green-50 hover:border-green-300 transition-colors duration-200 cursor-pointer">
+                        Poznań
+                      </span>
+                    </div>
+
+                    <div
+                      className="absolute"
+                      style={{ left: "53%", top: "27%" }}
+                    >
+                      <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:w-6 hover:h-6 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"></div>
+                      <span className="text-xs font-bold absolute ml-2 whitespace-nowrap text-black bg-white px-1.5 py-0.5 rounded shadow-sm border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 cursor-pointer">
+                        Olsztyn
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Caption at the bottom, with a smaller and more focused gradient */}
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent flex items-center justify-center">
+                    <span className="text-sm text-gray-700 font-medium">
                       Mapa przedstawia przybliżone położenie jednostek
                       penitencjarnych dla kobiet
                     </span>

@@ -34,7 +34,7 @@ export default function About() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <section className="bg-white p-6 rounded-lg shadow-sm border border-border mb-8">
+            <section className="bg-white p-6 mb-8">
               <h2 className="text-xl font-bold text-primary mb-4">
                 O programie Więźniarki
               </h2>
@@ -59,7 +59,7 @@ export default function About() {
               </p>
             </section>
 
-            <section className="bg-white p-6 rounded-lg shadow-sm border border-border mb-8">
+            <section className="bg-white p-6 mb-8">
               <h2 className="text-xl font-bold text-primary mb-4">
                 Założenia programu
               </h2>
@@ -97,7 +97,7 @@ export default function About() {
               </ul>
             </section>
 
-            <section className="bg-white p-6 rounded-lg shadow-sm border border-border">
+            <section className="bg-white p-6 mb-8">
               <h2 className="text-xl font-bold text-primary mb-4">
                 Struktura i organizacja
               </h2>
@@ -127,7 +127,7 @@ export default function About() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-border mb-6">
+            <div className="bg-white p-6 mb-6">
               <h3 className="text-lg font-bold text-primary mb-4">
                 Dane kontaktowe
               </h3>
@@ -143,18 +143,10 @@ export default function About() {
                     kontakt@wiezniarki.gov.pl
                   </a>
                 </p>
-                <p>
-                  <a
-                    href="tel:+48123456789"
-                    className="text-primary hover:underline"
-                  >
-                    +48 123 456 789
-                  </a>
-                </p>
               </address>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-border mb-6">
+            <div className="bg-white p-6 mb-6">
               <h3 className="text-lg font-bold text-primary mb-4">
                 Dokumenty i informacje
               </h3>
@@ -246,7 +238,7 @@ export default function About() {
               </ul>
             </div>
 
-            <div className="bg-primary text-white p-6 rounded-lg shadow-sm">
+            <div className="bg-primary text-white p-6">
               <h3 className="text-lg font-bold mb-4">Jesteś zainteresowany?</h3>
               <p className="text-sm mb-4">
                 Chcesz dołączyć do programu lub masz pytania? Zachęcamy do
@@ -254,7 +246,7 @@ export default function About() {
               </p>
               <Link
                 href="/contact"
-                className="inline-block bg-white text-primary font-semibold py-2 px-4 rounded hover:bg-gray-100 transition w-full text-center"
+                className="inline-block bg-white text-primary font-semibold py-2 px-4 hover:bg-gray-100 transition w-full text-center"
               >
                 Skontaktuj się z nami
               </Link>

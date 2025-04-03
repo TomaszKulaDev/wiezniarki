@@ -157,27 +157,7 @@ export default function Footer() {
                   kontakt@wiezniarki.gov.pl
                 </a>
               </p>
-              <p>
-                <a
-                  href="tel:+48123456789"
-                  className="text-primary hover:underline"
-                >
-                  +48 123 456 789
-                </a>
-              </p>
             </address>
-            <div className="mt-4">
-              <Link
-                href="/contact"
-                className="inline-block bg-primary text-white font-medium py-2 px-4 rounded hover:bg-primary-dark transition"
-                style={{
-                  backgroundColor: "#1e50a0",
-                  color: "white",
-                }}
-              >
-                Kontakt
-              </Link>
-            </div>
           </div>
         </div>
       </div>
