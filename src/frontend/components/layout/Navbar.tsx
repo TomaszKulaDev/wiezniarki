@@ -26,6 +26,7 @@ export default function Navbar() {
       "/dashboard": "Mój panel",
       "/login": "Logowanie",
       "/register": "Rejestracja",
+      "/units": "Jednostki penitencjarne",
     };
 
     return pathSegments[path as keyof typeof pathSegments] || "";
@@ -247,6 +248,18 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
+                  href="/units"
+                  className={`text-sm font-medium hover:text-primary transition ${
+                    pathname === "/units"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
+                  }`}
+                >
+                  Jednostki
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/about"
                   className={`text-sm font-medium hover:text-primary transition ${
                     pathname === "/about"
@@ -338,6 +351,19 @@ export default function Navbar() {
                   onClick={() => setMenuOpen(false)}
                 >
                   Profile
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/units"
+                  className={`block text-sm font-medium hover:text-primary transition ${
+                    pathname === "/units"
+                      ? "text-primary font-bold"
+                      : "text-gray-700"
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Jednostki penitencjarne
                 </Link>
               </li>
               <li>
@@ -443,6 +469,14 @@ export default function Navbar() {
                   className="text-gray-700 hover:text-primary transition font-medium py-1 block"
                 >
                   Najczęściej zadawane pytania
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/units"
+                  className="text-gray-700 hover:text-primary transition font-medium py-1 block"
+                >
+                  Jednostki penitencjarne
                 </Link>
               </li>
               <li>

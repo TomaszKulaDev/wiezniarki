@@ -38,13 +38,13 @@ export default function Home() {
             <div className="hidden md:block">
               <div className="bg-gray-700 rounded-lg p-8">
                 <div className="aspect-video bg-gray-600 rounded flex items-center justify-center overflow-hidden">
-                  <Image
+        <Image
                     src="/prison-integration.svg"
                     alt="Program reintegracji społecznej dla kobiet w zakładach karnych"
                     width={600}
                     height={400}
-                    priority
-                  />
+          priority
+        />
                 </div>
               </div>
             </div>
@@ -248,95 +248,229 @@ export default function Home() {
       {/* Komunikaty i statystyki */}
       <section className="py-14 bg-gray-800 text-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <h2 className="text-2xl font-bold mb-6 text-gray-300">
-                Skuteczna resocjalizacja poprzez relacje społeczne
-              </h2>
-              <div className="space-y-4">
-                <p className="text-gray-300 leading-relaxed">
-                  Program Więźniarki jest oficjalną inicjatywą wspierającą
-                  proces resocjalizacji kobiet poprzez budowanie wartościowych
-                  relacji społecznych.
-                </p>
-                <p className="text-gray-300 leading-relaxed">
-                  Wnioski z przeprowadzonych analiz potwierdzają, że osoby
-                  osadzone utrzymujące regularny, pozytywny kontakt ze światem
-                  zewnętrznym zwiększają swoje szanse na skuteczną reintegrację
-                  społeczną po odbyciu kary o 40%.
-                </p>
-                <div className="mt-8">
-                  <Link
-                    href="/about"
-                    className="inline-flex items-center bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded hover:bg-gray-300 transition"
+          <div className="md:max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6 text-gray-300">
+              Skuteczna resocjalizacja poprzez relacje społeczne
+            </h2>
+            <div className="space-y-4">
+              <p className="text-gray-300 leading-relaxed">
+                Program Więźniarki jest oficjalną inicjatywą wspierającą proces
+                resocjalizacji kobiet poprzez budowanie wartościowych relacji
+                społecznych.
+              </p>
+              <p className="text-gray-300 leading-relaxed">
+                Wnioski z przeprowadzonych analiz potwierdzają, że osoby
+                osadzone utrzymujące regularny, pozytywny kontakt ze światem
+                zewnętrznym zwiększają swoje szanse na skuteczną reintegrację
+                społeczną po odbyciu kary o 40%.
+              </p>
+              <div className="mt-6 mb-6 bg-gray-750 rounded-lg p-5 border border-gray-600 shadow-inner">
+                <h4 className="text-lg font-semibold mb-4 text-gray-200 flex items-center border-b border-gray-600 pb-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2 text-red-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <span>Szczegółowe informacje o programie</span>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    />
+                  </svg>
+                  Jednostki penitencjarne dla kobiet uczestniczące w programie
+                  <span className="ml-auto text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                    10 z 24
+                  </span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-700 rounded p-3">
+                    <h5 className="text-sm font-medium mb-2 text-gray-300 border-b border-gray-600 pb-1 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Polska Północna
+                    </h5>
+                    <ul className="space-y-2">
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Grudziądz</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          265 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">AŚ Białystok</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          112 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Czersk</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          98 osadzonych
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-700 rounded p-3">
+                    <h5 className="text-sm font-medium mb-2 text-gray-300 border-b border-gray-600 pb-1 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Polska Centralna
+                    </h5>
+                    <ul className="space-y-2">
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Lubliniec</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          142 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">AŚ Warszawa-Grochów</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          189 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">AŚ Lublin</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          122 osadzonych
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-700 rounded p-3">
+                    <h5 className="text-sm font-medium mb-2 text-gray-300 border-b border-gray-600 pb-1 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Polska Południowa
+                    </h5>
+                    <ul className="space-y-2">
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Krzywaniec</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          178 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">AŚ Kraków-Podgórze</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          136 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Wrocław</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          157 osadzonych
+                        </span>
+                      </li>
+                      <li className="flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200">
+                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                        <span className="font-medium">ZK Opole</span>
+                        <span className="text-xs ml-auto bg-gray-600 px-1.5 rounded">
+                          94 osadzonych
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-600">
+                  <p className="text-xs text-gray-500 italic flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 ml-2"
+                      className="h-3 w-3 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Dane aktualizowane codziennie
+                  </p>
+                  <Link
+                    href="/units"
+                    className="text-xs text-red-400 hover:text-red-300 transition-colors duration-200 flex items-center"
+                  >
+                    Pełna lista jednostek
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3 ml-1"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
                       <path
                         fillRule="evenodd"
-                        d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
                         clipRule="evenodd"
                       />
                     </svg>
                   </Link>
                 </div>
               </div>
-            </div>
-            <div className="bg-gray-700 rounded-lg border border-gray-600 p-8">
-              <h3 className="text-xl font-semibold mb-8 text-center text-gray-300 border-b border-gray-600 pb-4">
-                Bieżące statystyki programu
-              </h3>
-              <div className="grid grid-cols-2 gap-8">
-                <div className="text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="text-3xl font-bold mb-1 text-gray-300">
-                      247
-                    </div>
-                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
-                    <p className="text-sm text-gray-400">
-                      Aktywnych uczestniczek
-                    </p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="text-3xl font-bold mb-1 text-gray-300">
-                      1452
-                    </div>
-                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
-                    <p className="text-sm text-gray-400">
-                      Nawiązanych kontaktów
-                    </p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="text-3xl font-bold mb-1 text-gray-300">
-                      83%
-                    </div>
-                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
-                    <p className="text-sm text-gray-400">Pozytywnych opinii</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="text-3xl font-bold mb-1 text-gray-300">
-                      124
-                    </div>
-                    <div className="w-12 h-1 bg-gray-600 rounded mb-2"></div>
-                    <p className="text-sm text-gray-400">
-                      Jednostek penitencjarnych
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-8 text-center text-xs text-gray-400 font-medium">
-                Stan na dzień: 3.04.2025
+              <div className="mt-8">
+                <Link
+                  href="/about"
+                  className="inline-flex items-center bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded hover:bg-gray-300 transition"
+                >
+                  <span>Szczegółowe informacje o programie</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </Link>
               </div>
             </div>
           </div>
@@ -371,7 +505,7 @@ export default function Home() {
               Najczęstsze pytania
             </Link>
           </div>
-        </div>
+    </div>
       </section>
     </MainLayout>
   );

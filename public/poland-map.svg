@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Tło mapy -->
+  <rect width="800" height="600" fill="#f8f9fa" />
+  
+  <!-- Zarys Polski - uproszczony -->
+  <path d="M400,150 C450,140 500,145 550,160 C600,175 630,200 650,240 C670,280 685,320 690,370 C695,420 685,460 660,490 C635,520 600,540 550,550 C500,560 450,565 400,560 C350,565 300,560 250,550 C200,540 165,520 140,490 C115,460 105,420 110,370 C115,320 130,280 150,240 C170,200 200,175 250,160 C300,145 350,140 400,150 Z" fill="#f0f0f0" stroke="#cccccc" stroke-width="2" />
+  
+  <!-- Granice województw - uproszczone -->
+  <path d="M400,150 C420,170 440,190 460,210 M460,210 C480,230 490,260 485,290 M485,290 C480,320 460,340 430,350 M430,350 C400,360 370,355 345,335 M345,335 C320,315 310,285 315,255 M315,255 C320,225 340,200 365,185 M365,185 C390,170 420,160 450,165" stroke="#dddddd" stroke-width="1.5" fill="none" />
+  <path d="M460,210 C490,200 520,205 545,225 M545,225 C570,245 585,275 580,305 M580,305 C575,335 555,355 525,365 M525,365 C495,375 465,370 440,350 M440,350 C430,340 425,330 430,350" stroke="#dddddd" stroke-width="1.5" fill="none" />
+  <path d="M485,290 C510,280 540,285 565,305 M565,305 C590,325 605,355 600,385 M600,385 C595,415 575,435 545,445 M545,445 C515,455 485,450 460,430 M460,430 C435,410 425,380 430,350" stroke="#dddddd" stroke-width="1.5" fill="none" />
+  <path d="M430,350 C455,370 465,400 460,430 M460,430 C455,460 435,480 410,490 M410,490 C385,500 355,495 335,475 M335,475 C315,455 305,425 310,395 M310,395 C315,365 335,345 360,335 M360,335 C385,325 415,330 430,350" stroke="#dddddd" stroke-width="1.5" fill="none" />
+  <path d="M345,335 C325,355 315,385 320,415 M320,415 C325,445 345,465 370,475 M370,475 C395,485 425,480 445,460 M445,460 C465,440 475,410 470,380 M470,380 C465,350 445,330 420,320 M420,320 C395,310 365,315 345,335" stroke="#dddddd" stroke-width="1.5" fill="none" />
+  
+  <!-- Oznaczenia miast - jednostki penitencjarne -->
+  <!-- Zakłady karne (niebieskie) -->
+  <circle cx="360" cy="220" r="5" fill="#3b82f6" /> <!-- Grudziądz -->
+  <text x="370" y="220" font-family="Arial" font-size="10" fill="#333333">Grudziądz</text>
+  
+  <circle cx="395" cy="280" r="5" fill="#3b82f6" /> <!-- Czersk -->
+  <text x="405" y="280" font-family="Arial" font-size="10" fill="#333333">Czersk</text>
+  
+  <circle cx="500" cy="400" r="5" fill="#3b82f6" /> <!-- Krzywaniec -->
+  <text x="510" y="400" font-family="Arial" font-size="10" fill="#333333">Krzywaniec</text>
+  
+  <circle cx="375" cy="475" r="5" fill="#3b82f6" /> <!-- Lubliniec -->
+  <text x="385" y="475" font-family="Arial" font-size="10" fill="#333333">Lubliniec</text>
+  
+  <circle cx="410" cy="410" r="5" fill="#3b82f6" /> <!-- Opole -->
+  <text x="420" y="410" font-family="Arial" font-size="10" fill="#333333">Opole</text>
+  
+  <circle cx="340" cy="385" r="5" fill="#3b82f6" /> <!-- Wrocław -->
+  <text x="350" y="385" font-family="Arial" font-size="10" fill="#333333">Wrocław</text>
+  
+  <!-- Areszty śledcze (czerwone) -->
+  <circle cx="500" cy="320" r="5" fill="#ef4444" /> <!-- Warszawa-Grochów -->
+  <text x="510" y="320" font-family="Arial" font-size="10" fill="#333333">Warszawa-Grochów</text>
+  
+  <circle cx="585" cy="280" r="5" fill="#ef4444" /> <!-- Białystok -->
+  <text x="595" y="280" font-family="Arial" font-size="10" fill="#333333">Białystok</text>
+  
+  <circle cx="560" cy="355" r="5" fill="#ef4444" /> <!-- Lublin -->
+  <text x="570" y="355" font-family="Arial" font-size="10" fill="#333333">Lublin</text>
+  
+  <circle cx="435" cy="460" r="5" fill="#ef4444" /> <!-- Kraków-Podgórze -->
+  <text x="445" y="460" font-family="Arial" font-size="10" fill="#333333">Kraków</text>
+  
+  <!-- Legenda -->
+  <rect x="610" y="480" width="160" height="100" fill="white" stroke="#cccccc" rx="5" ry="5" />
+  <text x="620" y="500" font-family="Arial" font-size="12" font-weight="bold" fill="#333333">Legenda:</text>
+  
+  <circle cx="630" y="520" r="5" fill="#3b82f6" />
+  <text x="645" y="523" font-family="Arial" font-size="10" fill="#333333">Zakład karny</text>
+  
+  <circle cx="630" y="540" r="5" fill="#ef4444" />
+  <text x="645" y="543" font-family="Arial" font-size="10" fill="#333333">Areszt śledczy</text>
+  
+  <text x="620" y="565" font-family="Arial" font-size="9" fill="#666666">Mapa poglądowa - lokalizacje</text>
+  <text x="620" y="575" font-family="Arial" font-size="9" fill="#666666">przybliżone</text>
+</svg> 
