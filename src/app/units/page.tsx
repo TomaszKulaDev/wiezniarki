@@ -363,7 +363,7 @@ export default function Units() {
 
                 <div className="mb-6 relative overflow-hidden rounded-lg">
                   <Image
-                    src="/poland-map.svg"
+                    src="/POL_location_map.svg"
                     alt="Mapa Polski z zaznaczonymi zakładami karnymi"
                     width={800}
                     height={600}
