@@ -462,37 +462,45 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4">
           <nav>
-            <ul className="flex flex-wrap items-center justify-center md:justify-start gap-6 md:gap-10 text-xs">
+            <ul className="flex flex-wrap items-center justify-center md:justify-start gap-6 md:gap-10 text-sm">
+              <li>
+                <Link
+                  href="/how-it-works"
+                  className="text-gray-700 hover:text-primary transition font-medium py-2 block"
+                >
+                  Jak działa platforma
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/faq"
-                  className="text-gray-700 hover:text-primary transition font-medium py-1 block"
+                  className="text-gray-700 hover:text-primary transition font-medium py-2 block"
                 >
                   Najczęściej zadawane pytania
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/units"
-                  className="text-gray-700 hover:text-primary transition font-medium py-1 block"
+                  href="/security"
+                  className="text-gray-700 hover:text-primary transition font-medium py-2 block"
                 >
-                  Jednostki penitencjarne
+                  Bezpieczeństwo
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/regulamin"
-                  className="text-gray-700 hover:text-primary transition font-medium py-1 block"
+                  href="/success-stories"
+                  className="text-gray-700 hover:text-primary transition font-medium py-2 block"
                 >
-                  Regulamin
+                  Historie sukcesu
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/privacy"
-                  className="text-gray-700 hover:text-primary transition font-medium py-1 block"
+                  href="/sitemap"
+                  className="text-gray-700 hover:text-primary transition font-medium py-2 block"
                 >
-                  Polityka prywatności
+                  Mapa strony
                 </Link>
               </li>
               {!isMounted || !isLoggedIn ? (
