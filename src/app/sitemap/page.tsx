@@ -11,6 +11,7 @@ export default function Sitemap() {
       links: [
         { href: "/", label: "Strona główna" },
         { href: "/about", label: "O projekcie" },
+        { href: "/how-it-works", label: "Jak działa platforma" },
         { href: "/contact", label: "Kontakt" },
         { href: "/faq", label: "Najczęściej zadawane pytania" },
       ],
@@ -28,15 +29,19 @@ export default function Sitemap() {
       links: [
         { href: "/profiles", label: "Profile więźniarek" },
         { href: "/units", label: "Jednostki penitencjarne" },
+        { href: "/success-stories", label: "Historie sukcesu" },
+        { href: "/security", label: "Bezpieczeństwo" },
       ],
     },
     {
-      title: "Regulaminy i polityki",
+      title: "Dokumenty i informacje",
       links: [
         { href: "/regulamin", label: "Regulamin" },
         { href: "/privacy", label: "Polityka prywatności" },
         { href: "/cookies", label: "Polityka cookies" },
         { href: "/declaration", label: "Deklaracja dostępności" },
+        { href: "/reports", label: "Raporty i analizy" },
+        { href: "/help", label: "Pomoc" },
       ],
     },
   ];
