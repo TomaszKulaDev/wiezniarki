@@ -28,7 +28,8 @@ export default function SuccessStories() {
       ],
       quote:
         "Program Więźniarki dał mi nie tylko przyjaźń, ale też motywację i konkretne wsparcie w powrocie do normalnego życia.",
-      imgSrc: "/stories/story1.jpg",
+      imgSrc:
+        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=2071&auto=format&fit=crop",
     },
     {
       id: "aleksandra-t",
@@ -49,7 +50,8 @@ export default function SuccessStories() {
       ],
       quote:
         "Odkryłam, że nigdy nie jest za późno, by naprawić błędy i zacząć od nowa, szczególnie gdy ma się wsparcie życzliwych ludzi.",
-      imgSrc: "/stories/story2.jpg",
+      imgSrc:
+        "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?q=80&w=1974&auto=format&fit=crop",
     },
     {
       id: "joanna-w",
@@ -70,7 +72,8 @@ export default function SuccessStories() {
       ],
       quote:
         "Nigdy bym nie pomyślała, że hobby, które odkryłam w najtrudniejszym okresie życia, stanie się moim sposobem na samorealizację i utrzymanie.",
-      imgSrc: "/stories/story3.jpg",
+      imgSrc:
+        "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=2070&auto=format&fit=crop",
     },
   ];
 
@@ -104,9 +107,10 @@ export default function SuccessStories() {
                 <div className="md:w-2/3">
                   <p className="text-gray-700 mb-4">
                     Program &quot;Więźniarki&quot;, który ruszy w 2025 roku, ma
-                    na celu wspieranie procesu resocjalizacji kobiet odbywających
-                    karę pozbawienia wolności poprzez umożliwienie im nawiązania
-                    wartościowych relacji z osobami spoza zakładów karnych.
+                    na celu wspieranie procesu resocjalizacji kobiet
+                    odbywających karę pozbawienia wolności poprzez umożliwienie
+                    im nawiązania wartościowych relacji z osobami spoza zakładów
+                    karnych.
                   </p>
                   <p className="text-gray-700">
                     Poniżej prezentujemy historie kobiet, które dzięki
@@ -120,8 +124,8 @@ export default function SuccessStories() {
                 <div className="md:w-1/3 flex justify-center">
                   <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-white shadow-lg">
                     <Image
-                      src="/connection.jpg"
-                      alt="Symboliczne połączenie"
+                      src="https://images.unsplash.com/photo-1531983412531-1f49a365ffed?q=80&w=2070&auto=format&fit=crop"
+                      alt="Symboliczne wsparcie i budowanie relacji"
                       fill
                       className="object-cover"
                     />
@@ -134,6 +138,7 @@ export default function SuccessStories() {
             {stories.map((story, index) => (
               <div
                 key={story.id}
+                id={story.id}
                 className="bg-white rounded-lg shadow-sm p-6 mb-6"
               >
                 <div className="border-b border-gray-100 pb-4 mb-4">
@@ -183,12 +188,13 @@ export default function SuccessStories() {
                   </div>
 
                   <div className="md:w-1/3">
-                    <div className="rounded-lg overflow-hidden shadow-sm mb-4 bg-gray-200">
-                      <div className="relative h-64 w-full">
+                    <div className="rounded-lg overflow-hidden shadow-sm mb-4">
+                      <div className="relative h-80 w-full">
                         <Image
                           src={story.imgSrc}
-                          alt={`Zdjęcie przedstawiające historię ${story.name}`}
+                          alt={`Zdjęcie ilustrujące historię ${story.name}`}
                           fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
                           className="object-cover"
                         />
                       </div>
@@ -196,9 +202,18 @@ export default function SuccessStories() {
 
                     {index < stories.length - 1 && (
                       <div className="mt-4 text-center">
-                        <a
-                          href={`#${stories[index + 1].id}`}
-                          className="inline-flex items-center text-primary hover:underline"
+                        <button
+                          onClick={() => {
+                            const nextStoryElement = document.getElementById(
+                              stories[index + 1].id
+                            );
+                            if (nextStoryElement) {
+                              nextStoryElement.scrollIntoView({
+                                behavior: "smooth",
+                              });
+                            }
+                          }}
+                          className="inline-flex items-center text-primary hover:underline cursor-pointer"
                         >
                           <span>Przeczytaj następną historię</span>
                           <svg
@@ -215,7 +230,7 @@ export default function SuccessStories() {
                               d="M19 9l-7 7-7-7"
                             />
                           </svg>
-                        </a>
+                        </button>
                       </div>
                     )}
                   </div>
