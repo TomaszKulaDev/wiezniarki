@@ -53,11 +53,22 @@ export default function Home() {
       </section>
 
       {/* Poznaj uczestniczki programu - interaktywne karty */}
-      <section className="py-20 bg-gradient-to-b from-accent to-white">
+      <section className="py-8 bg-gradient-to-b from-accent to-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-3 text-gray-800">
-            Poznaj uczestniczki programu
-          </h2>
+          <div className="flex flex-col items-center mb-3">
+            <div className="mb-2">
+              <Image
+                src="/godlo.jpg"
+                alt="Godło Polski"
+                width={50}
+                height={60}
+                className="object-contain"
+              />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Poznaj uczestniczki programu
+            </h2>
+          </div>
           <p className="text-center text-gray-600 mb-14 max-w-2xl mx-auto">
             Kobiety, które dzięki programowi mogą nawiązać wartościowe relacje
             społeczne i przygotować się do powrotu do społeczeństwa.
