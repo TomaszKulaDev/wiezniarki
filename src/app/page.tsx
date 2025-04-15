@@ -112,7 +112,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/1"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -157,7 +171,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/2"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -202,7 +230,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/3"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -247,7 +289,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/4"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -294,7 +350,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/5"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -339,7 +409,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/6"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -384,7 +468,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/7"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
@@ -397,7 +495,7 @@ export default function Home() {
               <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
                 <div className="relative h-64 overflow-hidden">
                   <Image
-                    src="https://images.unsplash.com/photo-1557862921-37829c790f19?q=80&w=2071&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop"
                     alt="Monika P."
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -429,7 +527,21 @@ export default function Home() {
                 <div className="px-5 pb-5">
                   <Link
                     href="/profiles/8"
-                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#1e50a0",
+                      borderColor: "#1e50a0",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1e50a0";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#1e50a0";
+                      e.currentTarget.style.borderColor = "#1e50a0";
+                    }}
                   >
                     Zobacz profil
                   </Link>
