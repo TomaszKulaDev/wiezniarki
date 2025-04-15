@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <MainLayout>
       {/* Hero Section - bardziej oficjalny styl */}
-      <section className="bg-gray-800 py-12">
+      <section className="bg-gray-800 py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="text-gray-300">
@@ -38,13 +38,13 @@ export default function Home() {
             <div className="hidden md:block">
               <div className="bg-gray-700 rounded-lg p-8">
                 <div className="aspect-video bg-gray-600 rounded flex items-center justify-center overflow-hidden">
-        <Image
+                  <Image
                     src="/prison-integration.svg"
                     alt="Program reintegracji społecznej dla kobiet w zakładach karnych"
                     width={600}
                     height={400}
-          priority
-        />
+                    priority
+                  />
                 </div>
               </div>
             </div>
@@ -52,109 +52,409 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Informacje o projekcie - w stylu podobnym do gov.pl */}
-      <section className="py-12 bg-accent">
+      {/* Poznaj uczestniczki programu - interaktywne karty */}
+      <section className="py-20 bg-gradient-to-b from-accent to-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-primary mb-8 text-center">
-            Informacje o projekcie
+          <h2 className="text-3xl font-bold text-center mb-3 text-gray-800">
+            Poznaj uczestniczki programu
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
-              <div className="mb-4 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+          <p className="text-center text-gray-600 mb-14 max-w-2xl mx-auto">
+            Kobiety, które dzięki programowi mogą nawiązać wartościowe relacje
+            społeczne i przygotować się do powrotu do społeczeństwa.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Karta 1 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=2071&auto=format&fit=crop"
+                    alt="Anna K."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                </svg>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Anna K.</h3>
+                      <p className="text-sm">32 lata • ZK w Warszawie</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      malarstwo
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      literatura
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      joga
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Pasjonatka sztuki i literatury. Uczy się malarstwa i
+                    projektowania graficznego.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/1"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
               </div>
-              <h3 className="text-lg font-bold mb-2">Dla osadzonych kobiet</h3>
-              <p className="text-gray-600">
-                Możliwość stworzenia profilu, przedstawienia siebie i swoich
-                zainteresowań, nawiązania relacji z osobami z zewnątrz.
-              </p>
-              <Link
-                href="/for-inmates"
-                className="mt-4 inline-block text-primary font-medium hover:underline"
-              >
-                Szczegółowe informacje →
-              </Link>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
-              <div className="mb-4 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+
+            {/* Karta 2 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop"
+                    alt="Martyna W."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                </svg>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Martyna W.</h3>
+                      <p className="text-sm">28 lat • ZK w Krakowie</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      muzyka
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      taniec
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      pisanie
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Samouk gry na gitarze i pianinie. Pisze opowiadania i teksty
+                    piosenek.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/2"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
               </div>
-              <h3 className="text-lg font-bold mb-2">Dla partnerów</h3>
-              <p className="text-gray-600">
-                Możliwość poznania kobiet, które chcą dzielić się swoimi
-                doświadczeniami i budować relacje mimo trudnej sytuacji
-                życiowej.
-              </p>
-              <Link
-                href="/for-partners"
-                className="mt-4 inline-block text-primary font-medium hover:underline"
-              >
-                Zasady udziału →
-              </Link>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
-              <div className="mb-4 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+
+            {/* Karta 3 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop"
+                    alt="Karolina M."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                </svg>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Karolina M.</h3>
+                      <p className="text-sm">35 lat • ZK w Poznaniu</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      psychologia
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      rozwój osobisty
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      gotowanie
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Interesuje się psychologią i rozwojem osobistym. Wierzy w
+                    drugą szansę dla każdego.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/3"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
               </div>
-              <h3 className="text-lg font-bold mb-2">Bezpieczeństwo</h3>
-              <p className="text-gray-600">
-                Program jest monitorowany przez specjalistów. Wszystkie profile
-                i korespondencja są weryfikowane pod kątem bezpieczeństwa.
-              </p>
-              <Link
-                href="/security"
-                className="mt-4 inline-block text-primary font-medium hover:underline"
-              >
-                Zasady bezpieczeństwa →
-              </Link>
             </div>
+
+            {/* Karta 4 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop"
+                    alt="Joanna T."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Joanna T.</h3>
+                      <p className="text-sm">29 lat • ZK w Łodzi</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      fotografia
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      sport
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      języki obce
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Pasjonatka fotografii i aktywności fizycznej. Uczy się
+                    języka angielskiego i hiszpańskiego.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/4"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {/* Karta 5 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop"
+                    alt="Magdalena S."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Magdalena S.</h3>
+                      <p className="text-sm">27 lat • ZK w Opolu</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      informatyka
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      programowanie
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      sztuka
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Pasjonatka nowych technologii. Uczy się kodowania i
+                    projektowania stron internetowych.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/5"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Karta 6 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?q=80&w=1974&auto=format&fit=crop"
+                    alt="Natalia R."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Natalia R.</h3>
+                      <p className="text-sm">31 lat • ZK w Grudziądzu</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      ogrodnictwo
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      ekologia
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      zdrowie
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Zaangażowana w ochronę środowiska. Marzy o prowadzeniu
+                    własnego gospodarstwa ekologicznego.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/6"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Karta 7 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1554727242-741c14fa561c?q=80&w=1974&auto=format&fit=crop"
+                    alt="Katarzyna D."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Katarzyna D.</h3>
+                      <p className="text-sm">36 lat • ZK w Lublińcu</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      rękodzieło
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      historia
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      kulinaria
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Miłośniczka tradycyjnego rękodzieła. Tworzy biżuterię i
+                    dekoracje z naturalnych materiałów.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/7"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Karta 8 */}
+            <div className="group relative transform transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg h-full flex flex-col">
+                <div className="relative h-64 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1557862921-37829c790f19?q=80&w=2071&auto=format&fit=crop"
+                    alt="Monika P."
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div className="p-4 text-white">
+                      <h3 className="text-xl font-bold">Monika P.</h3>
+                      <p className="text-sm">24 lata • ZK w Krzywańcu</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 flex-grow">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      edukacja
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      pedagogika
+                    </span>
+                    <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                      dzieci
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Studiowała pedagogikę przed osadzeniem. Chce pracować z
+                    dziećmi w przyszłości.
+                  </p>
+                </div>
+                <div className="px-5 pb-5">
+                  <Link
+                    href="/profiles/8"
+                    className="block w-full py-2 text-center border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
+                  >
+                    Zobacz profil
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 flex justify-end">
+            <Link
+              href="/profiles"
+              className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg hover:bg-blue-700"
+              style={{ backgroundColor: "#1e50a0" }}
+            >
+              <span>Zobacz wszystkie profile</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 ml-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Jak to działa - sekcja procesowa */}
-      <section className="py-12 bg-white">
+      {/* Jak działa program - proces */}
+      <section className="py-2 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-10">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
             Jak działa program Więźniarki?
           </h2>
           <div className="max-w-3xl mx-auto">
@@ -245,11 +545,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Komunikaty i statystyki */}
-      <section className="py-14 bg-gray-800 text-white">
+      {/* Skuteczność programu - statystyki */}
+      <section className="py-20 bg-gray-800 text-white">
         <div className="container mx-auto px-4">
           <div className="md:max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-gray-300">
+            <h2 className="text-3xl font-bold mb-8 text-gray-300">
               Skuteczna resocjalizacja poprzez relacje społeczne
             </h2>
             <div className="space-y-4">
@@ -452,10 +752,10 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="mt-8">
+              <div className="mt-12">
                 <Link
                   href="/about"
-                  className="inline-flex items-center bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded hover:bg-gray-300 transition"
+                  className="inline-flex items-center bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded hover:bg-gray-300 transition"
                 >
                   <span>Szczegółowe informacje o programie</span>
                   <svg
@@ -477,11 +777,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-14 bg-accent border-t border-border mt-8">
+      {/* Wsparcie i kontakt */}
+      <section className="py-20 bg-accent border-t border-border">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-6">Masz pytania?</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-6">Masz pytania?</h2>
+          <p className="text-gray-600 mb-10 max-w-2xl mx-auto">
             Jeśli chcesz dowiedzieć się więcej o programie Więźniarki lub
             potrzebujesz pomocy, skontaktuj się z naszym biurem obsługi.
           </p>
@@ -505,7 +805,7 @@ export default function Home() {
               Najczęstsze pytania
             </Link>
           </div>
-    </div>
+        </div>
       </section>
     </MainLayout>
   );
