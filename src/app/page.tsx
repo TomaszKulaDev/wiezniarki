@@ -463,7 +463,7 @@ export default function Home() {
       </section>
 
       {/* Jak działa program - proces */}
-      <section className="py-2 bg-white">
+      <section className="py-2 mb-10 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
             Jak działa program Więźniarki?
