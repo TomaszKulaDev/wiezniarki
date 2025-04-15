@@ -194,9 +194,9 @@ export default function Units() {
   return (
     <MainLayout>
       {/* Nagłówek strony */}
-      <section className="bg-primary py-8">
+      <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
             Jednostki penitencjarne dla kobiet
           </h1>
           <p className="text-gray-600">
@@ -204,18 +204,6 @@ export default function Units() {
           </p>
         </div>
       </section>
-
-      {/* Breadcrumbs */}
-      <div className="bg-accent py-2 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="text-xs text-gray-600">
-            <Link href="/" className="hover:text-primary transition">
-              Strona główna
-            </Link>{" "}
-            &gt; <span className="text-gray-800">Jednostki penitencjarne</span>
-          </div>
-        </div>
-      </div>
 
       {/* Główna treść */}
       <div className="bg-gray-50 py-8">
