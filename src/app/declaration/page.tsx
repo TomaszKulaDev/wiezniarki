@@ -15,7 +15,7 @@ export default function AccessibilityDeclaration() {
             Deklaracja dostępności
           </h1>
           <p className="text-gray-600">
-            Informacje o dostępności cyfrowej platformy "Więźniarki"
+            Informacje o dostępności cyfrowej platformy &quot;Więźniarki&quot;
           </p>
         </div>
       </section>
@@ -38,8 +38,8 @@ export default function AccessibilityDeclaration() {
                       ustawy z dnia 4 kwietnia 2019 r. o dostępności cyfrowej
                       stron internetowych i aplikacji mobilnych podmiotów
                       publicznych. Oświadczenie w sprawie dostępności ma
-                      zastosowanie do platformy "Więźniarki" dostępnej pod
-                      adresem wiezniarki.gov.pl.
+                      zastosowanie do platformy &quot;Więźniarki&quot; dostępnej
+                      pod adresem wiezniarki.gov.pl.
                     </p>
                     <p>Data publikacji strony internetowej: 01.01.2023</p>
                     <p>Data ostatniej dużej aktualizacji: 01.06.2023</p>
@@ -52,7 +52,7 @@ export default function AccessibilityDeclaration() {
                   </h3>
                   <div className="space-y-2 text-gray-700">
                     <p>
-                      Platforma "Więźniarki" jest{" "}
+                      Platforma &quot;Więźniarki&quot; jest{" "}
                       <strong>częściowo zgodna</strong> z ustawą z dnia 4
                       kwietnia 2019 r. o dostępności cyfrowej stron
                       internetowych i aplikacji mobilnych podmiotów publicznych
@@ -162,8 +162,8 @@ export default function AccessibilityDeclaration() {
                   </h3>
                   <div className="space-y-2 text-gray-700">
                     <p>
-                      Siedziba Biura Programu "Więźniarki", ul. Przykładowa 123,
-                      00-001 Warszawa
+                      Siedziba Biura Programu &quot;Więźniarki&quot;, ul.
+                      Przykładowa 123, 00-001 Warszawa
                     </p>
                     <ol className="list-decimal pl-6 space-y-1">
                       <li>
@@ -190,7 +190,7 @@ export default function AccessibilityDeclaration() {
                         umówieniu spotkania.
                       </li>
                       <li>
-                        W budynku nie ma oznaczeń w alfabecie Braille'a ani
+                        W budynku nie ma oznaczeń w alfabecie Braille&apos;a ani
                         oznaczeń kontrastowych lub w druku powiększonym dla osób
                         niewidomych i słabowidzących.
                       </li>
@@ -204,8 +204,8 @@ export default function AccessibilityDeclaration() {
                   </h3>
                   <div className="space-y-2 text-gray-700">
                     <p>
-                      Program "Więźniarki" nie posiada obecnie dedykowanej
-                      aplikacji mobilnej.
+                      Program &quot;Więźniarki&quot; nie posiada obecnie
+                      dedykowanej aplikacji mobilnej.
                     </p>
                   </div>
                 </section>
