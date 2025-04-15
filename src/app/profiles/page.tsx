@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/frontend/components/layout/Navbar";
-import Footer from "@/frontend/components/layout/Footer";
+import MainLayout from "../MainLayout";
 import ProfileCard from "@/frontend/components/profile/ProfileCard";
 import ProfileFilter from "@/frontend/components/profile/ProfileFilter";
 import { Profile } from "@/backend/models/Profile";
@@ -73,44 +72,51 @@ export default function ProfilesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
+    <MainLayout>
+      {/* Nagłówek strony */}
+      <section className="bg-primary py-5">
+        <div className="container mx-auto px-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+            Profile Więźniarek
+          </h1>
+          <p className="text-gray-600">
+            Poznaj uczestniczki programu resocjalizacji społecznej
+          </p>
+        </div>
+      </section>
 
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-center">
-          Profile Więźniarek
-        </h1>
+      {/* Główna treść */}
+      <div className="bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+            <div className="lg:col-span-1">
+              <ProfileFilter onFilter={handleFilter} />
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-          <div className="lg:col-span-1">
-            <ProfileFilter onFilter={handleFilter} />
-          </div>
-
-          <div className="lg:col-span-3">
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            ) : error ? (
-              <div className="text-center text-red-500 p-4">{error}</div>
-            ) : filteredProfiles.length === 0 ? (
-              <div className="text-center p-4">
-                <p className="text-lg text-gray-600">
-                  Nie znaleziono profili spełniających podane kryteria.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProfiles.map((profile) => (
-                  <ProfileCard key={profile.id} profile={profile} />
-                ))}
-              </div>
-            )}
+            <div className="lg:col-span-3">
+              {loading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center text-red-500 p-4">{error}</div>
+              ) : filteredProfiles.length === 0 ? (
+                <div className="text-center p-4">
+                  <p className="text-lg text-gray-600">
+                    Nie znaleziono profili spełniających podane kryteria.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProfiles.map((profile) => (
+                    <ProfileCard key={profile.id} profile={profile} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 }

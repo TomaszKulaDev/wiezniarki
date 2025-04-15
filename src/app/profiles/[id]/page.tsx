@@ -57,7 +57,7 @@ export default function ProfileDetailPage({
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1e50a0]"></div>
         </main>
         <Footer />
       </div>
@@ -73,7 +73,7 @@ export default function ProfileDetailPage({
             <p>{error || "Nie znaleziono profilu"}</p>
             <Link
               href="/profiles"
-              className="text-primary hover:underline mt-2 inline-block"
+              className="text-[#1e50a0] hover:underline mt-2 inline-block"
             >
               Wróć do listy profili
             </Link>
@@ -127,7 +127,7 @@ export default function ProfileDetailPage({
 
                   <button
                     onClick={handleContactRequest}
-                    className="mt-4 md:mt-0 bg-primary text-white py-2 px-6 rounded-md hover:bg-primary/90 transition-colors"
+                    className="mt-4 md:mt-0 bg-[#1e50a0] text-white py-2 px-6 rounded-md hover:bg-[#153b7a] transition-colors"
                   >
                     Nawiąż kontakt
                   </button>
@@ -176,7 +176,7 @@ export default function ProfileDetailPage({
                     {profile.interests.map((interest, index) => (
                       <span
                         key={index}
-                        className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                        className="bg-[#1e50a0]/10 text-[#1e50a0] px-3 py-1 rounded-full text-sm"
                       >
                         {interest}
                       </span>
@@ -352,7 +352,7 @@ export default function ProfileDetailPage({
               <div className="flex space-x-4">
                 <Link
                   href="/login"
-                  className="flex-1 bg-primary text-white text-center py-2 px-4 rounded-md hover:bg-primary/90 transition-colors"
+                  className="flex-1 bg-[#1e50a0] text-white text-center py-2 px-4 rounded-md hover:bg-[#153b7a] transition-colors"
                 >
                   Zaloguj się
                 </Link>
