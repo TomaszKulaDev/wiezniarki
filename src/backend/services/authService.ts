@@ -1,7 +1,9 @@
 import { User } from "../models/User";
+import { mongodbService } from "./mongodbService";
+import { dbName } from "../utils/mongodb";
+import * as crypto from "crypto";
 
-// Symulacja danych - w rzeczywistym projekcie użylibyśmy bazy danych
-const users: User[] = [];
+const COLLECTION_NAME = "users";
 
 export const authService = {
   // Rejestracja użytkownika
@@ -11,13 +13,22 @@ export const authService = {
     role: User["role"]
   ): Promise<Omit<User, "passwordHash">> {
     // Sprawdzenie, czy użytkownik już istnieje
-    const existingUser = users.find((user) => user.email === email);
+    const existingUser = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { email }
+    );
+
     if (existingUser) {
-      throw new Error("Użytkownik z tym adresem email już istnieje");
+      throw new Error("User already exists");
     }
 
-    // W rzeczywistym projekcie zahaszowalibyśmy hasło
-    const hashedPassword = `hashed_${password}`;
+    // Haszowanie hasła
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 1000, 64, "sha512")
+      .toString("hex");
+    const passwordHash = `${salt}:${hash}`;
 
     // Generowanie kodu weryfikacyjnego
     const verificationCode = Math.random()
@@ -28,9 +39,9 @@ export const authService = {
     const newUser: User = {
       id: Date.now().toString(),
       email,
-      passwordHash: hashedPassword,
+      passwordHash,
       role,
-      verified: false,
+      verified: process.env.NODE_ENV === "development", // W dev automatycznie weryfikujemy
       verificationCode,
       active: true,
       loginAttempts: 0,
@@ -39,9 +50,10 @@ export const authService = {
       updatedAt: new Date(),
     };
 
-    users.push(newUser);
+    // Zapisanie użytkownika w bazie danych
+    await mongodbService.insertDocument(dbName, COLLECTION_NAME, newUser);
 
-    // Używamy destructuring bez zmiennych, które nie będą wykorzystane
+    // Nie zwracamy hashu w odpowiedzi
     const { passwordHash: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
   },
@@ -51,86 +63,144 @@ export const authService = {
     email: string,
     password: string
   ): Promise<{ token: string; user: Omit<User, "passwordHash"> }> {
-    const user = users.find((user) => user.email === email);
+    // Pobranie użytkownika z bazy danych
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { email }
+    );
 
     if (!user) {
-      throw new Error("Nieprawidłowy email lub hasło");
+      throw new Error("Invalid credentials");
     }
 
     if (user.locked) {
       if (user.lockedUntil && user.lockedUntil > new Date()) {
-        throw new Error(
-          `Konto zablokowane. Spróbuj ponownie po ${user.lockedUntil.toLocaleString()}`
-        );
+        throw new Error("Account is locked");
       } else {
+        // Odblokowanie konta, jeśli czas blokady minął
+        await mongodbService.updateDocument(
+          dbName,
+          COLLECTION_NAME,
+          { id: user.id },
+          { locked: false, loginAttempts: 0, updatedAt: new Date() }
+        );
         user.locked = false;
         user.loginAttempts = 0;
       }
     }
 
-    // W rzeczywistym projekcie porównalibyśmy zahaszowane hasła
-    if (user.passwordHash !== `hashed_${password}`) {
-      user.loginAttempts += 1;
+    // Weryfikacja hasła
+    const [salt, storedHash] = user.passwordHash.split(":");
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 1000, 64, "sha512")
+      .toString("hex");
+
+    if (storedHash !== hash) {
+      // Inkrementacja liczby nieudanych prób logowania
+      const loginAttempts = user.loginAttempts + 1;
+      const updates: Partial<User> = {
+        loginAttempts,
+        updatedAt: new Date(),
+      };
 
       // Zablokuj konto po 5 nieudanych próbach
-      if (user.loginAttempts >= 5) {
-        user.locked = true;
-        user.lockedUntil = new Date(Date.now() + 30 * 60 * 1000); // 30 minut
-        throw new Error(
-          "Konto zablokowane na 30 minut z powodu zbyt wielu nieudanych prób logowania"
+      if (loginAttempts >= 5) {
+        const lockedUntil = new Date(Date.now() + 30 * 60 * 1000); // 30 minut
+        updates.locked = true;
+        updates.lockedUntil = lockedUntil;
+
+        await mongodbService.updateDocument(
+          dbName,
+          COLLECTION_NAME,
+          { id: user.id },
+          updates
         );
+
+        throw new Error("Account is locked");
       }
 
-      throw new Error("Nieprawidłowy email lub hasło");
-    }
-
-    if (!user.verified) {
-      throw new Error(
-        "Konto nie zostało zweryfikowane. Sprawdź swoją skrzynkę email"
+      await mongodbService.updateDocument(
+        dbName,
+        COLLECTION_NAME,
+        { id: user.id },
+        updates
       );
+
+      throw new Error("Invalid credentials");
     }
 
-    // Resetuj licznik nieudanych prób
-    user.loginAttempts = 0;
-    user.lastLogin = new Date();
-    user.updatedAt = new Date();
+    // W środowisku produkcyjnym sprawdź weryfikację
+    if (!user.verified && process.env.NODE_ENV !== "development") {
+      throw new Error("Account is not verified");
+    }
+
+    // Aktualizacja danych logowania
+    await mongodbService.updateDocument(
+      dbName,
+      COLLECTION_NAME,
+      { id: user.id },
+      {
+        loginAttempts: 0,
+        lastLogin: new Date(),
+        updatedAt: new Date(),
+      }
+    );
 
     // W rzeczywistym projekcie wygenerowalibyśmy token JWT
-    const token = `fake_jwt_token_${user.id}`;
+    // Dla testów generujemy prosty token
+    const token = `${user.id}_${Date.now()}_${crypto
+      .randomBytes(16)
+      .toString("hex")}`;
 
-    // Nie zwracamy hashu w odpowiedzi - używamy zmiennej bez podkreślenia
+    // Nie zwracamy hashu w odpowiedzi
     const { passwordHash: _, ...userWithoutPassword } = user;
     return { token, user: userWithoutPassword };
   },
 
   // Weryfikacja użytkownika
   async verifyAccount(email: string, code: string): Promise<boolean> {
-    const userIndex = users.findIndex((user) => user.email === email);
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { email }
+    );
 
-    if (userIndex === -1) {
-      throw new Error("Użytkownik nie istnieje");
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    if (users[userIndex].verified) {
+    if (user.verified) {
       return true; // Konto już zweryfikowane
     }
 
-    if (users[userIndex].verificationCode !== code) {
-      throw new Error("Nieprawidłowy kod weryfikacyjny");
+    if (user.verificationCode !== code) {
+      throw new Error("Invalid verification code");
     }
 
-    users[userIndex].verified = true;
-    users[userIndex].verificationCode = undefined;
-    users[userIndex].updatedAt = new Date();
+    await mongodbService.updateDocument(
+      dbName,
+      COLLECTION_NAME,
+      { id: user.id },
+      {
+        verified: true,
+        verificationCode: undefined,
+        updatedAt: new Date(),
+      }
+    );
 
     return true;
   },
 
   // Resetowanie hasła - żądanie
   async requestPasswordReset(email: string): Promise<boolean> {
-    const userIndex = users.findIndex((user) => user.email === email);
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { email }
+    );
 
-    if (userIndex === -1) {
+    if (!user) {
       // Nie ujawniaj czy użytkownik istnieje
       return true;
     }
@@ -139,9 +209,16 @@ export const authService = {
     const resetToken = Math.random().toString(36).substring(2, 15);
     const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 godzina
 
-    users[userIndex].resetPasswordToken = resetToken;
-    users[userIndex].resetPasswordExpires = expires;
-    users[userIndex].updatedAt = new Date();
+    await mongodbService.updateDocument(
+      dbName,
+      COLLECTION_NAME,
+      { id: user.id },
+      {
+        resetPasswordToken: resetToken,
+        resetPasswordExpires: expires,
+        updatedAt: new Date(),
+      }
+    );
 
     // W rzeczywistym projekcie wysłalibyśmy email z tokenem
     console.log(`Token resetowania dla ${email}: ${resetToken}`);
@@ -155,23 +232,38 @@ export const authService = {
     token: string,
     newPassword: string
   ): Promise<boolean> {
-    const userIndex = users.findIndex(
-      (user) =>
-        user.email === email &&
-        user.resetPasswordToken === token &&
-        user.resetPasswordExpires &&
-        user.resetPasswordExpires > new Date()
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      {
+        email,
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: new Date() },
+      }
     );
 
-    if (userIndex === -1) {
+    if (!user) {
       throw new Error("Nieprawidłowy lub wygasły token resetowania hasła");
     }
 
-    // W rzeczywistym projekcie zahaszowalibyśmy nowe hasło
-    users[userIndex].passwordHash = `hashed_${newPassword}`;
-    users[userIndex].resetPasswordToken = undefined;
-    users[userIndex].resetPasswordExpires = undefined;
-    users[userIndex].updatedAt = new Date();
+    // Haszowanie nowego hasła
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hash = crypto
+      .pbkdf2Sync(newPassword, salt, 1000, 64, "sha512")
+      .toString("hex");
+    const passwordHash = `${salt}:${hash}`;
+
+    await mongodbService.updateDocument(
+      dbName,
+      COLLECTION_NAME,
+      { id: user.id },
+      {
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        updatedAt: new Date(),
+      }
+    );
 
     return true;
   },
