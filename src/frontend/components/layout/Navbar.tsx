@@ -621,14 +621,6 @@ export default function Navbar() {
                     Historie sukcesu
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/sitemap"
-                    className="text-gray-700 hover:text-primary transition font-medium py-2 block"
-                  >
-                    Mapa strony
-                  </Link>
-                </li>
                 <li
                   className="ml-auto"
                   style={{
