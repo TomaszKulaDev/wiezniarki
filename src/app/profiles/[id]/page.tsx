@@ -29,22 +29,19 @@ async function getProfile(id: string): Promise<Profile | null> {
 }
 
 interface ProfilePageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-  const profile = await getProfile(params.id);
+export default async function ProfilePage(props: ProfilePageProps) {
+  const { id } = await props.params;
+  const profile = await getProfile(id);
 
   return (
     <MainLayout>
       {!profile ? (
         <div className="container mx-auto px-4 py-8">
           <div className="bg-red-50 text-red-700 p-4 rounded-lg shadow-sm mb-6">
-            <h1 className="text-xl font-bold mb-2">
-              Nie znaleziono profilu
-            </h1>
+            <h1 className="text-xl font-bold mb-2">Nie znaleziono profilu</h1>
             <p>
               Niestety, nie mogliśmy znaleźć profilu o podanym identyfikatorze.
             </p>
