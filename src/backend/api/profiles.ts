@@ -23,6 +23,9 @@ const mockProfiles: Profile[] = [
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2023-03-20"),
     releaseDateEstimate: new Date("2025-06-10"),
+    relationshipStatus: "single",
+    personalityTraits: ["otwarta", "empatyczna", "kreatywna"],
+    hobbies: ["czytanie książek", "malarstwo", "joga"],
   },
   {
     id: "2",
@@ -43,6 +46,9 @@ const mockProfiles: Profile[] = [
     createdAt: new Date("2023-02-10"),
     updatedAt: new Date("2023-04-15"),
     releaseDateEstimate: new Date("2024-11-30"),
+    relationshipStatus: "single",
+    personalityTraits: ["otwarta", "empatyczna", "kreatywna"],
+    hobbies: ["czytanie książek", "malarstwo", "joga"],
   },
 ];
 

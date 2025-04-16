@@ -1,39 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MainLayout from "../MainLayout";
 import ProfileCard from "@/frontend/components/profile/ProfileCard";
 import ProfileFilter from "@/frontend/components/profile/ProfileFilter";
-import { Profile } from "@/backend/models/Profile";
+import { useGetProfilesQuery } from "@/frontend/store/apis/profileApi";
 
 export default function ProfilesPage() {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // Używamy RTK Query zamiast własnego stanu i fetcha
+  const [filterParams, setFilterParams] = useState<{
+    minAge?: number;
+    maxAge?: number;
+    facility?: string;
+    interests?: string[];
+  }>({});
 
-  useEffect(() => {
-    async function fetchProfiles() {
-      try {
-        setLoading(true);
-        // W przyszłości zastąpić rzeczywistym wywołaniem API
-        const response = await fetch("/api/profiles");
-        if (!response.ok) {
-          throw new Error("Nie udało się pobrać profili");
-        }
-        const data = await response.json();
-        setProfiles(data);
-        setFilteredProfiles(data);
-      } catch (err) {
-        setError("Wystąpił błąd podczas pobierania profili");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchProfiles();
-  }, []);
+  const {
+    data: profiles,
+    isLoading,
+    error,
+  } = useGetProfilesQuery(filterParams);
 
   const handleFilter = (filters: {
     minAge?: number;
@@ -42,33 +28,15 @@ export default function ProfilesPage() {
     interests?: string[];
     releaseDate?: { before?: Date; after?: Date };
   }) => {
-    let filtered = [...profiles];
+    // Usuwamy filtrację lokalną, aktualizujemy parametry zapytania API
+    const apiFilters = {
+      minAge: filters.minAge,
+      maxAge: filters.maxAge,
+      facility: filters.facility,
+      interests: filters.interests,
+    };
 
-    if (filters.minAge) {
-      filtered = filtered.filter((profile) => profile.age >= filters.minAge!);
-    }
-
-    if (filters.maxAge) {
-      filtered = filtered.filter((profile) => profile.age <= filters.maxAge!);
-    }
-
-    if (filters.facility) {
-      filtered = filtered.filter((profile) =>
-        profile.facility.toLowerCase().includes(filters.facility!.toLowerCase())
-      );
-    }
-
-    if (filters.interests && filters.interests.length > 0) {
-      filtered = filtered.filter((profile) =>
-        filters.interests!.some((interest) =>
-          profile.interests.some((profileInterest) =>
-            profileInterest.toLowerCase().includes(interest.toLowerCase())
-          )
-        )
-      );
-    }
-
-    setFilteredProfiles(filtered);
+    setFilterParams(apiFilters);
   };
 
   return (
@@ -94,13 +62,15 @@ export default function ProfilesPage() {
             </div>
 
             <div className="lg:col-span-3">
-              {loading ? (
+              {isLoading ? (
                 <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                 </div>
               ) : error ? (
-                <div className="text-center text-red-500 p-4">{error}</div>
-              ) : filteredProfiles.length === 0 ? (
+                <div className="text-center text-red-500 p-4">
+                  Wystąpił błąd podczas pobierania profili
+                </div>
+              ) : !profiles || profiles.length === 0 ? (
                 <div className="text-center p-4">
                   <p className="text-lg text-gray-600">
                     Nie znaleziono profili spełniających podane kryteria.
@@ -108,7 +78,7 @@ export default function ProfilesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProfiles.map((profile) => (
+                  {profiles.map((profile) => (
                     <ProfileCard key={profile.id} profile={profile} />
                   ))}
                 </div>

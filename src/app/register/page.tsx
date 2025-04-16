@@ -1,17 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/frontend/components/layout/Navbar";
 import Footer from "@/frontend/components/layout/Footer";
 import RegisterForm from "@/frontend/components/forms/RegisterForm";
+import { useRegisterMutation } from "@/frontend/store/apis/authApi";
 
 export default function RegisterPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  // Użycie RTK Query mutation zamiast bezpośredniego fetcha
+  const [register, { isLoading: isSubmitting, error: registerError }] =
+    useRegisterMutation();
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const router = useRouter();
+
+  // Efekt obsługujący błędy
+  useEffect(() => {
+    if (registerError) {
+      if ("data" in registerError) {
+        // Używamy bardziej precyzyjnego typu
+        setError(
+          (registerError.data as { message?: string })?.message ||
+            "Błąd podczas rejestracji"
+        );
+      } else {
+        setError("Wystąpił błąd podczas rejestracji");
+      }
+    }
+  }, [registerError]);
 
   const handleRegister = async (formData: {
     email: string;
@@ -26,31 +46,19 @@ export default function RegisterPage() {
     }
 
     if (!formData.acceptTerms) {
-      setError("Musisz zaakceptować regulamin");
+      setError("Musisz zaakceptować regulamin, aby utworzyć konto");
       return;
     }
 
     try {
-      setIsSubmitting(true);
       setError("");
 
-      // W przyszłości zastąpić rzeczywistym wywołaniem API
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Błąd podczas rejestracji");
-      }
+      // Wykonanie mutacji register
+      await register({
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      }).unwrap();
 
       setSuccess(
         "Rejestracja udana! Sprawdź swoją skrzynkę email, aby zweryfikować konto."
@@ -60,14 +68,9 @@ export default function RegisterPage() {
       setTimeout(() => {
         router.push("/login");
       }, 3000);
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Wystąpił błąd podczas rejestracji";
-      setError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+    } catch {
+      // Obsługa błędów jest w useEffect powyżej
+      // Pusty blok catch, ponieważ błędy są obsługiwane w useEffect
     }
   };
 

@@ -9,7 +9,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#1e50a0", // niebieski gov.pl
+        primary: "#1e50a0", // Ciemny niebieski kolor
+        "primary-dark": "#163b78", // Ciemniejszy wariant dla hover
         secondary: "#d1213d", // czerwony
         accent: "#f6f9fc", // jasny niebieski
         muted: "#f5f5f5", // jasny szary

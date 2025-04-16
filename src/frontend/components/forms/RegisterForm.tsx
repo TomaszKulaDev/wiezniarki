@@ -126,7 +126,7 @@ export default function RegisterForm({
         />
         <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
           Akceptuję{" "}
-          <Link href="/terms" className="text-primary hover:underline">
+          <Link href="/regulamin" className="text-primary hover:underline">
             regulamin serwisu
           </Link>{" "}
           i{" "}
@@ -140,11 +140,10 @@ export default function RegisterForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-primary text-white py-2 px-4 rounded-md transition-colors ${
-            isSubmitting
-              ? "opacity-70 cursor-not-allowed"
-              : "hover:bg-primary/90"
+          className={`w-full text-white py-2 px-4 rounded-md transition-colors ${
+            isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700"
           }`}
+          style={{ backgroundColor: "#1e50a0" }}
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">

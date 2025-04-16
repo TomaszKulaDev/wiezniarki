@@ -1,8 +1,8 @@
 // To jest Server Component (brak dyrektywy "use client")
 import { Profile } from "@/backend/models/Profile";
 import MainLayout from "../../MainLayout";
-import ProfileClientContent from "./ProfileClientContent"; // Będziemy musieli stworzyć ten komponent
-import Link from "next/link"; // Dodaj import Link
+import ProfileClientContent from "./ProfileClientContent";
+import Link from "next/link";
 
 // Funkcja do pobierania danych po stronie serwera
 async function getProfile(id: string): Promise<Profile | null> {
@@ -28,56 +28,39 @@ async function getProfile(id: string): Promise<Profile | null> {
   }
 }
 
-// Główny komponent strony jako Server Component
-export default async function ProfileDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  // W Server Component możemy bezpośrednio używać params.id
-  const { id } = params;
+interface ProfilePageProps {
+  params: {
+    id: string;
+  };
+}
 
-  // Pobieramy dane profilu po stronie serwera
-  const profile = await getProfile(id);
+export default async function ProfilePage({ params }: ProfilePageProps) {
+  const profile = await getProfile(params.id);
 
   return (
     <MainLayout>
-      {/* Nagłówek strony */}
-      <section className="bg-primary py-5">
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
-            {profile
-              ? `${profile.firstName} ${profile.lastName}`
-              : "Profil uczestniczki"}
-          </h1>
-          <p className="text-gray-600">
-            Szczegóły uczestniczki programu resocjalizacji społecznej
-          </p>
-        </div>
-      </section>
-
-      {/* Główna treść */}
-      <div className="bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          {profile ? (
-            // Przekazujemy pobrane dane do komponentu klienckiego
-            <ProfileClientContent initialProfile={profile} />
-          ) : (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              <p>
-                Nie znaleziono profilu lub wystąpił błąd podczas jego
-                pobierania.
-              </p>
+      {!profile ? (
+        <div className="container mx-auto px-4 py-8">
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg shadow-sm mb-6">
+            <h1 className="text-xl font-bold mb-2">
+              Nie znaleziono profilu
+            </h1>
+            <p>
+              Niestety, nie mogliśmy znaleźć profilu o podanym identyfikatorze.
+            </p>
+            <div className="mt-4">
               <Link
                 href="/profiles"
-                className="text-primary hover:underline mt-2 inline-block"
+                className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
               >
                 Wróć do listy profili
               </Link>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <ProfileClientContent initialProfile={profile} />
+      )}
     </MainLayout>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Profile } from "@/backend/models/Profile";
 import ProfileBreadcrumbs from "./components/ProfileBreadcrumbs";
 import ProfileHeader from "./components/ProfileHeader";
@@ -9,13 +8,19 @@ import ProfileAbout from "./components/ProfileAbout";
 import ProfileGoals from "./components/ProfileGoals";
 import ProfileSidebar from "./components/ProfileSidebar";
 import ProfileContact from "./components/ProfileContact";
+import { useState } from "react";
+import { useGetProfileByIdQuery } from "@/frontend/store/apis/profileApi";
 
 export default function ProfileClientContent({
   initialProfile,
 }: {
   initialProfile: Profile;
 }) {
-  const [profile] = useState<Profile>(initialProfile);
+  // Używamy initialProfile jako fallback, ale korzystamy z RTK Query
+  // aby mieć zawsze aktualne dane
+  const { data: profile = initialProfile } = useGetProfileByIdQuery(
+    initialProfile.id
+  );
   const [showContactForm, setShowContactForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"about" | "interests" | "goals">(
     "about"

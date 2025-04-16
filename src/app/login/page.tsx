@@ -1,16 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/frontend/components/layout/Navbar";
 import Footer from "@/frontend/components/layout/Footer";
 import LoginForm from "@/frontend/components/forms/LoginForm";
+import { useLoginMutation } from "@/frontend/store/apis/authApi";
+import { useAppDispatch } from "@/frontend/store/hooks";
+import { loginSuccess } from "@/frontend/store/slices/authSlice";
 
 export default function LoginPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  // Użycie RTK Query mutation zamiast bezpośredniego fetcha
+  const [
+    login,
+    { isLoading: isSubmitting, error: loginError, data: loginData },
+  ] = useLoginMutation();
+  const [error, setError] = useState("");
+
+  // Efekt czyszczący błędy
+  useEffect(() => {
+    if (loginError) {
+      if ("data" in loginError) {
+        // Używamy bardziej precyzyjnego typu
+        setError(
+          (loginError.data as { message?: string })?.message ||
+            "Nieprawidłowy email lub hasło"
+        );
+      } else {
+        setError("Wystąpił błąd podczas logowania");
+      }
+    }
+  }, [loginError]);
+
+  // Efekt po pomyślnym logowaniu
+  useEffect(() => {
+    if (loginData) {
+      dispatch(
+        loginSuccess({
+          id: loginData.user.id,
+          email: loginData.user.email,
+          role: loginData.user.role,
+        })
+      );
+      router.push("/");
+    }
+  }, [loginData, dispatch, router]);
 
   const handleLogin = async (formData: {
     email: string;
@@ -18,43 +56,23 @@ export default function LoginPage() {
     rememberMe: boolean;
   }) => {
     try {
-      setIsSubmitting(true);
       setError("");
 
-      // W przyszłości zastąpić rzeczywistym wywołaniem API
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Nieprawidłowy email lub hasło");
-      }
-
-      const data = await response.json();
+      // Wykonanie mutacji login
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
 
       // Zapisz token w localStorage/sessionStorage w zależności od "rememberMe"
       if (formData.rememberMe) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token", result.token);
       } else {
-        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("token", result.token);
       }
-
-      // Przekieruj na stronę główną
-      router.push("/");
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Wystąpił błąd podczas logowania";
-      setError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+    } catch {
+      // Obsługa błędów jest w useEffect powyżej
+      // Pusty blok catch, ponieważ błędy są obsługiwane w useEffect
     }
   };
 

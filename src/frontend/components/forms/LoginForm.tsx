@@ -80,6 +80,7 @@ export default function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               ? "opacity-70 cursor-not-allowed"
               : "hover:bg-primary/90"
           }`}
+          style={{ backgroundColor: "#1e50a0" }}
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">

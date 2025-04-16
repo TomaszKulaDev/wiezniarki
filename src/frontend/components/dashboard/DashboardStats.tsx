@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { User } from "@/backend/models/User";
+import { useGetUserStatsQuery } from "@/frontend/store/apis/statsApi";
 
 interface DashboardStatsProps {
   userId: string;
@@ -7,38 +7,8 @@ interface DashboardStatsProps {
 }
 
 export default function DashboardStats({ userId, role }: DashboardStatsProps) {
-  const [stats, setStats] = useState({
-    matches: 0,
-    messages: 0,
-    views: 0,
-    notifications: 0,
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        setLoading(true);
-
-        // W przyszłości zastąpić rzeczywistym wywołaniem API
-        // Symulacja danych
-        setTimeout(() => {
-          setStats({
-            matches: Math.floor(Math.random() * 10),
-            messages: Math.floor(Math.random() * 20),
-            views: Math.floor(Math.random() * 50),
-            notifications: Math.floor(Math.random() * 5),
-          });
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error("Błąd podczas ładowania statystyk:", error);
-        setLoading(false);
-      }
-    }
-
-    fetchStats();
-  }, [userId]);
+  // Używamy RTK Query zamiast lokalnego stanu
+  const { data: stats, isLoading } = useGetUserStatsQuery(userId);
 
   const getStatIcon = (type: string) => {
     switch (type) {
@@ -133,7 +103,7 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-xl font-bold mb-6">Statystyki</h2>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
         </div>
@@ -144,7 +114,7 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
               {getStatIcon("matches")}
               <h3 className="ml-3 text-lg font-semibold">Dopasowania</h3>
             </div>
-            <p className="text-2xl font-bold">{stats.matches}</p>
+            <p className="text-2xl font-bold">{stats?.matches || 0}</p>
             <p className="text-xs text-gray-500 mt-1">
               {role === "prisoner"
                 ? "Zainteresowanych osób"
@@ -157,9 +127,9 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
               {getStatIcon("messages")}
               <h3 className="ml-3 text-lg font-semibold">Wiadomości</h3>
             </div>
-            <p className="text-2xl font-bold">{stats.messages}</p>
+            <p className="text-2xl font-bold">{stats?.messages || 0}</p>
             <p className="text-xs text-gray-500 mt-1">
-              {stats.messages > 0
+              {(stats?.messages || 0) > 0
                 ? "Nowe wiadomości"
                 : "Brak nowych wiadomości"}
             </p>
@@ -170,7 +140,7 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
               {getStatIcon("views")}
               <h3 className="ml-3 text-lg font-semibold">Wyświetlenia</h3>
             </div>
-            <p className="text-2xl font-bold">{stats.views}</p>
+            <p className="text-2xl font-bold">{stats?.views || 0}</p>
             <p className="text-xs text-gray-500 mt-1">
               {`Wyświetleń ${
                 role === "prisoner" ? "Twojego profilu" : "profili więźniarek"
@@ -183,9 +153,9 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
               {getStatIcon("notifications")}
               <h3 className="ml-3 text-lg font-semibold">Powiadomienia</h3>
             </div>
-            <p className="text-2xl font-bold">{stats.notifications}</p>
+            <p className="text-2xl font-bold">{stats?.notifications || 0}</p>
             <p className="text-xs text-gray-500 mt-1">
-              {stats.notifications > 0
+              {(stats?.notifications || 0) > 0
                 ? "Nieprzeczytane powiadomienia"
                 : "Brak powiadomień"}
             </p>

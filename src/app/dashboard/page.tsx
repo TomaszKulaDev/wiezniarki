@@ -1,66 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/frontend/components/layout/Navbar";
 import Footer from "@/frontend/components/layout/Footer";
 import DashboardSidebar from "@/frontend/components/dashboard/DashboardSidebar";
-import { User } from "@/backend/models/User";
 import DashboardStats from "@/frontend/components/dashboard/DashboardStats";
+import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
+import { useAppDispatch } from "@/frontend/store/hooks";
+import { loginSuccess, logout } from "@/frontend/store/slices/authSlice";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<Omit<User, "passwordHash"> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
+  // Użycie RTK Query do pobierania danych użytkownika
+  const { data: user, isLoading, error, isError } = useGetCurrentUserQuery();
+
+  // Zaktualizuj globalny stan auth po pobraniu danych
   useEffect(() => {
-    async function fetchUserData() {
-      try {
-        setLoading(true);
+    if (user) {
+      dispatch(
+        loginSuccess({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        })
+      );
+    } else if (isError) {
+      dispatch(logout());
 
-        // Sprawdź czy użytkownik jest zalogowany
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
-
-        if (!token) {
-          // Użytkownik nie jest zalogowany, przekieruj do strony logowania
-          router.push("/login");
-          return;
-        }
-
-        // W przyszłości zastąpić rzeczywistym wywołaniem API
-        const response = await fetch("/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Token wygasł, przekieruj do strony logowania
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("token");
-            router.push("/login");
-            return;
-          }
-          throw new Error("Błąd podczas pobierania danych użytkownika");
-        }
-
-        const userData = await response.json();
-        setUser(userData);
-      } catch (err) {
-        setError("Wystąpił błąd podczas ładowania panelu użytkownika");
-        console.error(err);
-      } finally {
-        setLoading(false);
+      // Sprawdź czy token istnieje - jeśli tak to był nieważny
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (token) {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        router.push("/login");
       }
     }
+  }, [user, isError, dispatch, router]);
 
-    fetchUserData();
-  }, [router]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
@@ -72,13 +53,17 @@ export default function DashboardPage() {
     );
   }
 
-  if (error || !user) {
+  if (isError || !user) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            <p>{error || "Nie znaleziono danych użytkownika"}</p>
+            <p>
+              {error
+                ? "Wystąpił błąd podczas ładowania panelu użytkownika"
+                : "Nie znaleziono danych użytkownika"}
+            </p>
           </div>
         </main>
         <Footer />
