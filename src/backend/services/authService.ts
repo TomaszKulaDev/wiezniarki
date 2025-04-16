@@ -41,8 +41,9 @@ export const authService = {
 
     users.push(newUser);
 
-    // Nie zwracamy hashu w odpowiedzi
-    const { passwordHash: _, ...userWithoutPassword } = newUser;
+    // Nie zwracamy hashu w odpowiedzi - używamy zmiennej bez podkreślenia
+    const { passwordHash: passwordHashOmitted, ...userWithoutPassword } =
+      newUser;
     return userWithoutPassword;
   },
 
@@ -98,8 +99,8 @@ export const authService = {
     // W rzeczywistym projekcie wygenerowalibyśmy token JWT
     const token = `fake_jwt_token_${user.id}`;
 
-    // Nie zwracamy hashu w odpowiedzi
-    const { passwordHash: _, ...userWithoutPassword } = user;
+    // Nie zwracamy hashu w odpowiedzi - używamy zmiennej bez podkreślenia
+    const { passwordHash: passwordHashOmitted, ...userWithoutPassword } = user;
     return { token, user: userWithoutPassword };
   },
 

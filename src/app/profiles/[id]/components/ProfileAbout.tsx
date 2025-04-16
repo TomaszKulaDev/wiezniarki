@@ -7,15 +7,6 @@ interface ProfileAboutProps {
 }
 
 export default function ProfileAbout({ profile }: ProfileAboutProps) {
-  // Funkcja pomocnicza do formatowania daty
-  const formatDate = (date: string | Date): string => {
-    return new Date(date).toLocaleDateString("pl-PL", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-xl shadow-md p-6">

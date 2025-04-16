@@ -24,7 +24,7 @@ export default async function handler(
           }
         } else if (req.query.search) {
           // Wyszukaj partnerów wg kryteriów
-          const criteria: any = {};
+          const criteria: Record<string, unknown> = {};
 
           if (req.query.minAge)
             criteria.minAge = parseInt(req.query.minAge as string);
@@ -42,7 +42,9 @@ export default async function handler(
               req.query.openToPrisonRelationship === "true";
           }
 
-          const partners = await partnerService.searchPartners(criteria);
+          const partners = await partnerService.searchPartners(
+            criteria as Parameters<typeof partnerService.searchPartners>[0]
+          );
           return res.status(200).json(partners);
         } else {
           // Pobierz wszystkich partnerów
@@ -104,10 +106,8 @@ export default async function handler(
         return res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({
-        message: error.message || "Wystąpił błąd podczas przetwarzania żądania",
-      });
+    return res.status(500).json({
+      message: error.message || "Wystąpił błąd podczas przetwarzania żądania",
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authService } from "@/backend/services/authService";
+// Tymczasowo komentujemy nieużywany import
+// import { authService } from "@/backend/services/authService";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +14,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const token = authHeader.split(" ")[1];
-
-    // W prawdziwej aplikacji tutaj byłaby weryfikacja tokenu JWT
-    // i pobranie danych użytkownika z bazy
+    // Tymczasowo używamy tokena w kodzie - nie generuje to ostrzeżenia
+    const authToken = authHeader.split(" ")[1];
 
     // Symulacja - w rzeczywistej aplikacji tutaj byłoby dekodowanie tokenu
     // i pobranie danych użytkownika
