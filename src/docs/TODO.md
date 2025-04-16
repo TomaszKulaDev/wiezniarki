@@ -131,4 +131,3 @@
 - [ ] Dokumentacja API
 - [ ] Dokumentacja funkcjonalności
 - [ ] Instrukcja wdrożenia
-- [ ] Instrukcja dla użytkowników
