@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientBodyWrapper from "./ClientBodyWrapper";
 import StoreProvider from "@/frontend/providers/StoreProvider";
+import clientPromise from "@/backend/utils/mongodb";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,19 @@ export const metadata: Metadata = {
     apple: { url: "/apple-touch-icon.svg" },
   },
 };
+
+(async () => {
+  if (process.env.NODE_ENV === "production") return; // Wyłącz w produkcji
+
+  try {
+    const client = await clientPromise;
+    const adminDb = client.db().admin();
+    const result = await adminDb.ping();
+    console.log("🟢 MongoDB: Połączenie udane", result);
+  } catch (error) {
+    console.error("🔴 MongoDB: Błąd połączenia", error);
+  }
+})();
 
 export default function RootLayout({
   children,
