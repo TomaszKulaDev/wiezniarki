@@ -3,6 +3,39 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientBodyWrapper from "./ClientBodyWrapper";
 import StoreProvider from "@/frontend/providers/StoreProvider";
+import clientPromise from "@/backend/utils/mongodb";
+import { dbName } from "@/backend/utils/mongodb";
+
+// Sprawdź połączenie z MongoDB podczas startu aplikacji
+(async () => {
+  if (process.env.NODE_ENV === "production") return; // Wyłącz w produkcji
+
+  try {
+    const client = await clientPromise;
+    const adminDb = client.db().admin();
+    const result = await adminDb.ping();
+    console.log("🟢 MongoDB: Połączenie udane", result);
+
+    // Pobierz dane z bazy i wyświetl w konsoli
+    console.log("🔍 Pobieranie danych z kolekcji users...");
+    const db = client.db(dbName);
+    const users = await db.collection("users").find({}).toArray();
+
+    console.log(`✅ Znaleziono ${users.length} użytkowników w kolekcji users:`);
+    console.log(JSON.stringify(users, null, 2));
+
+    // Pobierz również dane z kolekcji profiles, jeśli istnieje
+    console.log("🔍 Pobieranie danych z kolekcji profiles...");
+    const profiles = await db.collection("profiles").find({}).toArray();
+
+    console.log(
+      `✅ Znaleziono ${profiles.length} profili w kolekcji profiles:`
+    );
+    console.log(JSON.stringify(profiles, null, 2));
+  } catch (error) {
+    console.error("🔴 MongoDB: Błąd połączenia lub pobierania danych", error);
+  }
+})();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
