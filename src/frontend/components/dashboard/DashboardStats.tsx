@@ -14,10 +14,10 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
     switch (type) {
       case "matches":
         return (
-          <div className="p-3 rounded-full bg-pink-100 text-pink-600">
+          <div className="p-2.5 rounded-full bg-pink-100 text-pink-600">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -33,10 +33,10 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
         );
       case "messages":
         return (
-          <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+          <div className="p-2.5 rounded-full bg-blue-100 text-blue-600">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -52,10 +52,10 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
         );
       case "views":
         return (
-          <div className="p-3 rounded-full bg-green-100 text-green-600">
+          <div className="p-2.5 rounded-full bg-green-100 text-green-600">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -77,10 +77,10 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
         );
       case "notifications":
         return (
-          <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
+          <div className="p-2.5 rounded-full bg-yellow-100 text-yellow-600">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -100,61 +100,61 @@ export default function DashboardStats({ userId, role }: DashboardStatsProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 className="text-xl font-bold mb-6">Statystyki</h2>
+    <div className="bg-white rounded-lg shadow-md p-5 mb-6">
+      <h2 className="text-lg font-bold mb-4">Statystyki</h2>
 
       {isLoading ? (
-        <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <div className="flex justify-center items-center h-24">
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-            <div className="flex items-center mb-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+            <div className="flex items-center mb-2">
               {getStatIcon("matches")}
-              <h3 className="ml-3 text-lg font-semibold">Dopasowania</h3>
+              <h3 className="ml-2 text-sm font-medium">Dopasowania</h3>
             </div>
-            <p className="text-2xl font-bold">{stats?.matches || 0}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xl font-bold">{stats?.matches || 0}</p>
+            <p className="text-xs text-gray-500 mt-0.5">
               {role === "prisoner"
                 ? "Zainteresowanych osób"
                 : "Zainteresowanych więźniarek"}
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-            <div className="flex items-center mb-3">
+          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+            <div className="flex items-center mb-2">
               {getStatIcon("messages")}
-              <h3 className="ml-3 text-lg font-semibold">Wiadomości</h3>
+              <h3 className="ml-2 text-sm font-medium">Wiadomości</h3>
             </div>
-            <p className="text-2xl font-bold">{stats?.messages || 0}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xl font-bold">{stats?.messages || 0}</p>
+            <p className="text-xs text-gray-500 mt-0.5">
               {(stats?.messages || 0) > 0
                 ? "Nowe wiadomości"
                 : "Brak nowych wiadomości"}
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-            <div className="flex items-center mb-3">
+          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+            <div className="flex items-center mb-2">
               {getStatIcon("views")}
-              <h3 className="ml-3 text-lg font-semibold">Wyświetlenia</h3>
+              <h3 className="ml-2 text-sm font-medium">Wyświetlenia</h3>
             </div>
-            <p className="text-2xl font-bold">{stats?.views || 0}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xl font-bold">{stats?.views || 0}</p>
+            <p className="text-xs text-gray-500 mt-0.5">
               {`Wyświetleń ${
                 role === "prisoner" ? "Twojego profilu" : "profili więźniarek"
               }`}
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-            <div className="flex items-center mb-3">
+          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+            <div className="flex items-center mb-2">
               {getStatIcon("notifications")}
-              <h3 className="ml-3 text-lg font-semibold">Powiadomienia</h3>
+              <h3 className="ml-2 text-sm font-medium">Powiadomienia</h3>
             </div>
-            <p className="text-2xl font-bold">{stats?.notifications || 0}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xl font-bold">{stats?.notifications || 0}</p>
+            <p className="text-xs text-gray-500 mt-0.5">
               {(stats?.notifications || 0) > 0
                 ? "Nieprzeczytane powiadomienia"
                 : "Brak powiadomień"}
