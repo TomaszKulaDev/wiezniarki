@@ -2,6 +2,7 @@ import { User } from "../models/User";
 import { mongodbService } from "./mongodbService";
 import { dbName } from "../utils/mongodb";
 import * as crypto from "crypto";
+import { emailService } from "./emailService";
 
 const COLLECTION_NAME = "users";
 
@@ -52,6 +53,14 @@ export const authService = {
 
     // Zapisanie użytkownika w bazie danych
     await mongodbService.insertDocument(dbName, COLLECTION_NAME, newUser);
+
+    // Wysłanie emaila weryfikacyjnego (tylko w produkcji)
+    if (process.env.NODE_ENV !== "development") {
+      await emailService.sendVerificationEmail(email, verificationCode);
+    } else {
+      // W środowisku deweloperskim wyświetlamy kod weryfikacyjny w konsoli
+      console.log(`Kod weryfikacyjny dla ${email}: ${verificationCode}`);
+    }
 
     // Nie zwracamy hashu w odpowiedzi
     const { passwordHash: _, ...userWithoutPassword } = newUser;
@@ -192,7 +201,7 @@ export const authService = {
     return true;
   },
 
-  // Resetowanie hasła - żądanie
+  // Resetowanie hasła - żądanie (zaktualizowana)
   async requestPasswordReset(email: string): Promise<boolean> {
     const user = await mongodbService.findDocument<User>(
       dbName,
@@ -220,8 +229,13 @@ export const authService = {
       }
     );
 
-    // W rzeczywistym projekcie wysłalibyśmy email z tokenem
-    console.log(`Token resetowania dla ${email}: ${resetToken}`);
+    // Wysłanie emaila z tokenem do resetowania hasła
+    if (process.env.NODE_ENV !== "development") {
+      await emailService.sendPasswordResetEmail(email, resetToken);
+    } else {
+      // W środowisku deweloperskim wyświetlamy token w konsoli
+      console.log(`Token resetowania dla ${email}: ${resetToken}`);
+    }
 
     return true;
   },
