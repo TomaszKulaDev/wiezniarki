@@ -17,7 +17,7 @@ export const authService = {
     }
 
     // W rzeczywistym projekcie zahaszowalibyśmy hasło
-    const passwordHash = `hashed_${password}`;
+    const hashedPassword = `hashed_${password}`;
 
     // Generowanie kodu weryfikacyjnego
     const verificationCode = Math.random()
@@ -28,7 +28,7 @@ export const authService = {
     const newUser: User = {
       id: Date.now().toString(),
       email,
-      passwordHash,
+      passwordHash: hashedPassword,
       role,
       verified: false,
       verificationCode,
@@ -41,9 +41,8 @@ export const authService = {
 
     users.push(newUser);
 
-    // Nie zwracamy hashu w odpowiedzi - używamy zmiennej bez podkreślenia
-    const { passwordHash: passwordHashOmitted, ...userWithoutPassword } =
-      newUser;
+    // Używamy destructuring bez zmiennych, które nie będą wykorzystane
+    const { passwordHash: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
   },
 
@@ -100,7 +99,7 @@ export const authService = {
     const token = `fake_jwt_token_${user.id}`;
 
     // Nie zwracamy hashu w odpowiedzi - używamy zmiennej bez podkreślenia
-    const { passwordHash: passwordHashOmitted, ...userWithoutPassword } = user;
+    const { passwordHash: _, ...userWithoutPassword } = user;
     return { token, user: userWithoutPassword };
   },
 

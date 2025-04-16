@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
 
     // Tymczasowo używamy tokena w kodzie - nie generuje to ostrzeżenia
     const authToken = authHeader.split(" ")[1];
+    console.log(`Otrzymano żądanie z tokenem: ${authToken.substring(0, 5)}...`);
 
     // Symulacja - w rzeczywistej aplikacji tutaj byłoby dekodowanie tokenu
     // i pobranie danych użytkownika

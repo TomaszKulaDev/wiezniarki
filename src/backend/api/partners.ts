@@ -1,6 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { partnerService } from "../services/partnerService";
 
+// Zamiast any, używamy typowanych interfejsów
+interface SearchCriteria {
+  minAge?: number;
+  maxAge?: number;
+  location?: string;
+  interests?: string[];
+  openToPrisonRelationship?: boolean;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -24,7 +33,7 @@ export default async function handler(
           }
         } else if (req.query.search) {
           // Wyszukaj partnerów wg kryteriów
-          const criteria: Record<string, unknown> = {};
+          const criteria: SearchCriteria = {};
 
           if (req.query.minAge)
             criteria.minAge = parseInt(req.query.minAge as string);
