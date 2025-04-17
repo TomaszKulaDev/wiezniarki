@@ -62,6 +62,18 @@ export const authApi = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+
+    updateProfileLink: builder.mutation<
+      { message: string },
+      { userId: string; profileId: string }
+    >({
+      query: (data) => ({
+        url: "auth/update-profile-link",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
@@ -70,4 +82,5 @@ export const {
   useRegisterMutation,
   useGetCurrentUserQuery,
   useLogoutMutation,
+  useUpdateProfileLinkMutation,
 } = authApi;

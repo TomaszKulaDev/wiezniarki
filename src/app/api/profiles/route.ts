@@ -41,3 +41,29 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    // Pobierz dane profilu z ciała żądania
+    const profileData = await request.json();
+
+    // Walidacja - sprawdź czy podstawowe pola są obecne
+    if (!profileData.firstName || !profileData.lastName || !profileData.age) {
+      return NextResponse.json(
+        { message: "Brakujące wymagane pola profilu" },
+        { status: 400 }
+      );
+    }
+
+    // Utwórz profil za pomocą serwisu
+    const newProfile = await profileService.createProfile(profileData);
+
+    return NextResponse.json(newProfile, { status: 201 });
+  } catch (error: unknown) {
+    console.error("Błąd podczas tworzenia profilu:", error);
+    return NextResponse.json(
+      { message: "Wystąpił błąd podczas tworzenia profilu" },
+      { status: 500 }
+    );
+  }
+}

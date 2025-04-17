@@ -9,13 +9,17 @@ import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import {
   useGetProfileByIdQuery,
   useUpdateProfileMutation,
+  useCreateProfileMutation,
 } from "@/frontend/store/apis/profileApi";
+import { useUpdateProfileLinkMutation } from "@/frontend/store/apis/authApi";
 import { Profile } from "@/backend/models/Profile";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Sprawdzamy czy użytkownik ma już profil
   const { data: profile, isLoading: profileLoading } = useGetProfileByIdQuery(
@@ -43,7 +47,10 @@ export default function ProfilePage() {
     hobbies: [],
   });
 
+  // Hooki RTK Query
   const [updateProfile] = useUpdateProfileMutation();
+  const [createProfile] = useCreateProfileMutation();
+  const [updateProfileLink] = useUpdateProfileLinkMutation();
 
   // Inicjalizacja formularza danymi z profilu
   useEffect(() => {
@@ -112,6 +119,8 @@ export default function ProfilePage() {
   // Zapisywanie zmian
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       if (profile) {
@@ -120,14 +129,62 @@ export default function ProfilePage() {
           id: profile.id,
           ...formData,
         }).unwrap();
-      } else {
-        // Tworzenie nowego profilu
-        // Tu należałoby zaimplementować createProfile mutation
-      }
+        setIsEditing(false);
+      } else if (user) {
+        // Przygotuj dane profilu, zapewniając że wszystkie wymagane pola są zdefiniowane
+        const profileDataToCreate: Omit<
+          Profile,
+          "id" | "createdAt" | "updatedAt"
+        > = {
+          firstName: formData.firstName || "", // Zapewnij niepustą wartość
+          lastName: formData.lastName || "", // Zapewnij niepustą wartość
+          age: formData.age || 18, // Zapewnij domyślny wiek
+          facility: formData.facility || "", // Zapewnij niepustą wartość
+          interests: formData.interests || [], // Zapewnij pustą tablicę
+          skills: formData.skills || [], // Zapewnij pustą tablicę
+          bio: formData.bio || "", // Zapewnij niepustą wartość
+          education: formData.education || "", // Zapewnij niepustą wartość
+          goals: formData.goals || "", // Zapewnij niepustą wartość
+          contactPreferences: formData.contactPreferences || {
+            email: true,
+            letter: false,
+            phone: false,
+          },
+          relationshipStatus: formData.relationshipStatus || "single",
+          personalityTraits: formData.personalityTraits || [],
+          hobbies: formData.hobbies || [],
+        };
 
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Błąd podczas zapisywania profilu:", error);
+        // Tworzenie nowego profilu z odpowiednio przygotowanymi danymi
+        const newProfile = await createProfile(profileDataToCreate).unwrap();
+        console.log("Utworzono profil:", newProfile);
+
+        // Użyj właściwego ID (albo email jako alternatywa) do powiązania
+        try {
+          // Preferuj użycie ID, ale jeśli to nie zadziała, możesz spróbować email
+          await updateProfileLink({
+            userId: user.id || user.email, // Używaj ID lub email jako fallback
+            profileId: newProfile.id,
+          }).unwrap();
+          console.log("Powiązanie zaktualizowane");
+
+          // Pokaż komunikat sukcesu
+          setError(null);
+          alert("Profil został pomyślnie utworzony!");
+          router.refresh();
+        } catch (linkError) {
+          console.error("Błąd powiązania:", linkError);
+          // Pokaż bardziej pomocny komunikat dla MVP
+          setError(
+            "Profil został utworzony, ale wystąpił problem z powiązaniem go z kontem. Odśwież stronę lub skontaktuj się z administratorem."
+          );
+        }
+      }
+    } catch (mainError) {
+      console.error("Główny błąd:", mainError);
+      setError("Wystąpił błąd podczas zapisywania profilu. Spróbuj ponownie.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -136,7 +193,7 @@ export default function ProfilePage() {
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-700"></div>
         </main>
         <Footer />
       </div>
@@ -171,12 +228,19 @@ export default function ProfilePage() {
                 {profile && !isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+                    className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors"
                   >
                     Edytuj profil
                   </button>
                 )}
               </div>
+
+              {/* Wyświetl błąd jeśli występuje */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+                  {error}
+                </div>
+              )}
 
               {/* Formularz lub widok profilu */}
               {isEditing || !profile ? (
@@ -248,7 +312,7 @@ export default function ProfilePage() {
                       {formData.interests?.map((interest) => (
                         <div
                           key={interest}
-                          className="bg-primary/10 text-primary px-3 py-1 rounded-full flex items-center"
+                          className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full flex items-center"
                         >
                           {interest}
                           <button
@@ -256,7 +320,7 @@ export default function ProfilePage() {
                             onClick={() =>
                               handleInterestChange(interest, "remove")
                             }
-                            className="ml-2 text-primary/70 hover:text-primary"
+                            className="ml-2 text-slate-500 hover:text-slate-700"
                           >
                             ×
                           </button>
@@ -281,7 +345,7 @@ export default function ProfilePage() {
                             input.value = "";
                           }
                         }}
-                        className="bg-primary text-white px-4 py-2 rounded-r hover:bg-primary/90"
+                        className="bg-slate-700 text-white px-4 py-2 rounded-r hover:bg-slate-800 transition-colors"
                       >
                         Dodaj
                       </button>
@@ -295,15 +359,45 @@ export default function ProfilePage() {
                         type="button"
                         onClick={() => setIsEditing(false)}
                         className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        disabled={isSubmitting}
                       >
                         Anuluj
                       </button>
                     )}
                     <button
                       type="submit"
-                      className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+                      className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isSubmitting}
                     >
-                      {profile ? "Zapisz zmiany" : "Utwórz profil"}
+                      {isSubmitting ? (
+                        <span className="flex items-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          {profile ? "Zapisywanie..." : "Tworzenie..."}
+                        </span>
+                      ) : (
+                        <span>
+                          {profile ? "Zapisz zmiany" : "Utwórz profil"}
+                        </span>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -345,11 +439,16 @@ export default function ProfilePage() {
                       {profile.interests?.map((interest) => (
                         <div
                           key={interest}
-                          className="bg-primary/10 text-primary px-3 py-1 rounded-full"
+                          className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full"
                         >
                           {interest}
                         </div>
                       ))}
+                      {profile.interests?.length === 0 && (
+                        <p className="text-gray-500 italic">
+                          Brak zainteresowań
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
