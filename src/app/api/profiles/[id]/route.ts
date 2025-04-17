@@ -38,10 +38,10 @@ export async function GET(
 // Dodajemy metodę PATCH do obsługi aktualizacji profilu
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = context.params.id;
 
     if (!id) {
       return NextResponse.json(
@@ -86,10 +86,10 @@ export async function PATCH(
 // Dodajemy metodę DELETE do obsługi usuwania profilu
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = context.params.id;
 
     if (!id) {
       return NextResponse.json(
