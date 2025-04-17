@@ -68,6 +68,18 @@ export const profileApi = createApi({
         ],
       }
     ),
+
+    createProfile: builder.mutation<
+      Profile,
+      Omit<Profile, "id" | "createdAt" | "updatedAt">
+    >({
+      query: (profileData) => ({
+        url: "profiles",
+        method: "POST",
+        body: profileData,
+      }),
+      invalidatesTags: [{ type: "Profile", id: "LIST" }],
+    }),
   }),
 });
 
@@ -76,4 +88,5 @@ export const {
   useGetProfilesQuery,
   useGetProfileByIdQuery,
   useUpdateProfileMutation,
+  useCreateProfileMutation,
 } = profileApi;

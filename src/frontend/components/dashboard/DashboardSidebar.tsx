@@ -251,27 +251,37 @@ export default function DashboardSidebar({ user }: DashboardSidebarProps) {
       </div>
 
       <div className="space-y-1">
-        {menuItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex items-center justify-between px-4 py-3 rounded-md transition-colors ${
-              pathname === item.href
-                ? "bg-primary text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            <div className="flex items-center">
-              <span className="mr-3">{renderIcon(item.icon)}</span>
-              <span>{item.name}</span>
-            </div>
-            {item.badge && (
-              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {item.badge}
-              </span>
-            )}
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center justify-between px-4 py-3 rounded-md transition-all ${
+                isActive
+                  ? "bg-slate-700 text-white font-medium"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              <div className="flex items-center">
+                <span
+                  className={`mr-3 ${
+                    isActive ? "text-white" : "text-slate-500"
+                  }`}
+                >
+                  {renderIcon(item.icon)}
+                </span>
+                <span>{item.name}</span>
+              </div>
+              {item.badge && (
+                <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="mt-8 pt-6 border-t">
