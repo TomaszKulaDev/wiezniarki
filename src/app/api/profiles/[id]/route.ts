@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { profileService } from "@/backend/services/profileService";
 
-// Podejście z jawnym typem "Partial<Record<string, string | string[]>>"
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Record<string, string> }
-) {
+// Funkcja pomocnicza do wyodrębniania ID z URL
+function getIdFromUrl(request: NextRequest): string | null {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split("/");
+  return pathParts[pathParts.length - 1] || null;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const id = params.id;
+    const id = getIdFromUrl(request);
 
     if (!id) {
       return NextResponse.json(
@@ -39,12 +40,9 @@ export async function GET(
 }
 
 // Dodajemy metodę PATCH do obsługi aktualizacji profilu
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Record<string, string> }
-) {
+export async function PATCH(request: NextRequest) {
   try {
-    const id = params.id;
+    const id = getIdFromUrl(request);
 
     if (!id) {
       return NextResponse.json(
@@ -87,12 +85,9 @@ export async function PATCH(
 }
 
 // Dodajemy metodę DELETE do obsługi usuwania profilu
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Record<string, string> }
-) {
+export async function DELETE(request: NextRequest) {
   try {
-    const id = params.id;
+    const id = getIdFromUrl(request);
 
     if (!id) {
       return NextResponse.json(
