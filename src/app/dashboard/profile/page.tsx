@@ -7,6 +7,7 @@ import Footer from "@/frontend/components/layout/Footer";
 import DashboardSidebar from "@/frontend/components/dashboard/DashboardSidebar";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import {
+  useGetProfilesQuery,
   useGetProfileByIdQuery,
   useUpdateProfileMutation,
   useCreateProfileMutation,
@@ -17,15 +18,53 @@ import { Profile } from "@/backend/models/Profile";
 export default function ProfilePage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
+// Pobierz wszystkie profile, aby znaleźć profil użytkownika, jeśli istnieje
+  const { data: allProfiles } = useGetProfilesQuery();
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Sprawdzamy czy użytkownik ma już profil
+  // Lokalne ID profilu, które będzie używane zamiast user.profileId
+  const [localProfileId, setLocalProfileId] = useState<string | null>(null);
+
+  // Znajdź profil po jego ID, używając lokalnego ID jeśli dostępne
+  const profileId = localProfileId || user?.profileId || "none";
   const { data: profile, isLoading: profileLoading } = useGetProfileByIdQuery(
-    user?.profileId || "none",
-    { skip: !user?.profileId }
+    profileId,
+    { skip: profileId === "none" }
   );
+
+  // Sprawdź, czy klucz lokalny "createdProfileId" istnieje
+  useEffect(() => {
+    const savedProfileId = localStorage.getItem("createdProfileId");
+    if (savedProfileId) {
+      setLocalProfileId(savedProfileId);
+    }
+  }, []);
+
+  // Sprawdź czy użytkownik ma już profil w bazie danych
+  useEffect(() => {
+    if (user && allProfiles && allProfiles.length > 0) {
+      // Jeśli mamy nowego użytkownika i listę profili, znajdźmy profil
+      // który może należeć do tego użytkownika (na podstawie innych pól)
+      const userEmail = user.email;
+
+      // Np. możemy sprawdzić, czy jest profil z imieniem lub nazwiskiem
+      // zawierającym część adresu email (prostą heurystykę)
+      const possibleUserProfile = allProfiles.find(
+        (p) =>
+          p.firstName.includes(userEmail.split("@")[0]) ||
+          p.lastName.includes(userEmail.split("@")[0])
+      );
+
+      if (possibleUserProfile) {
+        setLocalProfileId(possibleUserProfile.id);
+        localStorage.setItem("createdProfileId", possibleUserProfile.id);
+      }
+    }
+  }, [user, allProfiles]);
 
   const [formData, setFormData] = useState<Partial<Profile>>({
     firstName: "",
@@ -60,15 +99,19 @@ export default function ProfilePage() {
         lastName: profile.lastName,
         age: profile.age,
         facility: profile.facility,
-        interests: profile.interests,
-        skills: profile.skills,
-        bio: profile.bio,
-        education: profile.education,
-        goals: profile.goals,
-        contactPreferences: profile.contactPreferences,
-        relationshipStatus: profile.relationshipStatus,
-        personalityTraits: profile.personalityTraits,
-        hobbies: profile.hobbies,
+        interests: profile.interests || [],
+        skills: profile.skills || [],
+        bio: profile.bio || "",
+        education: profile.education || "",
+        goals: profile.goals || "",
+        contactPreferences: profile.contactPreferences || {
+          email: true,
+          letter: false,
+          phone: false,
+        },
+        relationshipStatus: profile.relationshipStatus || "single",
+        personalityTraits: profile.personalityTraits || [],
+        hobbies: profile.hobbies || [],
       });
     }
   }, [profile]);
@@ -89,10 +132,13 @@ export default function ProfilePage() {
   // Handler dla zainteresowań (dodawanie/usuwanie tagów)
   const handleInterestChange = (interest: string, action: "add" | "remove") => {
     if (action === "add") {
+      // Sprawdź czy zainteresowanie już istnieje
+      if (!formData.interests?.includes(interest)) {
       setFormData((prev) => ({
         ...prev,
         interests: [...(prev.interests || []), interest],
       }));
+      }
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -116,35 +162,37 @@ export default function ProfilePage() {
     }
   };
 
-  // Zapisywanie zmian
+  // Funkcja obsługująca formularz
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setSuccess(null);
 
     try {
       if (profile) {
         // Aktualizacja istniejącego profilu
-        await updateProfile({
+        const updatedProfile = await updateProfile({
           id: profile.id,
           ...formData,
         }).unwrap();
+
+        // Aktualizacja lokalnego stanu
+        console.log("Profil zaktualizowany:", updatedProfile);
+        setSuccess("Profil został pomyślnie zaktualizowany");
         setIsEditing(false);
       } else if (user) {
-        // Przygotuj dane profilu, zapewniając że wszystkie wymagane pola są zdefiniowane
-        const profileDataToCreate: Omit<
-          Profile,
-          "id" | "createdAt" | "updatedAt"
-        > = {
-          firstName: formData.firstName || "", // Zapewnij niepustą wartość
-          lastName: formData.lastName || "", // Zapewnij niepustą wartość
-          age: formData.age || 18, // Zapewnij domyślny wiek
-          facility: formData.facility || "", // Zapewnij niepustą wartość
-          interests: formData.interests || [], // Zapewnij pustą tablicę
-          skills: formData.skills || [], // Zapewnij pustą tablicę
-          bio: formData.bio || "", // Zapewnij niepustą wartość
-          education: formData.education || "", // Zapewnij niepustą wartość
-          goals: formData.goals || "", // Zapewnij niepustą wartość
+        // Tworzenie nowego profilu
+        const profileDataToCreate = {
+          firstName: formData.firstName || "",
+          lastName: formData.lastName || "",
+          age: formData.age || 18,
+          facility: formData.facility || "",
+          interests: formData.interests || [],
+          skills: formData.skills || [],
+          bio: formData.bio || "",
+          education: formData.education || "",
+          goals: formData.goals || "",
           contactPreferences: formData.contactPreferences || {
             email: true,
             letter: false,
@@ -155,30 +203,31 @@ export default function ProfilePage() {
           hobbies: formData.hobbies || [],
         };
 
-        // Tworzenie nowego profilu z odpowiednio przygotowanymi danymi
+        // Tworzenie nowego profilu
         const newProfile = await createProfile(profileDataToCreate).unwrap();
         console.log("Utworzono profil:", newProfile);
 
-        // Użyj właściwego ID (albo email jako alternatywa) do powiązania
+        // Zapisz ID profilu w localStorage dla trwałości
+        localStorage.setItem("createdProfileId", newProfile.id);
+        setLocalProfileId(newProfile.id);
+
+        // Aktualizacja powiązania
         try {
-          // Preferuj użycie ID, ale jeśli to nie zadziała, możesz spróbować email
           await updateProfileLink({
-            userId: user.id || user.email, // Używaj ID lub email jako fallback
+            userId: user.id,
             profileId: newProfile.id,
           }).unwrap();
           console.log("Powiązanie zaktualizowane");
-
-          // Pokaż komunikat sukcesu
-          setError(null);
-          alert("Profil został pomyślnie utworzony!");
-          router.refresh();
+          setSuccess("Profil został utworzony pomyślnie");
         } catch (linkError) {
           console.error("Błąd powiązania:", linkError);
-          // Pokaż bardziej pomocny komunikat dla MVP
           setError(
-            "Profil został utworzony, ale wystąpił problem z powiązaniem go z kontem. Odśwież stronę lub skontaktuj się z administratorem."
+            "Profil został utworzony, ale wystąpił problem z powiązaniem go z kontem."
           );
         }
+
+        // Wyłącz edycję
+        setIsEditing(false);
       }
     } catch (mainError) {
       console.error("Główny błąd:", mainError);
@@ -188,7 +237,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (userLoading || profileLoading) {
+  if (userLoading || (profileLoading && localProfileId)) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
@@ -211,9 +260,7 @@ export default function ProfilePage() {
               <DashboardSidebar user={user} />
             ) : (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="animate-pulse h-24 w-24 rounded-full bg-gray-200 mx-auto"></div>
-                <div className="animate-pulse h-6 bg-gray-200 rounded mt-4 mx-auto w-3/4"></div>
-                <div className="animate-pulse h-4 bg-gray-200 rounded mt-2 mx-auto w-1/2"></div>
+                {/* Placeholder */}
               </div>
             )}
           </div>
@@ -235,10 +282,15 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Wyświetl błąd jeśli występuje */}
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
                   {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+                  {success}
                 </div>
               )}
 
@@ -320,7 +372,7 @@ export default function ProfilePage() {
                             onClick={() =>
                               handleInterestChange(interest, "remove")
                             }
-                            className="ml-2 text-slate-500 hover:text-slate-700"
+                            className="ml-2 text-red-500 hover:text-red-700"
                           >
                             ×
                           </button>
@@ -330,25 +382,149 @@ export default function ProfilePage() {
                     <div className="flex">
                       <input
                         type="text"
-                        id="new-interest"
+                        id="newInterest"
                         className="w-full border border-gray-300 rounded-l-md px-3 py-2"
-                        placeholder="Dodaj zainteresowanie"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const input = document.getElementById(
-                            "new-interest"
-                          ) as HTMLInputElement;
+                        placeholder="Dodaj zainteresowanie i naciśnij Enter"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const input = e.target as HTMLInputElement;
                           if (input.value.trim()) {
                             handleInterestChange(input.value.trim(), "add");
                             input.value = "";
                           }
+                          }
                         }}
-                        className="bg-slate-700 text-white px-4 py-2 rounded-r hover:bg-slate-800 transition-colors"
-                      >
-                        Dodaj
-                      </button>
+                      />
+                    </div>
+                  </div>
+
+                  {/* Bio */}
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      O mnie
+                    </label>
+                    <textarea
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 h-32"
+                      placeholder="Napisz coś o sobie..."
+                    />
+                  </div>
+
+                  {/* Wykształcenie */}
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Wykształcenie
+                    </label>
+                    <input
+                      type="text"
+                      name="education"
+                      value={formData.education}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                  </div>
+
+                  {/* Cele */}
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Cele i aspiracje
+                    </label>
+                    <textarea
+                      name="goals"
+                      value={formData.goals}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 h-32"
+                      placeholder="Jakie masz cele i aspiracje na przyszłość?"
+                    />
+                  </div>
+
+                  {/* Status związku */}
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Status związku
+                    </label>
+                    <select
+                      name="relationshipStatus"
+                      value={formData.relationshipStatus}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="single">Singiel/ka</option>
+                      <option value="complicated">Skomplikowany</option>
+                      <option value="divorced">Rozwiedziony/a</option>
+                      <option value="widowed">Wdowiec/Wdowa</option>
+                    </select>
+                  </div>
+
+                  {/* Preferencje kontaktu */}
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Preferowane formy kontaktu
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.contactPreferences?.email ?? true}
+                          onChange={(e) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              contactPreferences: {
+                                email: e.target.checked,
+                                letter:
+                                  prev.contactPreferences?.letter ?? false,
+                                phone: prev.contactPreferences?.phone ?? false,
+                              },
+                            }));
+                          }}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">
+                          Email
+                        </span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.contactPreferences?.letter ?? false}
+                          onChange={(e) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              contactPreferences: {
+                                email: prev.contactPreferences?.email ?? true,
+                                letter: e.target.checked,
+                                phone: prev.contactPreferences?.phone ?? false,
+                              },
+                            }));
+                          }}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">List</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.contactPreferences?.phone ?? false}
+                          onChange={(e) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              contactPreferences: {
+                                email: prev.contactPreferences?.email ?? true,
+                                letter:
+                                  prev.contactPreferences?.letter ?? false,
+                                phone: e.target.checked,
+                              },
+                            }));
+                          }}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">
+                          Telefon
+                        </span>
+                      </label>
                     </div>
                   </div>
 
@@ -366,33 +542,11 @@ export default function ProfilePage() {
                     )}
                     <button
                       type="submit"
-                      className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors disabled:opacity-50"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
-                        <span className="flex items-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          {profile ? "Zapisywanie..." : "Tworzenie..."}
-                        </span>
+                        <span>Zapisywanie...</span>
                       ) : (
                         <span>
                           {profile ? "Zapisz zmiany" : "Utwórz profil"}
@@ -436,7 +590,7 @@ export default function ProfilePage() {
                       Zainteresowania
                     </h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {profile.interests?.map((interest) => (
+                      {(profile.interests || []).map((interest) => (
                         <div
                           key={interest}
                           className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full"
@@ -444,7 +598,7 @@ export default function ProfilePage() {
                           {interest}
                         </div>
                       ))}
-                      {profile.interests?.length === 0 && (
+                      {(profile.interests || []).length === 0 && (
                         <p className="text-gray-500 italic">
                           Brak zainteresowań
                         </p>

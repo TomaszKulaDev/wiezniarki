@@ -3,10 +3,10 @@ import { profileService } from "@/backend/services/profileService";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -30,6 +30,54 @@ export async function GET(
     console.error("Błąd podczas pobierania profilu:", error);
     return NextResponse.json(
       { message: "Wystąpił błąd podczas pobierania profilu" },
+      { status: 500 }
+    );
+  }
+}
+
+// Dodajemy metodę PATCH do obsługi aktualizacji profilu
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "ID profilu jest wymagane" },
+        { status: 400 }
+      );
+    }
+
+    // Pobieramy dane aktualizacji z ciała żądania
+    const updateData = await request.json();
+
+    // Sprawdzamy, czy profil istnieje
+    const existingProfile = await profileService.getProfileById(id);
+
+    if (!existingProfile) {
+      return NextResponse.json(
+        { message: "Profil nie został znaleziony" },
+        { status: 404 }
+      );
+    }
+
+    // Aktualizujemy profil
+    const updatedProfile = await profileService.updateProfile(id, updateData);
+
+    if (!updatedProfile) {
+      return NextResponse.json(
+        { message: "Nie udało się zaktualizować profilu" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(updatedProfile, { status: 200 });
+  } catch (error: unknown) {
+    console.error("Błąd podczas aktualizacji profilu:", error);
+    return NextResponse.json(
+      { message: "Wystąpił błąd podczas aktualizacji profilu" },
       { status: 500 }
     );
   }
