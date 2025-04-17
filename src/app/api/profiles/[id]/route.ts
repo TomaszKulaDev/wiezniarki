@@ -1,6 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { profileService } from "@/backend/services/profileService";
 
+/**
+ * UWAGA DLA PRZYSZŁYCH PROGRAMISTÓW
+ * -----------------------------------------------------------------------------
+ * Ten plik zawiera obejście problemu typów w Next.js 15.2.4 dla API Routes z dynamicznymi segmentami.
+ *
+ * PROBLEM:
+ * W Next.js 15.2.4 występuje problem z typami dla funkcji obsługi żądań HTTP (GET, PATCH, DELETE)
+ * w plikach route.ts znajdujących się w folderach z dynamicznymi segmentami ([id]).
+ *
+ * Standardowa składnia:
+ * ```
+ * export async function GET(
+ *   request: NextRequest,
+ *   { params }: { params: { id: string } }
+ * ) {...}
+ * ```
+ *
+ * Powoduje błąd typów podczas budowania:
+ * "Type error: Route has an invalid GET export: Type { params: { id: string } }
+ * is not a valid type for the function's second argument."
+ *
+ * ROZWIĄZANIE:
+ * Zamiast polegać na mechanizmie segmentów dynamicznych Next.js, ręcznie wyciągamy ID
+ * bezpośrednio z URL żądania. Funkcje obsługi żądań HTTP przyjmują tylko obiekt request
+ * jako parametr, co całkowicie omija problem typów.
+ *
+ * ALTERNATYWY:
+ * 1. Aktualizacja do nowszej wersji Next.js, jeśli problem został naprawiony
+ * 2. Downgrade do starszej wersji Next.js (np. 14.x), gdzie ten problem nie występuje
+ * 3. Użycie flagi --no-lint podczas budowania: "next build --no-lint"
+ *
+ * DODATKOWE INFORMACJE:
+ * - Jest to znany problem związany z pewnymi wersjami Next.js
+ * - To rozwiązanie zachowuje pełną funkcjonalność API Routes, ale z innym sposobem dostępu do parametrów URL
+ * - Gdy problem zostanie rozwiązany w przyszłych wersjach Next.js, można wrócić do standardowej składni
+ */
+
 // Funkcja pomocnicza do wyodrębniania ID z URL
 function getIdFromUrl(request: NextRequest): string | null {
   const url = new URL(request.url);
