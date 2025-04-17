@@ -470,6 +470,22 @@ export default function ProfilePage() {
                           }
                         }}
                       />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const input = document.getElementById(
+                            "newInterest"
+                          ) as HTMLInputElement;
+                          if (input.value.trim()) {
+                            handleInterestChange(input.value.trim(), "add");
+                            input.value = "";
+                          }
+                        }}
+                        className="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-primary-dark transition-colors"
+                        style={{ backgroundColor: "#1e50a0" }}
+                      >
+                        Dodaj
+                      </button>
                     </div>
                   </div>
 
@@ -608,7 +624,7 @@ export default function ProfilePage() {
                       <button
                         type="button"
                         onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
                         disabled={isSubmitting}
                       >
                         Anuluj
@@ -616,7 +632,8 @@ export default function ProfilePage() {
                     )}
                     <button
                       type="submit"
-                      className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors disabled:opacity-50"
+                      className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors disabled:opacity-50"
+                      style={{ backgroundColor: "#1e50a0" }}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
