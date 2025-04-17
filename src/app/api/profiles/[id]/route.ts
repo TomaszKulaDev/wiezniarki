@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { profileService } from "@/backend/services/profileService";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = { params: { id: string } };
+
+export async function GET(request: NextRequest, { params }: Params) {
   try {
     const id = params.id;
 
@@ -36,10 +35,7 @@ export async function GET(
 }
 
 // Dodajemy metodę PATCH do obsługi aktualizacji profilu
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: Params) {
   try {
     const id = params.id;
 
@@ -84,10 +80,7 @@ export async function PATCH(
 }
 
 // Dodajemy metodę DELETE do obsługi usuwania profilu
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     const id = params.id;
 
