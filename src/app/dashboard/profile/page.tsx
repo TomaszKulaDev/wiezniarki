@@ -18,7 +18,7 @@ import { Profile } from "@/backend/models/Profile";
 export default function ProfilePage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
-// Pobierz wszystkie profile, aby znaleźć profil użytkownika, jeśli istnieje
+  // Pobierz wszystkie profile, aby znaleźć profil użytkownika, jeśli istnieje
   const { data: allProfiles } = useGetProfilesQuery();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -134,10 +134,10 @@ export default function ProfilePage() {
     if (action === "add") {
       // Sprawdź czy zainteresowanie już istnieje
       if (!formData.interests?.includes(interest)) {
-      setFormData((prev) => ({
-        ...prev,
-        interests: [...(prev.interests || []), interest],
-      }));
+        setFormData((prev) => ({
+          ...prev,
+          interests: [...(prev.interests || []), interest],
+        }));
       }
     } else {
       setFormData((prev) => ({
@@ -389,10 +389,10 @@ export default function ProfilePage() {
                           if (e.key === "Enter") {
                             e.preventDefault();
                             const input = e.target as HTMLInputElement;
-                          if (input.value.trim()) {
-                            handleInterestChange(input.value.trim(), "add");
-                            input.value = "";
-                          }
+                            if (input.value.trim()) {
+                              handleInterestChange(input.value.trim(), "add");
+                              input.value = "";
+                            }
                           }
                         }}
                       />
