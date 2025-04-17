@@ -1,11 +1,11 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { profileService } from "@/backend/services/profileService";
 
-// Definicja bez własnych typów
+// Podejście z jawnym typem "Partial<Record<string, string | string[]>>"
 export async function GET(
   request: NextRequest,
-  // Używamy tego konkretnego formatu bez alternatywnych typów
-  { params }: { params: { id: string } }
+  { params }: { params: Record<string, string> }
 ) {
   try {
     const id = params.id;
@@ -40,7 +40,7 @@ export async function GET(
 // Dodajemy metodę PATCH do obsługi aktualizacji profilu
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Record<string, string> }
 ) {
   try {
     const id = params.id;
@@ -88,7 +88,7 @@ export async function PATCH(
 // Dodajemy metodę DELETE do obsługi usuwania profilu
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Record<string, string> }
 ) {
   try {
     const id = params.id;
