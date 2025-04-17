@@ -80,6 +80,18 @@ export const profileApi = createApi({
       }),
       invalidatesTags: [{ type: "Profile", id: "LIST" }],
     }),
+
+    // Dodaj mutation do usuwania profilu
+    deleteProfile: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `profiles/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_, __, id) => [
+        { type: "Profile", id },
+        { type: "Profile", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -89,4 +101,5 @@ export const {
   useGetProfileByIdQuery,
   useUpdateProfileMutation,
   useCreateProfileMutation,
+  useDeleteProfileMutation,
 } = profileApi;

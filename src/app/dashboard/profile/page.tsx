@@ -11,6 +11,7 @@ import {
   useGetProfileByIdQuery,
   useUpdateProfileMutation,
   useCreateProfileMutation,
+  useDeleteProfileMutation,
 } from "@/frontend/store/apis/profileApi";
 import { useUpdateProfileLinkMutation } from "@/frontend/store/apis/authApi";
 import { Profile } from "@/backend/models/Profile";
@@ -90,6 +91,8 @@ export default function ProfilePage() {
   const [updateProfile] = useUpdateProfileMutation();
   const [createProfile] = useCreateProfileMutation();
   const [updateProfileLink] = useUpdateProfileLinkMutation();
+  const [deleteProfile] = useDeleteProfileMutation();
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Inicjalizacja formularza danymi z profilu
   useEffect(() => {
@@ -237,6 +240,38 @@ export default function ProfilePage() {
     }
   };
 
+  // Dodaj funkcję obsługującą usuwanie profilu
+  const handleDeleteProfile = async () => {
+    if (!profile) return;
+
+    try {
+      setIsSubmitting(true);
+
+      // Usunięcie profilu
+      await deleteProfile(profile.id).unwrap();
+
+      // Wyczyszczenie ID profilu z localStorage
+      localStorage.removeItem("createdProfileId");
+      setLocalProfileId(null);
+
+      // Komunikat o sukcesie
+      setSuccess("Profil został usunięty");
+      setError(null);
+      setConfirmDelete(false);
+
+      // Przekierowanie na dashboard
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+    } catch (error) {
+      console.error("Błąd podczas usuwania profilu:", error);
+      setError("Wystąpił błąd podczas usuwania profilu");
+      setSuccess(null);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (userLoading || (profileLoading && localProfileId)) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -273,14 +308,53 @@ export default function ProfilePage() {
                   {profile ? "Mój profil" : "Utwórz profil"}
                 </h1>
                 {profile && !isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors"
-                  >
-                    Edytuj profil
-                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors"
+                    >
+                      Edytuj profil
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(true)}
+                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                    >
+                      Usuń profil
+                    </button>
+                  </div>
                 )}
               </div>
+
+              {/* Dialog potwierdzenia usunięcia */}
+              {confirmDelete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">
+                      Potwierdź usunięcie
+                    </h3>
+                    <p className="text-gray-700 mb-6">
+                      Czy na pewno chcesz usunąć swój profil? Ta operacja jest
+                      nieodwracalna.
+                    </p>
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        disabled={isSubmitting}
+                      >
+                        Anuluj
+                      </button>
+                      <button
+                        onClick={handleDeleteProfile}
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Usuwanie..." : "Usuń profil"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">

@@ -49,12 +49,18 @@ export const profileService = {
 
   // Usuń profil
   async deleteProfile(id: string): Promise<boolean> {
-    const result = await mongodbService.deleteDocument(
-      dbName,
-      COLLECTION_NAME,
-      { id }
-    );
-    return result.deletedCount === 1;
+    try {
+      const result = await mongodbService.deleteDocument(
+        dbName,
+        COLLECTION_NAME,
+        { id }
+      );
+
+      return result !== null;
+    } catch (error) {
+      console.error(`Błąd podczas usuwania profilu ${id}:`, error);
+      return false;
+    }
   },
 
   // Wyszukaj profile według kryteriów

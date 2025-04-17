@@ -82,3 +82,51 @@ export async function PATCH(
     );
   }
 }
+
+// Dodajemy metodę DELETE do obsługi usuwania profilu
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "ID profilu jest wymagane" },
+        { status: 400 }
+      );
+    }
+
+    // Sprawdzamy, czy profil istnieje
+    const existingProfile = await profileService.getProfileById(id);
+
+    if (!existingProfile) {
+      return NextResponse.json(
+        { message: "Profil nie został znaleziony" },
+        { status: 404 }
+      );
+    }
+
+    // Usuwamy profil
+    const result = await profileService.deleteProfile(id);
+
+    if (!result) {
+      return NextResponse.json(
+        { message: "Nie udało się usunąć profilu" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Profil został usunięty" },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    console.error("Błąd podczas usuwania profilu:", error);
+    return NextResponse.json(
+      { message: "Wystąpił błąd podczas usuwania profilu" },
+      { status: 500 }
+    );
+  }
+}
