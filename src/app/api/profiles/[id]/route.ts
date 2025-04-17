@@ -3,10 +3,10 @@ import { profileService } from "@/backend/services/profileService";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = context.params.id;
 
     if (!id) {
       return NextResponse.json(
@@ -123,7 +123,7 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error: unknown) {
-    console.error("Błąd podczas usuwania profilu:", error);
+    console.error("Błąd podczas usuwania profiluu:", error);
     return NextResponse.json(
       { message: "Wystąpił błąd podczas usuwania profilu" },
       { status: 500 }
