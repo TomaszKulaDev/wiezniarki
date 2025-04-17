@@ -3,10 +3,10 @@ import { profileService } from "@/backend/services/profileService";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
 
     if (!id) {
       return NextResponse.json(
@@ -38,10 +38,10 @@ export async function GET(
 // Dodajemy metodę PATCH do obsługi aktualizacji profilu
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
 
     if (!id) {
       return NextResponse.json(
@@ -86,10 +86,10 @@ export async function PATCH(
 // Dodajemy metodę DELETE do obsługi usuwania profilu
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
 
     if (!id) {
       return NextResponse.json(
