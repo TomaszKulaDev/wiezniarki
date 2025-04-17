@@ -13,6 +13,10 @@ import {
   loginSuccess,
 } from "@/frontend/store/slices/authSlice";
 import { Suspense } from "react";
+import {
+  useRefreshMutation,
+  useLogoutMutation,
+} from "@/frontend/store/apis/authApi";
 
 // Komponent obudowujący przyciski logowania/rejestracji
 // Ten komponent będzie renderowany dopiero po sprawdzeniu autoryzacji
@@ -114,6 +118,8 @@ export default function Navbar() {
   const [isMounted, setIsMounted] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [refresh] = useRefreshMutation();
+  const [logoutMutation] = useLogoutMutation();
 
   // Funkcja do pobierania nazwy strony na podstawie ścieżki
   const getPageNameFromPath = (path: string) => {
@@ -139,18 +145,26 @@ export default function Navbar() {
 
   const checkAuthStatus = useCallback(() => {
     try {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const accessToken = localStorage.getItem("accessToken");
+      const refreshToken = localStorage.getItem("refreshToken");
 
-      if (token) {
-        // W rzeczywistej aplikacji tutaj dekodowalibyśmy token JWT
-        dispatch(
-          loginSuccess({
-            id: "temp-id",
-            email: "user@example.com",
-            role: "partner",
+      if (accessToken) {
+        // Automatycznie pobierz dane użytkownika z backendu
+        // RTK Query getCurrentUser pobierze dane z tokenu
+      } else if (refreshToken) {
+        // Spróbuj odświeżyć token
+        refresh(refreshToken)
+          .unwrap()
+          .then(({ accessToken, refreshToken: newRefreshToken }) => {
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", newRefreshToken);
           })
-        );
+          .catch(() => {
+            // Jeśli odświeżenie nie powiedzie się, wyloguj
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            dispatch(logout());
+          });
       } else {
         dispatch(logout());
       }
@@ -158,7 +172,7 @@ export default function Navbar() {
       console.error("Błąd podczas sprawdzania stanu logowania:", error);
       dispatch(logout());
     }
-  }, [dispatch]);
+  }, [dispatch, refresh]);
 
   // Sprawdzamy czy jesteśmy w przeglądarce przy pierwszym renderze
   useEffect(() => {
@@ -169,10 +183,13 @@ export default function Navbar() {
 
   const handleLogout = () => {
     try {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
+      // Użyj RTK Query do wylogowania
+      logoutMutation().unwrap().catch(console.error);
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
+      // Wyczyść tokeny nawet w przypadku błędu
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     }
 
     dispatch(logout());

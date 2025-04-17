@@ -1,50 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-// Tymczasowo komentujemy nieużywany import
-// import { authService } from "@/backend/services/authService";
+import {
+  authMiddleware,
+  AuthenticatedRequest,
+} from "@/backend/middlewares/authMiddleware";
+import { mongodbService } from "@/backend/services/mongodbService";
+import { dbName } from "@/backend/utils/mongodb";
+import { User } from "@/backend/models/User";
 
-export async function GET(request: NextRequest) {
+async function getUserHandler(request: AuthenticatedRequest) {
   try {
-    // Pobierz token z nagłówka
-    const authHeader = request.headers.get("authorization");
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!request.user) {
       return NextResponse.json(
-        { message: "Brak tokenu autoryzacji" },
+        { message: "Użytkownik nie jest uwierzytelniony" },
         { status: 401 }
       );
     }
 
-    // Tymczasowo używamy tokena w kodzie - nie generuje to ostrzeżenia
-    const authToken = authHeader.split(" ")[1];
-    console.log(`Otrzymano żądanie z tokenem: ${authToken.substring(0, 5)}...`);
+    // Pobierz pełne dane użytkownika
+    const user = await mongodbService.findDocument<User>(dbName, "users", {
+      id: request.user.userId,
+    });
 
-    // Symulacja - w rzeczywistej aplikacji tutaj byłoby dekodowanie tokenu
-    // i pobranie danych użytkownika
-    const decodedToken = {
-      userId: "1",
-      email: "test@example.com",
-      role: "partner",
-    };
+    if (!user) {
+      return NextResponse.json(
+        { message: "Użytkownik nie został znaleziony" },
+        { status: 404 }
+      );
+    }
 
-    // Symulacja danych użytkownika
-    const user = {
-      id: decodedToken.userId,
-      email: decodedToken.email,
-      role: decodedToken.role,
-      verified: true,
-      profileId: null,
-      active: true,
-      lastLogin: new Date().toISOString(),
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    };
+    // Nie zwracaj hashu
+    const { passwordHash, ...userWithoutPassword } = user;
 
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(userWithoutPassword, { status: 200 });
   } catch (error: unknown) {
-    console.error("Błąd autoryzacji:", error);
+    console.error("Błąd pobierania danych użytkownika:", error);
 
     return NextResponse.json(
-      { message: "Wystąpił błąd autoryzacji" },
+      { message: "Wystąpił błąd podczas pobierania danych użytkownika" },
       { status: 500 }
     );
   }
+}
+
+export function GET(request: AuthenticatedRequest) {
+  return authMiddleware(request, getUserHandler);
 }

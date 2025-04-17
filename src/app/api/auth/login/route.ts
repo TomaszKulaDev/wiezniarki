@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Zaloguj użytkownika
-    const { user, token } = await authService.login(email, password);
+    const { accessToken, refreshToken, user } = await authService.login(
+      email,
+      password
+    );
 
     return NextResponse.json(
       {
@@ -25,7 +28,8 @@ export async function POST(request: NextRequest) {
           role: user.role,
           verified: user.verified,
         },
-        token,
+        accessToken,
+        refreshToken,
       },
       { status: 200 }
     );

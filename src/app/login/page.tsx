@@ -64,15 +64,16 @@ export default function LoginPage() {
         password: formData.password,
       }).unwrap();
 
-      // Zapisz token w localStorage/sessionStorage w zależności od "rememberMe"
+      // Zapisz tokeny w localStorage/sessionStorage w zależności od "rememberMe"
       if (formData.rememberMe) {
-        localStorage.setItem("token", result.token);
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
       } else {
-        sessionStorage.setItem("token", result.token);
+        sessionStorage.setItem("accessToken", result.accessToken);
+        sessionStorage.setItem("refreshToken", result.refreshToken);
       }
     } catch {
       // Obsługa błędów jest w useEffect powyżej
-      // Pusty blok catch, ponieważ błędy są obsługiwane w useEffect
     }
   };
 

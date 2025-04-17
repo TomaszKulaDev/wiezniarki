@@ -3,6 +3,7 @@ import { mongodbService } from "./mongodbService";
 import { dbName } from "../utils/mongodb";
 import * as crypto from "crypto";
 import { emailService } from "./emailService";
+import { jwtService } from "./jwtService";
 
 const COLLECTION_NAME = "users";
 
@@ -71,7 +72,11 @@ export const authService = {
   async login(
     email: string,
     password: string
-  ): Promise<{ token: string; user: Omit<User, "passwordHash"> }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Omit<User, "passwordHash">;
+  }> {
     // Pobranie użytkownika z bazy danych
     const user = await mongodbService.findDocument<User>(
       dbName,
@@ -156,15 +161,22 @@ export const authService = {
       }
     );
 
-    // W rzeczywistym projekcie wygenerowalibyśmy token JWT
-    // Dla testów generujemy prosty token
-    const token = `${user.id}_${Date.now()}_${crypto
-      .randomBytes(16)
-      .toString("hex")}`;
+    // Wygeneruj tokeny JWT
+    const accessToken = jwtService.generateAccessToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    const refreshToken = await jwtService.generateRefreshToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
     // Nie zwracamy hashu w odpowiedzi
     const { passwordHash: _, ...userWithoutPassword } = user;
-    return { token, user: userWithoutPassword };
+    return { accessToken, refreshToken, user: userWithoutPassword };
   },
 
   // Weryfikacja użytkownika
@@ -280,5 +292,59 @@ export const authService = {
     );
 
     return true;
+  },
+
+  // Nowa metoda do odświeżania tokenu
+  async refreshToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string } | null> {
+    const result = await jwtService.verifyRefreshToken(refreshToken);
+
+    if (!result.valid || !result.userId) {
+      return null;
+    }
+
+    // Pobierz dane użytkownika
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { id: result.userId }
+    );
+
+    if (!user) {
+      return null;
+    }
+
+    // Wygeneruj nowy token dostępu
+    const accessToken = jwtService.generateAccessToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // Rotacja tokenu odświeżającego (dla bezpieczeństwa)
+    const newRefreshToken = await jwtService.rotateRefreshToken(refreshToken, {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    if (!newRefreshToken) {
+      return null;
+    }
+
+    return { accessToken, refreshToken: newRefreshToken };
+  },
+
+  // Wylogowanie (unieważnienie tokenów)
+  async logout(refreshToken: string): Promise<boolean> {
+    try {
+      // Unieważnij token odświeżający
+      await jwtService.revokeRefreshToken(refreshToken);
+      return true;
+    } catch (error) {
+      console.error("Błąd podczas wylogowywania:", error);
+      return false;
+    }
   },
 };
