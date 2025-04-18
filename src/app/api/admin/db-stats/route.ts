@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const collectionNames = collections.map((col) => col.name);
 
     // Pobierz liczbę dokumentów w każdej kolekcji
-    const documentCounts = {};
+    const documentCounts: Record<string, number> = {};
     let totalDocuments = 0;
 
     for (const colName of collectionNames) {
@@ -78,7 +78,8 @@ export async function GET(request: NextRequest) {
 
     // Stałe dla planu darmowego
     const FREE_PLAN_STORAGE_LIMIT_MB = 512;
-    const FREE_PLAN_STORAGE_LIMIT_BYTES = FREE_PLAN_STORAGE_LIMIT_MB * 1024 * 1024;
+    const FREE_PLAN_STORAGE_LIMIT_BYTES =
+      FREE_PLAN_STORAGE_LIMIT_MB * 1024 * 1024;
 
     // Oblicz aktualne wykorzystanie jako procent całkowitego limitu planu darmowego
     const actualStorageBytes = dbStats.dataSize + dbStats.indexSize;
@@ -97,19 +98,24 @@ export async function GET(request: NextRequest) {
         totalStorageMB: (dbStats.storageSize / (1024 * 1024)).toFixed(2),
         usedStorageMB: (dbStats.dataSize / (1024 * 1024)).toFixed(2),
         indexSizeMB: (dbStats.indexSize / (1024 * 1024)).toFixed(2),
-        
-        percentUsed: Math.round((dbStats.dataSize / dbStats.storageSize) * 100) || 0,
-        
+
+        percentUsed:
+          Math.round((dbStats.dataSize / dbStats.storageSize) * 100) || 0,
+
         freePlanLimitMB: FREE_PLAN_STORAGE_LIMIT_MB,
         actualUsedStorageMB: actualStorageMB.toFixed(2),
-        freeStorageMB: (FREE_PLAN_STORAGE_LIMIT_MB - actualStorageMB).toFixed(2),
+        freeStorageMB: (FREE_PLAN_STORAGE_LIMIT_MB - actualStorageMB).toFixed(
+          2
+        ),
         percentOfFreePlanLimit: percentOfFreePlanLimit,
-        
+
         totalStorage: `${(dbStats.storageSize / (1024 * 1024)).toFixed(2)} MB`,
         usedStorage: `${(dbStats.dataSize / (1024 * 1024)).toFixed(2)} MB`,
         indexSize: `${(dbStats.indexSize / (1024 * 1024)).toFixed(2)} MB`,
         actualUsedStorage: `${actualStorageMB.toFixed(2)} MB`,
-        freeStorage: `${(FREE_PLAN_STORAGE_LIMIT_MB - actualStorageMB).toFixed(2)} MB`,
+        freeStorage: `${(FREE_PLAN_STORAGE_LIMIT_MB - actualStorageMB).toFixed(
+          2
+        )} MB`,
       },
       documents: {
         collections: collections.length,
@@ -120,7 +126,7 @@ export async function GET(request: NextRequest) {
       operations: operations,
       performance: {
         avgResponseTime: "12ms",
-        slowQueries: 0
+        slowQueries: 0,
       },
       planLimits: {
         planName: "MongoDB Atlas Free (M0)",
@@ -128,36 +134,36 @@ export async function GET(request: NextRequest) {
         connections: {
           maxConnections: 100,
           currentConnections: serverStats?.connections?.current || 0,
-          availableConnections: 100 - (serverStats?.connections?.current || 0)
+          availableConnections: 100 - (serverStats?.connections?.current || 0),
         },
         queries: {
           dailyLimit: "Ograniczone",
           usedQueries: operations.reads + operations.queries,
           remainingQueries: "Nieznane",
           resetTime: "00:00 UTC",
-          note: "Plan darmowy ma ograniczoną liczbę zapytań i może być throttlowany"
+          note: "Plan darmowy ma ograniczoną liczbę zapytań i może być throttlowany",
         },
         networkTransfer: {
           monthlyLimit: "10 GB",
           usedTransfer: "Nieznane",
           remainingTransfer: "Nieznane",
-          note: "Dane transferu są przybliżone"
+          note: "Dane transferu są przybliżone",
         },
         compute: {
           ram: "Współdzielone",
           cpu: "Współdzielone",
-          note: "Plan darmowy wykorzystuje współdzielone zasoby obliczeniowe"
+          note: "Plan darmowy wykorzystuje współdzielone zasoby obliczeniowe",
         },
         freePlanLimitations: [
           "Brak dedykowanej pamięci RAM",
           "Współdzielone zasoby CPU",
           "Ograniczona przepustowość",
           "Brak automatycznego skalowania",
-          "Ograniczone wsparcie", 
+          "Ograniczone wsparcie",
           "Możliwy throttling przy wysokim obciążeniu",
-          "Plany płatne oferują wyższą wydajność i więcej funkcji"
-        ]
-      }
+          "Plany płatne oferują wyższą wydajność i więcej funkcji",
+        ],
+      },
     });
   } catch (error) {
     console.error("Błąd podczas pobierania statystyk bazy danych:", error);
