@@ -15,6 +15,8 @@ import {
 } from "@/frontend/store/apis/profileApi";
 import { useUpdateProfileLinkMutation } from "@/frontend/store/apis/authApi";
 import { Profile } from "@/backend/models/Profile";
+import { useDispatch } from "react-redux";
+import { profileApi } from "@/frontend/store/apis/profileApi";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -240,7 +242,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Dodaj funkcję obsługującą usuwanie profilu
+  // Zaktualizowana funkcja handleDeleteProfile
   const handleDeleteProfile = async () => {
     if (!profile) return;
 
@@ -252,15 +254,40 @@ export default function ProfilePage() {
 
       // Wyczyszczenie ID profilu z localStorage
       localStorage.removeItem("createdProfileId");
+
+      // Zresetuj lokalny stan - to wystarczy do wymuszenia ponownego renderowania
       setLocalProfileId(null);
+
+      // Przygotuj formularz na nowo
+      setFormData({
+        firstName: "",
+        lastName: "",
+        age: 0,
+        facility: "",
+        interests: [],
+        skills: [],
+        bio: "",
+        education: "",
+        goals: "",
+        contactPreferences: {
+          email: true,
+          letter: false,
+          phone: false,
+        },
+        relationshipStatus: "single",
+        personalityTraits: [],
+        hobbies: [],
+      });
 
       // Komunikat o sukcesie
       setSuccess("Profil został usunięty");
       setError(null);
       setConfirmDelete(false);
 
-      // Nie przekierowujemy na dashboard - zamiast tego czekamy na odświeżenie
-      // komponentu przy zachowaniu aktualnej sesji
+      // Dodaj opóźnione odświeżenie strony
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500); // 1.5 sekundy, aby użytkownik zdążył przeczytać komunikat o sukcesie
     } catch (error) {
       console.error("Błąd podczas usuwania profilu:", error);
       setError("Wystąpił błąd podczas usuwania profilu");
@@ -367,7 +394,7 @@ export default function ProfilePage() {
               )}
 
               {/* Formularz lub widok profilu */}
-              {isEditing || !profile ? (
+              {isEditing || !profile || localProfileId === null ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Podstawowe informacje */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
