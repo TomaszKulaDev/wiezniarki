@@ -167,13 +167,20 @@ export default function Navbar() {
         .unwrap()
         .then(() => {
           dispatch(logout());
-          router.push("/");
+          // Użyj window.location zamiast router.push, aby wymusić pełne odświeżenie strony
+          window.location.href = "/";
         })
-        .catch(console.error);
+        .catch((error) => {
+          console.error("Błąd podczas wylogowywania:", error);
+          dispatch(logout());
+          // Użyj window.location zamiast router.push, aby wymusić pełne odświeżenie strony
+          window.location.href = "/";
+        });
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
       dispatch(logout());
-      router.push("/");
+      // Użyj window.location zamiast router.push, aby wymusić pełne odświeżenie strony
+      window.location.href = "/";
     }
   };
 

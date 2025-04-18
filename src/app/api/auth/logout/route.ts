@@ -16,9 +16,22 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // Usuń ciasteczka
-    response.cookies.delete("accessToken");
-    response.cookies.delete("refreshToken");
+    // Usuń ciasteczka - poprzez ustawienie wygasłych wartości
+    response.cookies.set("accessToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0, // Natychmiastowe wygaśnięcie
+      path: "/",
+    });
+
+    response.cookies.set("refreshToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0, // Natychmiastowe wygaśnięcie
+      path: "/",
+    });
 
     return response;
   } catch (error) {
@@ -30,8 +43,22 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
 
-    response.cookies.delete("accessToken");
-    response.cookies.delete("refreshToken");
+    // Usuń ciasteczka - poprzez ustawienie wygasłych wartości
+    response.cookies.set("accessToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0, // Natychmiastowe wygaśnięcie
+      path: "/",
+    });
+
+    response.cookies.set("refreshToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0, // Natychmiastowe wygaśnięcie
+      path: "/",
+    });
 
     return response;
   }
