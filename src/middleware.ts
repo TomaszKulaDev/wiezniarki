@@ -22,6 +22,10 @@ export async function middleware(request: NextRequest) {
   // Sprawdź tokeny w ciasteczkach
   const accessToken = request.cookies.get("accessToken")?.value;
 
+  // Dodaj logowanie dla debugowania (możesz to usunąć w produkcji)
+  console.log(`Middleware uruchomione dla ścieżki: ${currentPath}`);
+  console.log(`Access token obecny: ${!!accessToken}`);
+
   // Jeśli mamy token dostępu, kontynuuj nawigację
   if (accessToken) {
     return response;

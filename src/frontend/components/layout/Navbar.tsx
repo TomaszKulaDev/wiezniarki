@@ -416,16 +416,21 @@ export default function Navbar() {
                     visibility: isLoggedIn ? "visible" : "hidden",
                   }}
                 >
-                  <Link
+                  <a
                     href="/dashboard"
                     className={`text-sm font-medium hover:text-primary transition ${
                       pathname === "/dashboard"
                         ? "text-primary font-bold"
                         : "text-gray-700"
                     }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Użyj window.location zamiast router.push
+                      window.location.href = "/dashboard";
+                    }}
                   >
                     Mój panel
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </nav>
@@ -529,17 +534,21 @@ export default function Navbar() {
                     visibility: isLoggedIn ? "visible" : "hidden",
                   }}
                 >
-                  <Link
+                  <a
                     href="/dashboard"
                     className={`block text-sm font-medium hover:text-primary transition ${
                       pathname === "/dashboard"
                         ? "text-primary font-bold"
                         : "text-gray-700"
                     }`}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Użyj window.location zamiast router.push
+                      window.location.href = "/dashboard";
+                    }}
                   >
                     Mój panel
-                  </Link>
+                  </a>
                 </li>
                 <li style={{ display: isLoggedIn ? "block" : "none" }}>
                   <button
