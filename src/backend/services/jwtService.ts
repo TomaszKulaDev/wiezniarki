@@ -22,6 +22,18 @@ interface RefreshTokenDoc {
   isRevoked: boolean;
 }
 
+// Zdefiniuj typ dla rezultatu czyszczenia tokenów
+interface CleanupResult {
+  expiredRemoved: number;
+  revokedRemoved: number;
+  oldRemoved: number;
+  totalRemoved: number;
+  debug?: {
+    operations: string[];
+    queries: any[];
+  };
+}
+
 export const jwtService = {
   // Generowanie tokenu dostępu (krótko żyjącego)
   generateAccessToken(user: Pick<User, "id" | "email" | "role">): string {
@@ -220,18 +232,18 @@ export const jwtService = {
       removeRevoked?: boolean;
       olderThan?: number; // w dniach
       dryRun?: boolean; // tryb testowy, tylko zwraca liczbę tokenów do usunięcia
+      ignoreExpiry?: boolean; // nowa opcja - ignoruje datę wygaśnięcia i usuwa wszystkie tokeny
     } = {}
-  ): Promise<{
-    expiredRemoved: number;
-    revokedRemoved: number;
-    oldRemoved: number;
-    totalRemoved: number;
-  }> {
+  ): Promise<CleanupResult> {
     const result = {
       expiredRemoved: 0,
       revokedRemoved: 0,
       oldRemoved: 0,
       totalRemoved: 0,
+      debug: {
+        operations: [] as string[],
+        queries: [] as any[],
+      },
     };
 
     try {
@@ -242,23 +254,63 @@ export const jwtService = {
 
       // 1. Usuń wygasłe tokeny jeśli opcja jest włączona
       if (options.removeExpired) {
-        const expiredQuery = { expires: { $lt: new Date() } };
+        // Jeśli ignoreExpiry jest true, to usuwamy wszystkie tokeny niezależnie od daty wygaśnięcia
+        const expiredQuery = options.ignoreExpiry
+          ? {} // Puste zapytanie = wszystkie tokeny
+          : { expires: { $lt: new Date() } };
+
+        result.debug.queries.push({ type: "expired", query: expiredQuery });
+
         const expiredTokens = await collection.find(expiredQuery).toArray();
         result.expiredRemoved = expiredTokens.length;
 
         if (!options.dryRun && expiredTokens.length > 0) {
-          await collection.deleteMany(expiredQuery);
+          const deleteResult = await collection.deleteMany(expiredQuery);
+          result.debug.operations.push(
+            `Usunięto ${deleteResult.deletedCount} ${
+              options.ignoreExpiry ? "wszystkich" : "wygasłych"
+            } tokenów`
+          );
+
+          // Weryfikacja czy faktycznie usunięto tokeny
+          const remainingTokens = await collection.find(expiredQuery).toArray();
+          result.debug.operations.push(
+            `Pozostało ${remainingTokens.length} ${
+              options.ignoreExpiry ? "" : "wygasłych"
+            } tokenów`
+          );
+        } else {
+          result.debug.operations.push(
+            `Tryb testowy: znaleziono ${expiredTokens.length} ${
+              options.ignoreExpiry ? "wszystkich" : "wygasłych"
+            } tokenów`
+          );
         }
       }
 
       // 2. Usuń unieważnione tokeny jeśli opcja jest włączona
       if (options.removeRevoked) {
         const revokedQuery = { isRevoked: true };
+        result.debug.queries.push({ type: "revoked", query: revokedQuery });
+
         const revokedTokens = await collection.find(revokedQuery).toArray();
         result.revokedRemoved = revokedTokens.length;
 
         if (!options.dryRun && revokedTokens.length > 0) {
-          await collection.deleteMany(revokedQuery);
+          const deleteResult = await collection.deleteMany(revokedQuery);
+          result.debug.operations.push(
+            `Usunięto ${deleteResult.deletedCount} unieważnionych tokenów`
+          );
+
+          // Weryfikacja czy faktycznie usunięto tokeny
+          const remainingTokens = await collection.find(revokedQuery).toArray();
+          result.debug.operations.push(
+            `Pozostało ${remainingTokens.length} unieważnionych tokenów`
+          );
+        } else {
+          result.debug.operations.push(
+            `Tryb testowy: znaleziono ${revokedTokens.length} unieważnionych tokenów`
+          );
         }
       }
 
@@ -268,11 +320,30 @@ export const jwtService = {
         cutoffDate.setDate(cutoffDate.getDate() - options.olderThan);
 
         const oldQuery = { createdAt: { $lt: cutoffDate } };
+        result.debug.queries.push({
+          type: "old",
+          query: oldQuery,
+          cutoffDate: cutoffDate.toISOString(),
+        });
+
         const oldTokens = await collection.find(oldQuery).toArray();
         result.oldRemoved = oldTokens.length;
 
         if (!options.dryRun && oldTokens.length > 0) {
-          await collection.deleteMany(oldQuery);
+          const deleteResult = await collection.deleteMany(oldQuery);
+          result.debug.operations.push(
+            `Usunięto ${deleteResult.deletedCount} starych tokenów`
+          );
+
+          // Weryfikacja czy faktycznie usunięto tokeny
+          const remainingTokens = await collection.find(oldQuery).toArray();
+          result.debug.operations.push(
+            `Pozostało ${remainingTokens.length} starych tokenów`
+          );
+        } else {
+          result.debug.operations.push(
+            `Tryb testowy: znaleziono ${oldTokens.length} starych tokenów`
+          );
         }
       }
 
@@ -281,8 +352,16 @@ export const jwtService = {
         result.expiredRemoved + result.revokedRemoved + result.oldRemoved;
 
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Błąd podczas czyszczenia tokenów:", error);
+
+      // Dodaj informację o błędzie do debugowania w bezpieczny sposób
+      if (error instanceof Error) {
+        result.debug.operations.push(`BŁĄD: ${error.message}`);
+      } else {
+        result.debug.operations.push(`BŁĄD: Nieznany błąd`);
+      }
+
       throw error;
     }
   },

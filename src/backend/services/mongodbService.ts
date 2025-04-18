@@ -70,4 +70,10 @@ export const mongodbService = {
     const collection = await this.getCollection(dbName, collectionName);
     return collection.deleteOne(query);
   },
+
+  // Usuń wiele dokumentów
+  async deleteDocuments(dbName: string, collectionName: string, query: any) {
+    const collection = await this.getCollection(dbName, collectionName);
+    return collection.deleteMany(query);
+  },
 };

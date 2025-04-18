@@ -12,13 +12,18 @@ export default function AdminTokensPage() {
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showForceOption, setShowForceOption] = useState(false);
 
   const [cleanupConfig, setCleanupConfig] = useState({
     removeExpired: true,
     removeRevoked: true,
     olderThan: 30,
     dryRun: true,
+    ignoreExpiry: false,
   });
+
+  // Dodaj nowy stan do przechowywania informacji debugowych
+  const [debugMode, setDebugMode] = useState(false);
 
   // Przekieruj, jeśli użytkownik nie jest administratorem
   useEffect(() => {
@@ -78,6 +83,54 @@ export default function AdminTokensPage() {
     }
   };
 
+  // Funkcja do wymuszenia usunięcia wszystkich tokenów
+  const handleForceCleanup = async () => {
+    if (
+      !confirm(
+        "UWAGA: Ta operacja usunie WSZYSTKIE tokeny z bazy danych. Czy na pewno chcesz kontynuować?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      setSuccess(null);
+
+      const response = await fetch("/api/admin/force-cleanup-tokens", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dryRun: cleanupConfig.dryRun }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Wystąpił błąd podczas wymuszenia czyszczenia tokenów"
+        );
+      }
+
+      setResults(data.result);
+      setSuccess(data.message);
+    } catch (error) {
+      console.error("Błąd wymuszenia czyszczenia tokenów:", error);
+      setError(
+        error instanceof Error ? error.message : "Wystąpił nieznany błąd"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Funkcja do szybkiego przełączenia z trybu testowego na faktyczne czyszczenie
+  const handleExecuteRealCleanup = () => {
+    setCleanupConfig((prev) => ({ ...prev, dryRun: false }));
+  };
+
   if (userLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -106,6 +159,36 @@ export default function AdminTokensPage() {
         <p className="text-gray-600 mt-1">
           Czyszczenie i monitorowanie tokenów JWT w bazie danych
         </p>
+      </div>
+
+      {/* Alert o domyślnym trybie testowym */}
+      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <div className="flex">
+          <div className="flex-shrink-0 text-blue-600">
+            <svg
+              className="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-blue-700">
+              <span className="font-bold">
+                Tryb testowy jest domyślnie włączony.
+              </span>{" "}
+              W tym trybie tokeny nie są faktycznie usuwane, a system jedynie
+              pokazuje, które tokeny zostałyby usunięte. Aby faktycznie usunąć
+              tokeny, odznacz opcję &quot;Tryb testowy&quot; w formularzu.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Przewodnik dla administratorów */}
@@ -521,7 +604,7 @@ export default function AdminTokensPage() {
                       />
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="flex items-center bg-yellow-50 p-2 rounded border border-yellow-100">
                       <input
                         id="dryRun"
                         type="checkbox"
@@ -537,17 +620,76 @@ export default function AdminTokensPage() {
                         Tryb testowy (tylko sprawdź, nie usuwaj)
                       </label>
                     </div>
+
+                    <div className="mt-4">
+                      <div className="flex items-center">
+                        <input
+                          id="ignoreExpiry"
+                          type="checkbox"
+                          name="ignoreExpiry"
+                          checked={cleanupConfig.ignoreExpiry}
+                          onChange={handleCleanupConfigChange}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label
+                          htmlFor="ignoreExpiry"
+                          className="ml-2 block text-sm text-gray-700"
+                        >
+                          Ignoruj datę wygaśnięcia (usuwa wszystkie tokeny)
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500 ml-6 mt-1">
+                        To jest opcja awaryjna, która zignoruje daty wygaśnięcia
+                        i usunie wszystkie tokeny.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 flex gap-3 flex-wrap">
                 <button
                   type="submit"
-                  className="inline-flex justify-center py-2.5 px-5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  className={`inline-flex justify-center py-2.5 px-5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 ${
+                    cleanupConfig.dryRun
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Przetwarzanie..." : "Sprawdź tokeny"}
+                  {isSubmitting
+                    ? "Przetwarzanie..."
+                    : cleanupConfig.dryRun
+                    ? "Sprawdź tokeny (tryb testowy)"
+                    : "Usuń tokeny (faktyczne usunięcie)"}
+                </button>
+
+                {results &&
+                  cleanupConfig.dryRun &&
+                  results.totalRemoved > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleExecuteRealCleanup();
+                        // Automatycznie przewiń do formularza
+                        document
+                          .getElementById("dryRun")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="inline-flex justify-center py-2.5 px-5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Wykonaj faktyczne czyszczenie
+                    </button>
+                  )}
+
+                <button
+                  type="button"
+                  onClick={() => setDebugMode(!debugMode)}
+                  className="inline-flex justify-center py-2.5 px-5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                  {debugMode
+                    ? "Ukryj informacje debugowe"
+                    : "Pokaż informacje debugowe"}
                 </button>
               </div>
             </form>
@@ -772,6 +914,90 @@ export default function AdminTokensPage() {
                 </div>
               </div>
             )}
+
+            {/* Dodaj sekcję debugowania poniżej wyników */}
+            {debugMode && results && results.debug && (
+              <div className="mt-6 border border-gray-200 rounded-lg overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 bg-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Informacje debugowe
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Szczegółowe informacje o operacjach na bazie danych
+                  </p>
+                </div>
+                <div className="p-4">
+                  <h4 className="font-medium mb-2">Zapytania:</h4>
+                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-40">
+                    {JSON.stringify(results.debug.queries, null, 2)}
+                  </pre>
+
+                  <h4 className="font-medium mt-4 mb-2">Operacje:</h4>
+                  <ul className="bg-gray-50 p-3 rounded text-sm">
+                    {results.debug.operations.map(
+                      (op: string, index: number) => (
+                        <li
+                          key={index}
+                          className={op.includes("BŁĄD") ? "text-red-600" : ""}
+                        >
+                          {op}
+                        </li>
+                      )
+                    )}
+                  </ul>
+
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-100 rounded">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Informacja dla deweloperów:</strong> Jeśli tokeny
+                      nie są usuwane, sprawdź, czy baza danych jest dostępna i
+                      czy operacje na bazie danych przebiegły pomyślnie.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Przycisk rozwijający opcje zaawansowane */}
+      <div className="mb-4 mt-2">
+        <button
+          type="button"
+          onClick={() => setShowForceOption(!showForceOption)}
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          {showForceOption
+            ? "Ukryj opcje zaawansowane"
+            : "Pokaż opcje zaawansowane"}
+        </button>
+      </div>
+
+      {/* Opcje zaawansowane */}
+      {showForceOption && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <h3 className="text-lg font-semibold text-red-800 mb-2">
+            Zaawansowane opcje czyszczenia
+          </h3>
+          <p className="text-sm text-red-700 mb-4">
+            UWAGA: Te opcje są przeznaczone tylko dla zaawansowanych
+            administratorów. Niewłaściwe użycie może spowodować utratę danych i
+            wylogowanie wszystkich użytkowników.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={handleForceCleanup}
+              className={`py-2.5 px-5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isSubmitting}
+            >
+              {cleanupConfig.dryRun
+                ? "Symuluj usunięcie WSZYSTKICH tokenów"
+                : "Usuń WSZYSTKIE tokeny"}
+            </button>
           </div>
         </div>
       )}
