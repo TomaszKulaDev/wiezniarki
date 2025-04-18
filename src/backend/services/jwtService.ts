@@ -212,4 +212,78 @@ export const jwtService = {
       expires: { $lt: now },
     });
   },
+
+  // Funkcja czyszcząca wygasłe i unieważnione tokeny
+  async cleanupTokens(
+    options: {
+      removeExpired?: boolean;
+      removeRevoked?: boolean;
+      olderThan?: number; // w dniach
+      dryRun?: boolean; // tryb testowy, tylko zwraca liczbę tokenów do usunięcia
+    } = {}
+  ): Promise<{
+    expiredRemoved: number;
+    revokedRemoved: number;
+    oldRemoved: number;
+    totalRemoved: number;
+  }> {
+    const result = {
+      expiredRemoved: 0,
+      revokedRemoved: 0,
+      oldRemoved: 0,
+      totalRemoved: 0,
+    };
+
+    try {
+      const collection = await mongodbService.getCollection(
+        dbName,
+        COLLECTION_NAME
+      );
+
+      // 1. Usuń wygasłe tokeny jeśli opcja jest włączona
+      if (options.removeExpired) {
+        const expiredQuery = { expires: { $lt: new Date() } };
+        const expiredTokens = await collection.find(expiredQuery).toArray();
+        result.expiredRemoved = expiredTokens.length;
+
+        if (!options.dryRun && expiredTokens.length > 0) {
+          await collection.deleteMany(expiredQuery);
+        }
+      }
+
+      // 2. Usuń unieważnione tokeny jeśli opcja jest włączona
+      if (options.removeRevoked) {
+        const revokedQuery = { isRevoked: true };
+        const revokedTokens = await collection.find(revokedQuery).toArray();
+        result.revokedRemoved = revokedTokens.length;
+
+        if (!options.dryRun && revokedTokens.length > 0) {
+          await collection.deleteMany(revokedQuery);
+        }
+      }
+
+      // 3. Usuń stare tokeny na podstawie daty utworzenia
+      if (options.olderThan && options.olderThan > 0) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - options.olderThan);
+
+        const oldQuery = { createdAt: { $lt: cutoffDate } };
+        const oldTokens = await collection.find(oldQuery).toArray();
+        result.oldRemoved = oldTokens.length;
+
+        if (!options.dryRun && oldTokens.length > 0) {
+          await collection.deleteMany(oldQuery);
+        }
+      }
+
+      // Oblicz całkowitą liczbę usunięć
+      result.totalRemoved =
+        result.expiredRemoved + result.revokedRemoved + result.oldRemoved;
+
+      return result;
+    } catch (error) {
+      console.error("Błąd podczas czyszczenia tokenów:", error);
+      throw error;
+    }
+  },
 };
