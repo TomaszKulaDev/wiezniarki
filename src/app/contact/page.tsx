@@ -3,6 +3,10 @@
 import MainLayout from "../MainLayout";
 import Link from "next/link";
 import { useState } from "react";
+import FormInput from "@/frontend/components/common/FormInput";
+import TextareaInput from "@/frontend/components/common/TextareaInput";
+import SelectInput from "@/frontend/components/common/SelectInput";
+import CheckboxInput from "@/frontend/components/common/CheckboxInput";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -142,143 +146,94 @@ export default function Contact() {
 
                     <form onSubmit={handleSubmit}>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label
-                            htmlFor="name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Imię i nazwisko{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Adres e-mail <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                            required
-                          />
-                        </div>
+                        <FormInput
+                          id="name"
+                          name="name"
+                          label="Imię i nazwisko"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                        />
+                        <FormInput
+                          id="email"
+                          name="email"
+                          label="Adres e-mail"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label
-                            htmlFor="phone"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Numer telefonu
-                          </label>
-                          <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="subject"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Temat <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            id="subject"
-                            name="subject"
-                            value={formData.subject}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                            required
-                          >
-                            <option value="">Wybierz temat</option>
-                            <option value="info">Informacja o programie</option>
-                            <option value="join">Dołączenie do programu</option>
-                            <option value="cooperation">
-                              Propozycja współpracy
-                            </option>
-                            <option value="technical">
-                              Problemy techniczne
-                            </option>
-                            <option value="other">Inne</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <label
-                          htmlFor="message"
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          Wiadomość <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          id="message"
-                          name="message"
-                          rows={5}
-                          value={formData.message}
+                        <FormInput
+                          id="phone"
+                          name="phone"
+                          label="Numer telefonu"
+                          type="tel"
+                          value={formData.phone}
                           onChange={handleChange}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        />
+                        <SelectInput
+                          id="subject"
+                          name="subject"
+                          label="Temat"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          options={[
+                            { value: "info", label: "Informacja o programie" },
+                            { value: "join", label: "Dołączenie do programu" },
+                            {
+                              value: "cooperation",
+                              label: "Propozycja współpracy",
+                            },
+                            {
+                              value: "technical",
+                              label: "Problemy techniczne",
+                            },
+                            { value: "other", label: "Inne" },
+                          ]}
+                          placeholder="Wybierz temat"
                           required
-                        ></textarea>
+                        />
                       </div>
 
-                      <div className="mb-6">
-                        <div className="flex items-start">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="agreeTerms"
-                              name="agreeTerms"
-                              type="checkbox"
-                              checked={formData.agreeTerms}
-                              onChange={handleCheckboxChange}
-                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                            />
-                          </div>
-                          <div className="ml-3 text-sm">
-                            <label
-                              htmlFor="agreeTerms"
-                              className="font-medium text-gray-700"
+                      <TextareaInput
+                        id="message"
+                        name="message"
+                        label="Wiadomość"
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        className="mb-4"
+                      />
+
+                      <CheckboxInput
+                        id="agreeTerms"
+                        name="agreeTerms"
+                        label={
+                          <>
+                            Akceptuję{" "}
+                            <Link
+                              href="/regulamin"
+                              className="text-primary hover:underline"
                             >
-                              Akceptuję{" "}
-                              <Link
-                                href="/regulamin"
-                                className="text-primary hover:underline"
-                              >
-                                regulamin
-                              </Link>{" "}
-                              oraz{" "}
-                              <Link
-                                href="/privacy"
-                                className="text-primary hover:underline"
-                              >
-                                politykę prywatności
-                              </Link>{" "}
-                              <span className="text-red-500">*</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
+                              regulamin
+                            </Link>{" "}
+                            oraz{" "}
+                            <Link
+                              href="/privacy"
+                              className="text-primary hover:underline"
+                            >
+                              politykę prywatności
+                            </Link>
+                          </>
+                        }
+                        checked={formData.agreeTerms}
+                        onChange={handleCheckboxChange}
+                        required
+                        className="mb-6"
+                      />
 
                       <div>
                         <button

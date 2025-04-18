@@ -1,4 +1,5 @@
 import { useState, FormEvent } from "react";
+import PasswordInput from "@/frontend/components/common/PasswordInput";
 
 interface LoginFormProps {
   onSubmit: (formData: {
@@ -39,23 +40,15 @@ export default function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Hasło
-        </label>
-        <input
-          id="password"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Twoje hasło"
-        />
-      </div>
+      <PasswordInput
+        id="password"
+        label="Hasło"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Twoje hasło"
+        autoComplete="current-password"
+      />
 
       <div className="flex items-center justify-between">
         <label className="flex items-center">

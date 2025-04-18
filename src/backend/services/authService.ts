@@ -90,7 +90,7 @@ export const authService = {
 
     if (user.locked) {
       if (user.lockedUntil && user.lockedUntil > new Date()) {
-        throw new Error("Account is locked");
+        throw new Error("Konto jest zablokowane");
       } else {
         // Odblokowanie konta, jeśli czas blokady minął
         await mongodbService.updateDocument(
@@ -346,5 +346,53 @@ export const authService = {
       console.error("Błąd podczas wylogowywania:", error);
       return false;
     }
+  },
+
+  // Dodaj tę metodę do obiektu authService
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<boolean> {
+    // Pobierz użytkownika
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { id: userId }
+    );
+
+    if (!user) {
+      throw new Error("Użytkownik nie istnieje");
+    }
+
+    // Weryfikacja obecnego hasła
+    const [salt, storedHash] = user.passwordHash.split(":");
+    const hash = crypto
+      .pbkdf2Sync(currentPassword, salt, 1000, 64, "sha512")
+      .toString("hex");
+
+    if (storedHash !== hash) {
+      throw new Error("Nieprawidłowe aktualne hasło");
+    }
+
+    // Haszowanie nowego hasła
+    const newSalt = crypto.randomBytes(16).toString("hex");
+    const newHash = crypto
+      .pbkdf2Sync(newPassword, newSalt, 1000, 64, "sha512")
+      .toString("hex");
+    const newPasswordHash = `${newSalt}:${newHash}`;
+
+    // Aktualizacja hasła
+    await mongodbService.updateDocument(
+      dbName,
+      COLLECTION_NAME,
+      { id: user.id },
+      {
+        passwordHash: newPasswordHash,
+        updatedAt: new Date(),
+      }
+    );
+
+    return true;
   },
 };

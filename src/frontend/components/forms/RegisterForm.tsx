@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import PasswordInput from "@/frontend/components/common/PasswordInput";
 
 interface RegisterFormProps {
   onSubmit: (formData: {
@@ -47,43 +48,28 @@ export default function RegisterForm({
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Hasło
-        </label>
-        <input
-          id="password"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Minimum 8 znaków"
-          minLength={8}
-        />
-      </div>
+      <PasswordInput
+        id="password"
+        label="Hasło"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Minimum 8 znaków"
+        minLength={8}
+        autoComplete="new-password"
+        helpText="Hasło musi mieć co najmniej 8 znaków"
+      />
 
-      <div>
-        <label
-          htmlFor="confirm-password"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Potwierdź hasło
-        </label>
-        <input
-          id="confirm-password"
-          type="password"
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Powtórz hasło"
-          minLength={8}
-        />
-      </div>
+      <PasswordInput
+        id="confirm-password"
+        label="Potwierdź hasło"
+        required
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="Powtórz hasło"
+        minLength={8}
+        autoComplete="new-password"
+      />
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
