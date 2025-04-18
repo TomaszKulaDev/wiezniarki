@@ -4,8 +4,8 @@
 
 ### Baza danych
 
-- [x] Wybór systemu bazodanowego (PostgreSQL/MongoDB)
-- [x] Konfiguracja połączenia z bazą danych
+- [] Wybór systemu bazodanowego (PostgreSQL/MongoDB)
+- [] Konfiguracja połączenia z bazą danych
 - [ ] Definicja schematów/modeli dla bazy danych
 - [ ] Migracja mockowych danych do bazy
 - [ ] Implementacja repozytoriów dla dostępu do danych
