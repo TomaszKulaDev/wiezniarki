@@ -144,13 +144,21 @@ export const jwtService = {
   },
 
   // Unieważnij wszystkie tokeny odświeżające dla użytkownika
-  async revokeAllUserTokens(userId: string): Promise<void> {
-    await mongodbService.updateDocument(
-      dbName,
-      COLLECTION_NAME,
-      { userId },
-      { isRevoked: true, updatedAt: new Date() }
-    );
+  async revokeAllUserTokens(userId: string): Promise<boolean> {
+    try {
+      // Oznacz wszystkie tokeny użytkownika jako unieważnione
+      await mongodbService.updateDocument(
+        dbName,
+        COLLECTION_NAME,
+        { userId },
+        { isRevoked: true, updatedAt: new Date() }
+      );
+
+      return true;
+    } catch (error) {
+      console.error("Błąd podczas unieważniania wszystkich tokenów:", error);
+      throw error;
+    }
   },
 
   // Unieważnij pojedynczy token odświeżający

@@ -6,12 +6,17 @@ import Footer from "@/frontend/components/layout/Footer";
 import DashboardSidebar from "@/frontend/components/dashboard/DashboardSidebar";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import { PasswordInput } from "@/frontend/components/common";
+import { useRouter } from "next/navigation";
+import { logout } from "@/frontend/store/slices/authSlice";
+import { useAppDispatch } from "@/frontend/store/hooks";
 
 export default function SettingsPage() {
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
   // Dane formularza ustawień
   const [formData, setFormData] = useState({
@@ -29,6 +34,12 @@ export default function SettingsPage() {
       showActivity: true,
     },
   });
+
+  // Dodaj stan do obsługi modalu potwierdzającego
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Inicjalizacja formularza danymi użytkownika
   useEffect(() => {
@@ -161,6 +172,50 @@ export default function SettingsPage() {
       console.error("Błąd aktualizacji ustawień:", error);
       setError("Wystąpił błąd podczas aktualizacji ustawień powiadomień");
       setIsSubmitting(false);
+    }
+  };
+
+  // Dodaj funkcję do obsługi usuwania konta
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setDeleteError("Wprowadź hasło, aby potwierdzić usunięcie konta");
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      setDeleteError("");
+
+      const response = await fetch("/api/auth/delete-account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password: deletePassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Wystąpił błąd podczas usuwania konta");
+      }
+
+      // Wyślij akcję wylogowania do Redux
+      dispatch(logout());
+
+      // Przekieruj do strony głównej po usunięciu konta
+      router.push("/");
+    } catch (error) {
+      console.error("Błąd usuwania konta:", error);
+      setDeleteError(
+        error instanceof Error
+          ? error.message
+          : "Wystąpił błąd podczas usuwania konta"
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -412,14 +467,71 @@ export default function SettingsPage() {
                 </p>
                 <button
                   className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                  onClick={() =>
-                    alert(
-                      "Funkcja jeszcze niedostępna. Skontaktuj się z administratorem, aby usunąć konto."
-                    )
-                  }
+                  onClick={() => setShowDeleteConfirmation(true)}
                 >
                   Usuń konto
                 </button>
+
+                {/* Modal potwierdzający usunięcie konta */}
+                {showDeleteConfirmation && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+                      <h3 className="text-lg font-bold text-gray-900 mb-4">
+                        Potwierdzenie usunięcia konta
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        Czy na pewno chcesz usunąć swoje konto? Ta operacja jest
+                        nieodwracalna i spowoduje trwałe usunięcie wszystkich
+                        Twoich danych.
+                      </p>
+
+                      <div className="mb-4">
+                        <label
+                          htmlFor="delete-password"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Wprowadź hasło, aby potwierdzić
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            id="delete-password"
+                            value={deletePassword}
+                            onChange={(e) => setDeletePassword(e.target.value)}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                            required
+                          />
+                        </div>
+                        {deleteError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {deleteError}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end space-x-3">
+                        <button
+                          onClick={() => {
+                            setShowDeleteConfirmation(false);
+                            setDeletePassword("");
+                            setDeleteError("");
+                          }}
+                          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                          disabled={isDeleting}
+                        >
+                          Anuluj
+                        </button>
+                        <button
+                          onClick={handleDeleteAccount}
+                          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? "Usuwanie..." : "Usuń konto"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </section>
             </div>
           </div>

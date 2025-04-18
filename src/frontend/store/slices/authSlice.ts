@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../index";
+import { createAction } from "@reduxjs/toolkit";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -55,6 +56,14 @@ export const authSlice = createSlice({
     setAuthLoading: (state) => {
       state.status = "loading";
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logout, (state) => {
+      state.isLoggedIn = false;
+      state.user = initialState.user;
+      state.status = "idle";
+      state.error = null;
+    });
   },
 });
 

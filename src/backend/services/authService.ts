@@ -395,4 +395,68 @@ export const authService = {
 
     return true;
   },
+
+  // Dodaj tę metodę do obiektu authService
+  async deleteAccount(userId: string, password: string): Promise<boolean> {
+    // Pobierz użytkownika
+    const user = await mongodbService.findDocument<User>(
+      dbName,
+      COLLECTION_NAME,
+      { id: userId }
+    );
+
+    if (!user) {
+      throw new Error("Użytkownik nie istnieje");
+    }
+
+    // Weryfikacja hasła dla potwierdzenia
+    const [salt, storedHash] = user.passwordHash.split(":");
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 1000, 64, "sha512")
+      .toString("hex");
+
+    if (storedHash !== hash) {
+      throw new Error("Nieprawidłowe hasło");
+    }
+
+    // Sprawdź czy użytkownik ma profil
+    if (user.profileId) {
+      // Usuń profil użytkownika (opcjonalnie)
+      try {
+        // Możesz zaimportować profileService i użyć profileService.deleteProfile(user.profileId)
+        // Lub alternatywnie użyć bezpośrednio mongodbService
+        await mongodbService.deleteDocument(dbName, "profiles", {
+          id: user.profileId,
+        });
+      } catch (error) {
+        console.error(
+          `Błąd podczas usuwania profilu użytkownika ${userId}:`,
+          error
+        );
+        // Kontynuuj, nawet jeśli usunięcie profilu się nie powiodło
+      }
+    }
+
+    // Unieważnij wszystkie tokeny odświeżania użytkownika
+    try {
+      await jwtService.revokeAllUserTokens(userId);
+    } catch (error) {
+      console.error(
+        `Błąd podczas unieważniania tokenów użytkownika ${userId}:`,
+        error
+      );
+      // Kontynuuj mimo błędu z tokenami
+    }
+
+    // Usuń użytkownika
+    try {
+      await mongodbService.deleteDocument(dbName, COLLECTION_NAME, {
+        id: userId,
+      });
+      return true;
+    } catch (error) {
+      console.error(`Błąd podczas usuwania użytkownika ${userId}:`, error);
+      throw new Error("Wystąpił błąd podczas usuwania konta");
+    }
+  },
 };
