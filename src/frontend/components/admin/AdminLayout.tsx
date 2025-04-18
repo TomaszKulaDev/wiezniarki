@@ -19,6 +19,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Użytkownicy", href: "/admin/users" },
     { name: "Profile", href: "/admin/profiles" },
     { name: "Tokeny", href: "/admin/tokens" },
+    { name: "Metryki DB", href: "/admin/metrics" },
     { name: "Logi", href: "/admin/logs" },
     { name: "Ustawienia", href: "/admin/settings" },
   ];
