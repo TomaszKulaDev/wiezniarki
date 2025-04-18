@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       password
     );
 
-    return NextResponse.json(
+    // Stwórz odpowiedź z danymi użytkownika
+    const response = NextResponse.json(
       {
         message: "Zalogowano pomyślnie",
         user: {
@@ -28,11 +29,28 @@ export async function POST(request: NextRequest) {
           role: user.role,
           verified: user.verified,
         },
-        accessToken,
-        refreshToken,
       },
       { status: 200 }
     );
+
+    // Ustaw ciasteczka
+    response.cookies.set("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 15, // 15 minut
+      path: "/",
+    });
+
+    response.cookies.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 dni
+      path: "/",
+    });
+
+    return response;
   } catch (error: unknown) {
     console.error("Błąd logowania:", error);
 

@@ -30,14 +30,8 @@ export default function DashboardPage() {
     } else if (isError) {
       dispatch(logout());
 
-      // Sprawdź czy token istnieje - jeśli tak to był nieważny
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (token) {
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
-        router.push("/login");
-      }
+      // Przekieruj na stronę logowania
+      router.push("/login");
     }
   }, [user, isError, dispatch, router]);
 

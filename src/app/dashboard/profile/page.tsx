@@ -259,10 +259,8 @@ export default function ProfilePage() {
       setError(null);
       setConfirmDelete(false);
 
-      // Przekierowanie na dashboard
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 2000);
+      // Nie przekierowujemy na dashboard - zamiast tego czekamy na odświeżenie
+      // komponentu przy zachowaniu aktualnej sesji
     } catch (error) {
       console.error("Błąd podczas usuwania profilu:", error);
       setError("Wystąpił błąd podczas usuwania profilu");

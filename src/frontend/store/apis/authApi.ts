@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
   BaseQueryFn,
@@ -30,68 +29,12 @@ type RefreshResponse = {
   refreshToken: string;
 };
 
-// Funkcja pomocnicza do rotacji tokenów
+// Funkcja pomocnicza do obsługi zapytań bez localStorage
 const baseQuery = fetchBaseQuery({
   baseUrl: "/api",
-  prepareHeaders: (headers) => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (accessToken) {
-      headers.set("Authorization", `Bearer ${accessToken}`);
-    }
-
-    return headers;
-  },
+  // Credentials: 'include' automatycznie dołącza ciasteczka do żądań
+  credentials: "include",
 });
-
-// Zaawansowany baseQuery z automatycznym odświeżaniem tokenów
-const baseQueryWithReauth: BaseQueryFn<
-  string | FetchArgs,
-  unknown,
-  FetchBaseQueryError,
-  {},
-  FetchBaseQueryMeta
-> = async (args, api, extraOptions) => {
-  let result = await baseQuery(args, api, extraOptions);
-
-  if (result.error && result.error.status === 401) {
-    // Próba odświeżenia tokenów
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!refreshToken) {
-      // Brak tokenu odświeżającego, użytkownik musi się zalogować ponownie
-      return result;
-    }
-
-    // Wykonaj zapytanie o nowe tokeny
-    const refreshResult = await baseQuery(
-      {
-        url: "auth/refresh",
-        method: "POST",
-        body: { refreshToken },
-      },
-      api,
-      extraOptions
-    );
-
-    if (refreshResult.data) {
-      // Zapisz nowe tokeny
-      const { accessToken, refreshToken: newRefreshToken } =
-        refreshResult.data as RefreshResponse;
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      // Spróbuj zapytanie ponownie z nowym tokenem
-      result = await baseQuery(args, api, extraOptions);
-    } else {
-      // Odświeżenie nie powiodło się, wyloguj użytkownika
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-    }
-  }
-
-  return result;
-};
 
 // Definiujemy typy dla endpointów, aby uniknąć błędów TypeScript
 interface AuthEndpointsTypes {
@@ -133,7 +76,7 @@ interface AuthEndpointsTypes {
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: baseQueryWithReauth,
+  baseQuery: baseQuery,
   tagTypes: ["Auth"],
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginCredentials>({
@@ -142,15 +85,6 @@ export const authApi = createApi({
         method: "POST",
         body: credentials,
       }),
-      onQueryStarted: async (_, { queryFulfilled }) => {
-        try {
-          const { data } = await queryFulfilled;
-          localStorage.setItem("accessToken", data.accessToken);
-          localStorage.setItem("refreshToken", data.refreshToken);
-        } catch (error) {
-          // Obsługa błędów
-        }
-      },
     }),
 
     register: builder.mutation<AuthResponse, RegisterData>({
@@ -170,17 +104,7 @@ export const authApi = createApi({
       query: () => ({
         url: "auth/logout",
         method: "POST",
-        body: { refreshToken: localStorage.getItem("refreshToken") },
       }),
-      onQueryStarted: async (_, { queryFulfilled }) => {
-        try {
-          await queryFulfilled;
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-        } catch (error) {
-          // Obsługa błędów
-        }
-      },
       invalidatesTags: ["Auth"],
     }),
 

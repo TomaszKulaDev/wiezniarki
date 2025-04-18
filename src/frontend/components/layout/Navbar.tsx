@@ -16,6 +16,7 @@ import { Suspense } from "react";
 import {
   useRefreshMutation,
   useLogoutMutation,
+  useGetCurrentUserQuery,
 } from "@/frontend/store/apis/authApi";
 
 // Komponent obudowujący przyciski logowania/rejestracji
@@ -115,11 +116,11 @@ export default function Navbar() {
   const currentUser = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const [refresh] = useRefreshMutation();
   const [logoutMutation] = useLogoutMutation();
+  const { data: user, isLoading } = useGetCurrentUserQuery();
 
   // Funkcja do pobierania nazwy strony na podstawie ścieżki
   const getPageNameFromPath = (path: string) => {
@@ -143,57 +144,37 @@ export default function Navbar() {
 
   const pageName = getPageNameFromPath(pathname);
 
-  const checkAuthStatus = useCallback(() => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const refreshToken = localStorage.getItem("refreshToken");
-
-      if (accessToken) {
-        // Automatycznie pobierz dane użytkownika z backendu
-        // RTK Query getCurrentUser pobierze dane z tokenu
-      } else if (refreshToken) {
-        // Spróbuj odświeżyć token
-        refresh(refreshToken)
-          .unwrap()
-          .then(({ accessToken, refreshToken: newRefreshToken }) => {
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", newRefreshToken);
-          })
-          .catch(() => {
-            // Jeśli odświeżenie nie powiedzie się, wyloguj
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            dispatch(logout());
-          });
-      } else {
-        dispatch(logout());
-      }
-    } catch (error) {
-      console.error("Błąd podczas sprawdzania stanu logowania:", error);
-      dispatch(logout());
-    }
-  }, [dispatch, refresh]);
-
-  // Sprawdzamy czy jesteśmy w przeglądarce przy pierwszym renderze
+  // Sprawdzamy czy otrzymaliśmy dane użytkownika i aktualizujemy stan Redux
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      checkAuthStatus();
+    if (user) {
+      dispatch(
+        loginSuccess({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        })
+      );
+      setIsMounted(true);
+    } else if (!isLoading) {
+      setIsMounted(true);
     }
-  }, [checkAuthStatus]);
+  }, [user, isLoading, dispatch]);
 
   const handleLogout = () => {
     try {
       // Użyj RTK Query do wylogowania
-      logoutMutation().unwrap().catch(console.error);
+      logoutMutation()
+        .unwrap()
+        .then(() => {
+          dispatch(logout());
+          router.push("/");
+        })
+        .catch(console.error);
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
-      // Wyczyść tokeny nawet w przypadku błędu
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      dispatch(logout());
+      router.push("/");
     }
-
-    dispatch(logout());
-    router.push("/");
   };
 
   // Renderowanie komponentu

@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import MainLayout from "./MainLayout";
+import { useEffect } from "react";
+import { useAppSelector } from "@/frontend/store/hooks";
+import { selectIsLoggedIn } from "@/frontend/store/slices/authSlice";
 
 export default function NotFound() {
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
+  // Ta strona nie powinna próbować pobierać danych użytkownika na nowo
+  // ani wykonywać innych akcji autentykacyjnych
+
   return (
     <MainLayout>
       {/* Nagłówek strony */}
