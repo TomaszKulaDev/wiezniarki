@@ -38,13 +38,13 @@ export default function Home() {
             <div className="hidden md:block">
               <div className="bg-gray-700 rounded-lg p-8">
                 <div className="aspect-video bg-gray-600 rounded flex items-center justify-center overflow-hidden">
-                  <Image
+        <Image
                     src="/prison-integration.svg"
                     alt="Program reintegracji społecznej dla kobiet w zakładach karnych"
                     width={600}
                     height={400}
-                    priority
-                  />
+          priority
+        />
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@ export default function Home() {
             </div>
             <h2 className="text-3xl font-bold text-gray-800">
               Poznaj uczestniczki programu
-            </h2>
+          </h2>
           </div>
           <p className="text-center text-gray-600 mb-14 max-w-2xl mx-auto">
             Kobiety, które dzięki programowi mogą nawiązać wartościowe relacje
@@ -228,7 +228,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="px-5 pb-5">
-                  <Link
+              <Link
                     href="/profiles/3"
                     className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
                     style={{
@@ -247,7 +247,7 @@ export default function Home() {
                     }}
                   >
                     Zobacz profil
-                  </Link>
+              </Link>
                 </div>
               </div>
             </div>
@@ -407,7 +407,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="px-5 pb-5">
-                  <Link
+              <Link
                     href="/profiles/6"
                     className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
                     style={{
@@ -426,7 +426,7 @@ export default function Home() {
                     }}
                   >
                     Zobacz profil
-                  </Link>
+              </Link>
                 </div>
               </div>
             </div>
@@ -525,7 +525,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="px-5 pb-5">
-                  <Link
+              <Link
                     href="/profiles/8"
                     className="block w-full py-2 text-center border rounded-lg transition-colors duration-300"
                     style={{
@@ -544,7 +544,7 @@ export default function Home() {
                     }}
                   >
                     Zobacz profil
-                  </Link>
+              </Link>
                 </div>
               </div>
             </div>
@@ -928,7 +928,7 @@ export default function Home() {
               Najczęstsze pytania
             </Link>
           </div>
-        </div>
+    </div>
       </section>
     </MainLayout>
   );

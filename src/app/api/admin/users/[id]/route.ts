@@ -115,7 +115,7 @@ export async function PATCH(request: NextRequest) {
 
     // Pobierz dane do aktualizacji
     const updateData = await request.json();
-    const { role, active, locked } = updateData;
+    const { role, active, locked, verified } = updateData;
 
     // Weryfikacja danych
     if (role && !["prisoner", "partner", "admin", "moderator"].includes(role)) {
@@ -132,6 +132,7 @@ export async function PATCH(request: NextRequest) {
 
     if (role !== undefined) updates.role = role;
     if (active !== undefined) updates.active = active;
+    if (verified !== undefined) updates.verified = verified;
     if (locked !== undefined) {
       updates.locked = locked;
       if (locked) {

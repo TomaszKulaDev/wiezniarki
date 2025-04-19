@@ -61,8 +61,26 @@ export default function AdminUsersPage() {
   // Ustawienia rejestracji
   const [registrationEnabled, setRegistrationEnabled] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
-  const [registrationError, setRegistrationError] = useState<string | null>(null);
-  const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(null);
+  const [registrationError, setRegistrationError] = useState<string | null>(
+    null
+  );
+  const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(
+    null
+  );
+
+  // Ustawienia czyszczenia kont
+  const [cleanupInterval, setCleanupInterval] = useState(30);
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupError, setCleanupError] = useState<string | null>(null);
+  const [cleanupSuccess, setCleanupSuccess] = useState<string | null>(null);
+
+  // Stan dla nieaktywnych kont
+  const [inactiveUsers, setInactiveUsers] = useState<UserListItem[]>([]);
+  const [showInactiveUsers, setShowInactiveUsers] = useState(false);
+  const [loadingInactiveUsers, setLoadingInactiveUsers] = useState(false);
+  const [inactiveUsersError, setInactiveUsersError] = useState<string | null>(
+    null
+  );
 
   // Przekieruj, jeśli użytkownik nie jest administratorem
   useEffect(() => {
@@ -136,7 +154,7 @@ export default function AdminUsersPage() {
         setRegistrationLoading(true);
         // Tworzymy nowy endpoint, który nie wymaga autoryzacji
         const response = await fetch("/api/settings/registration");
-        
+
         if (response.ok) {
           const data = await response.json();
           setRegistrationEnabled(data.enabled);
@@ -147,9 +165,33 @@ export default function AdminUsersPage() {
         setRegistrationLoading(false);
       }
     };
-    
+
     fetchSettings();
   }, []);
+
+  // Pobierz ustawienia czyszczenia kont
+  useEffect(() => {
+    const fetchCleanupSettings = async () => {
+      try {
+        const response = await fetch("/api/admin/settings");
+        if (response.ok) {
+          const data = await response.json();
+          if (
+            data.database &&
+            typeof data.database.cleanupInterval === "number"
+          ) {
+            setCleanupInterval(data.database.cleanupInterval);
+          }
+        }
+      } catch (error) {
+        console.error("Błąd podczas pobierania ustawień czyszczenia:", error);
+      }
+    };
+
+    if (user && user.role === "admin") {
+      fetchCleanupSettings();
+    }
+  }, [user]);
 
   // Filtrowanie i sortowanie użytkowników
   useEffect(() => {
@@ -434,31 +476,154 @@ export default function AdminUsersPage() {
       setRegistrationLoading(true);
       setRegistrationError(null);
       setRegistrationSuccess(null);
-      
+
       // Tworzymy nowy endpoint do aktualizacji ustawień
       const response = await fetch("/api/settings/registration", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          enabled: !registrationEnabled
-        })
+          enabled: !registrationEnabled,
+        }),
       });
-      
+
       if (!response.ok) {
         throw new Error("Błąd podczas aktualizacji ustawień");
       }
-      
+
       // Aktualizuj stan
       setRegistrationEnabled(!registrationEnabled);
       setRegistrationSuccess("Ustawienia rejestracji zostały zaktualizowane");
-      
     } catch (error) {
       console.error("Błąd aktualizacji ustawień rejestracji:", error);
-      setRegistrationError("Wystąpił błąd podczas aktualizacji ustawień rejestracji");
+      setRegistrationError(
+        "Wystąpił błąd podczas aktualizacji ustawień rejestracji"
+      );
     } finally {
       setRegistrationLoading(false);
+    }
+  };
+
+  // Funkcja do aktualizacji ustawień czyszczenia
+  const handleUpdateCleanupInterval = async () => {
+    try {
+      setCleanupLoading(true);
+      setCleanupError(null);
+      setCleanupSuccess(null);
+
+      // Pobierz aktualne ustawienia
+      const settingsResponse = await fetch("/api/admin/settings");
+      const currentSettings = await settingsResponse.json();
+
+      // Przygotuj zaktualizowane ustawienia
+      const updatedSettings = {
+        ...currentSettings,
+        database: {
+          ...currentSettings.database,
+          cleanupInterval: cleanupInterval,
+        },
+      };
+
+      // Zapisz zaktualizowane ustawienia
+      const response = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedSettings),
+      });
+
+      if (!response.ok) {
+        throw new Error("Błąd podczas aktualizacji ustawień czyszczenia");
+      }
+
+      setCleanupSuccess("Ustawienia czyszczenia kont zostały zaktualizowane");
+    } catch (error) {
+      console.error("Błąd aktualizacji ustawień czyszczenia:", error);
+      setCleanupError(
+        "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"
+      );
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
+  // Funkcja do pobierania nieaktywnych kont
+  const fetchInactiveUsers = async () => {
+    try {
+      setLoadingInactiveUsers(true);
+      setInactiveUsersError(null);
+
+      // Pobieramy wszystkie konta i filtrujemy je po stronie klienta,
+      // aby móc zastosować złożoną logikę
+      const response = await fetch(`/api/admin/users`);
+
+      if (!response.ok) {
+        throw new Error("Błąd podczas pobierania kont użytkowników");
+      }
+
+      const data = await response.json();
+
+      // Filtrujemy konta, które są niezweryfikowane LUB zablokowane
+      const inactive = (data.users || []).filter(
+        (user: UserListItem) => !user.verified || user.locked
+      );
+
+      setInactiveUsers(inactive);
+      setShowInactiveUsers(true);
+    } catch (error) {
+      console.error("Błąd pobierania nieaktywnych kont:", error);
+      setInactiveUsersError(
+        "Wystąpił błąd podczas pobierania nieaktywnych kont"
+      );
+    } finally {
+      setLoadingInactiveUsers(false);
+    }
+  };
+
+  // Funkcja do ręcznej weryfikacji konta przez administratora
+  const handleVerifyUser = async (userId: string) => {
+    try {
+      setActionInProgress(userId);
+
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          verified: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Błąd podczas weryfikacji konta użytkownika");
+      }
+
+      // Pobierz odpowiedź, aby sprawdzić, czy aktualizacja się powiodła
+      const updatedUser = await response.json();
+
+      // Odśwież listę nieaktywnych użytkowników
+      fetchInactiveUsers();
+
+      // Pokaż komunikat sukcesu
+      setCleanupSuccess(
+        `Konto użytkownika ${updatedUser.email} zostało pomyślnie zweryfikowane`
+      );
+
+      setTimeout(() => {
+        setCleanupSuccess(null);
+      }, 3000);
+    } catch (error) {
+      console.error("Błąd weryfikacji konta:", error);
+      setCleanupError("Wystąpił błąd podczas weryfikacji konta użytkownika");
+
+      setTimeout(() => {
+        setCleanupError(null);
+      }, 3000);
+    } finally {
+      setActionInProgress(null);
     }
   };
 
@@ -533,48 +698,249 @@ export default function AdminUsersPage() {
       {/* Sekcja ustawień rejestracji */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">Ustawienia rejestracji</h2>
-        
+
         {registrationError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {registrationError}
           </div>
         )}
-        
+
         {registrationSuccess && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
             {registrationSuccess}
           </div>
         )}
-        
+
         <div className="flex items-center justify-between">
           <div>
             <p className="text-gray-700">
-              {registrationEnabled 
-                ? "Rejestracja nowych użytkowników jest aktualnie włączona." 
+              {registrationEnabled
+                ? "Rejestracja nowych użytkowników jest aktualnie włączona."
                 : "Rejestracja nowych użytkowników jest aktualnie wyłączona."}
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              To ustawienie wpływa tylko na możliwość wypełnienia formularza rejestracji przez nowych użytkowników.
+              To ustawienie wpływa tylko na możliwość wypełnienia formularza
+              rejestracji przez nowych użytkowników.
             </p>
           </div>
-          
+
           <button
             onClick={handleToggleRegistration}
             disabled={registrationLoading}
             className={`px-4 py-2 rounded-md text-white transition-colors ${
               registrationLoading
-                ? "bg-gray-400 cursor-not-allowed" 
-                : registrationEnabled 
-                  ? "bg-red-500 hover:bg-red-600" 
-                  : "bg-green-500 hover:bg-green-600"
+                ? "bg-gray-400 cursor-not-allowed"
+                : registrationEnabled
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-green-500 hover:bg-green-600"
             }`}
           >
-            {registrationLoading 
-              ? "Aktualizowanie..." 
-              : registrationEnabled 
-                ? "Wyłącz rejestrację" 
-                : "Włącz rejestrację"}
+            {registrationLoading
+              ? "Aktualizowanie..."
+              : registrationEnabled
+              ? "Wyłącz rejestrację"
+              : "Włącz rejestrację"}
           </button>
+        </div>
+      </div>
+
+      {/* Sekcja czyszczenia nieaktywnych kont */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">
+          Czyszczenie nieaktywnych kont
+        </h2>
+
+        {cleanupError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            {cleanupError}
+          </div>
+        )}
+
+        {cleanupSuccess && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+            {cleanupSuccess}
+          </div>
+        )}
+
+        <div className="mb-4">
+          <label
+            htmlFor="cleanup-interval"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Częstotliwość czyszczenia nieaktywnych kont (dni)
+          </label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              id="cleanup-interval"
+              min="1"
+              value={cleanupInterval}
+              onChange={(e) =>
+                setCleanupInterval(parseInt(e.target.value) || 30)
+              }
+              className="w-24 border border-gray-300 rounded-md px-3 py-2"
+            />
+            <button
+              onClick={handleUpdateCleanupInterval}
+              disabled={cleanupLoading}
+              className={`px-4 py-2 rounded-md text-white transition-colors ${
+                cleanupLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+              }`}
+            >
+              {cleanupLoading ? "Aktualizowanie..." : "Zapisz"}
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Konta, które nie zostały aktywowane w tym czasie, zostaną
+            automatycznie usunięte.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-md font-medium">
+              Nieaktywne konta użytkowników
+            </h3>
+            <button
+              onClick={fetchInactiveUsers}
+              disabled={loadingInactiveUsers}
+              className={`px-3 py-1 rounded-md text-white text-sm transition-colors ${
+                loadingInactiveUsers
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-500 hover:bg-indigo-600"
+              }`}
+            >
+              {loadingInactiveUsers ? (
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Ładowanie...
+                </span>
+              ) : (
+                "Pokaż nieaktywne konta"
+              )}
+            </button>
+          </div>
+
+          {inactiveUsersError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+              {inactiveUsersError}
+            </div>
+          )}
+
+          {showInactiveUsers && (
+            <div className="mt-3">
+              {inactiveUsers.length === 0 ? (
+                <div className="text-gray-600 text-sm bg-gray-50 p-4 rounded-md">
+                  Brak nieaktywnych kont użytkowników.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white border border-gray-200 rounded-md">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Email
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Rola
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Data utworzenia
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Działania
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {inactiveUsers.map((user) => (
+                        <tr key={user.id} className="hover:bg-gray-50">
+                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-600">
+                            {user.email}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-600">
+                            {user.role}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-sm">
+                            {!user.verified && (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mr-1">
+                                Niezweryfikowane
+                              </span>
+                            )}
+                            {user.locked && (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 ml-1">
+                                Zablokowane
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-600">
+                            {new Date(user.createdAt).toLocaleDateString()}(
+                            {Math.floor(
+                              (Date.now() -
+                                new Date(user.createdAt).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                            dni temu)
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-sm">
+                            {!user.verified && (
+                              <button
+                                onClick={() => handleVerifyUser(user.id)}
+                                disabled={actionInProgress === user.id}
+                                className="text-green-500 hover:text-green-700 mr-2"
+                                title="Zweryfikuj konto"
+                              >
+                                {actionInProgress === user.id
+                                  ? "Weryfikowanie..."
+                                  : "Zweryfikuj"}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteUser(user.id)}
+                              disabled={actionInProgress === user.id}
+                              className="text-red-500 hover:text-red-700"
+                              title="Usuń konto"
+                            >
+                              {actionInProgress === user.id
+                                ? "Usuwanie..."
+                                : "Usuń"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Znaleziono {inactiveUsers.length} nieaktywnych kont.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
