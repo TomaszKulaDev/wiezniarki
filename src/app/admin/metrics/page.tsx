@@ -113,14 +113,7 @@ export default function DatabaseMetricsPage() {
   }
 
   if (!user || user.role !== "admin") {
-    return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Brak dostępu</h1>
-        <p className="text-gray-600 mb-6">
-          Nie masz uprawnień do wyświetlenia tej strony.
-        </p>
-      </div>
-    );
+    return null; // AdminLayout już obsługuje brak uprawnień
   }
 
   if (!dbStats) {
@@ -136,20 +129,16 @@ export default function DatabaseMetricsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Metryki Bazy Danych
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Monitoring wykorzystania i wydajności bazy danych MongoDB Atlas
-        </p>
-        {error && (
-          <div className="mt-2 p-2 bg-red-100 border border-red-200 rounded text-red-700 text-sm">
-            {error} - wyświetlane są dane przykładowe
-          </div>
-        )}
-      </div>
+    <div className="mb-6">
+      <h1 className="text-2xl font-bold text-gray-800">Metryki Bazy Danych</h1>
+      <p className="text-gray-600 mt-1">
+        Monitoring wykorzystania i wydajności bazy danych MongoDB Atlas
+      </p>
+      {error && (
+        <div className="mt-2 p-2 bg-red-100 border border-red-200 rounded text-red-700 text-sm">
+          {error} - wyświetlane są dane przykładowe
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Karta wykorzystania pamięci */}

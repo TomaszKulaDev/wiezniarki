@@ -140,26 +140,17 @@ export default function AdminTokensPage() {
   }
 
   if (user && user.role !== "admin") {
-    return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Brak dostępu</h1>
-        <p className="text-gray-600 mb-6">
-          Nie masz uprawnień do wyświetlenia tej strony.
-        </p>
-      </div>
-    );
+    return null; // AdminLayout już obsługuje brak uprawnień
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Zarządzanie tokenami uwierzytelniającymi
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Czyszczenie i monitorowanie tokenów JWT w bazie danych
-        </p>
-      </div>
+    <div className="mb-6">
+      <h1 className="text-2xl font-bold text-gray-800">
+        Zarządzanie tokenami uwierzytelniającymi
+      </h1>
+      <p className="text-gray-600 mt-1">
+        Czyszczenie i monitorowanie tokenów JWT w bazie danych
+      </p>
 
       {/* Alert o domyślnym trybie testowym */}
       <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">

@@ -206,43 +206,66 @@ export default function AdminProfileDetailsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">
-          Szczegóły profilu: {profile.firstName} {profile.lastName}
-        </h1>
-        <div className="flex space-x-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {profile.firstName} {profile.lastName}
+          </h1>
+          <p className="text-gray-600">ID: {profile.id}</p>
+        </div>
+        <div className="flex space-x-2">
+          {!isEditing ? (
+            <>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Edytuj
+              </button>
+              <button
+                onClick={handleDeleteProfile}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Usuń
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleSaveProfile}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                disabled={isLoading}
+              >
+                {isLoading ? "Zapisywanie..." : "Zapisz"}
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setFormData(profile);
+                }}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                disabled={isLoading}
+              >
+                Anuluj
+              </button>
+            </>
+          )}
           <button
             onClick={() => router.push("/admin/profiles")}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
           >
-            Powrót do listy
+            Wróć
           </button>
-          {isEditing ? (
-            <button
-              onClick={handleSaveProfile}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-              disabled={isLoading}
-            >
-              {isLoading ? "Zapisywanie..." : "Zapisz zmiany"}
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Edytuj profil
-            </button>
-          )}
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
           {success}
         </div>
       )}

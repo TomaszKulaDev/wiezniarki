@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import AdminLayout from "@/frontend/components/admin/AdminLayout";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import Link from "next/link";
 
@@ -403,11 +402,9 @@ export default function AdminUsersPage() {
 
   if (userLoading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
@@ -416,470 +413,502 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <>
-      <style jsx global>{`
-        .admin-main-content {
-          padding: 0 !important;
-          margin: 0 !important;
-          max-width: 100% !important;
-        }
-      `}</style>
-      <AdminLayout>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">
-              Zarządzanie Użytkownikami
-            </h1>
-            <div className="flex flex-wrap justify-between items-center gap-4 mt-4">
-              <div></div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={exportToCSV}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
-                  disabled={filteredUsers.length === 0}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    />
-                  </svg>
-                  Eksport CSV
-                </button>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  Odśwież dane
-                </button>
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Nagłówek z tytułem i przyciskami akcji */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-lg shadow">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Zarządzanie Użytkownikami
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Panel zarządzania kontami użytkowników systemu
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => exportToCSV()}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Eksportuj
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Odśwież
+          </button>
+        </div>
+      </div>
+
+      {/* Karty statystyk */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex items-center">
+            <div className="mr-4 p-3 rounded-full bg-blue-50">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-blue-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-500">
+                Wszyscy użytkownicy
+              </div>
+              <div className="text-2xl font-bold text-gray-800">
+                {userStats.total}
               </div>
             </div>
           </div>
+        </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex items-center">
+            <div className="mr-4 p-3 rounded-full bg-green-50">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
-          )}
-
-          {/* Karty statystyk */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-500 text-sm mb-1">
-                    Wszyscy użytkownicy
-                  </p>
-                  <p className="text-2xl font-bold">{userStats.total}</p>
-                </div>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-500 text-sm mb-1">
-                    Aktywni użytkownicy
-                  </p>
-                  <p className="text-2xl font-bold">{userStats.active}</p>
-                </div>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-green-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-500 text-sm mb-1">Administratorzy</p>
-                  <p className="text-2xl font-bold">{userStats.byRole.admin}</p>
-                </div>
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-yellow-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-500 text-sm mb-1">Zablokowani</p>
-                  <p className="text-2xl font-bold">{userStats.locked}</p>
-                </div>
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-red-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
-                </div>
+            <div>
+              <div className="text-sm font-medium text-gray-500">Aktywni</div>
+              <div className="text-2xl font-bold text-green-600">
+                {userStats.active}
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Filtry */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div className="md:col-span-2">
-                <label
-                  htmlFor="search"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Wyszukiwanie
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    id="search"
-                    placeholder="Szukaj po adresie email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="role"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Rola
-                </label>
-                <select
-                  id="role"
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="all">Wszystkie role</option>
-                  <option value="prisoner">Więźniarki</option>
-                  <option value="partner">Partnerzy</option>
-                  <option value="admin">Administratorzy</option>
-                  <option value="moderator">Moderatorzy</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Status
-                </label>
-                <select
-                  id="status"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="all">Wszystkie statusy</option>
-                  <option value="active">Aktywni</option>
-                  <option value="inactive">Nieaktywni</option>
-                  <option value="locked">Zablokowani</option>
-                  <option value="unverified">Niezweryfikowani</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="sortBy"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Sortowanie
-                </label>
-                <select
-                  id="sortBy"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="email-asc">Email (A-Z)</option>
-                  <option value="email-desc">Email (Z-A)</option>
-                  <option value="role-asc">Rola (A-Z)</option>
-                  <option value="role-desc">Rola (Z-A)</option>
-                  <option value="createdAt-desc">Najnowsi</option>
-                  <option value="createdAt-asc">Najstarsi</option>
-                  <option value="lastLogin-desc">Ostatnio aktywni</option>
-                </select>
-              </div>
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex items-center">
+            <div className="mr-4 p-3 rounded-full bg-red-50">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
             </div>
-
-            {/* Etykieta z liczbą wyników */}
-            <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
-              <div>
-                Znaleziono{" "}
-                <span className="font-semibold">{filteredUsers.length}</span>{" "}
-                użytkowników
+            <div>
+              <div className="text-sm font-medium text-gray-500">
+                Zablokowani
               </div>
-              <div className="flex items-center">
-                <span className="mr-2">Pokaż na stronie:</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm"
-                >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
+              <div className="text-2xl font-bold text-red-600">
+                {userStats.locked}
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Lista użytkowników */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex flex-col">
+            <div className="text-sm font-medium text-gray-500 mb-3">
+              Role użytkowników
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-blue-50">
+                <span className="text-xs text-blue-800">Admin</span>
+                <span className="font-bold text-blue-800">
+                  {userStats.byRole.admin}
+                </span>
               </div>
-            ) : filteredUsers.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Email
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Rola
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Data rejestracji
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Ostatnie logowanie
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Akcje
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {currentItems.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.email}
-                          </div>
-                          {user.profileId && (
-                            <div className="text-xs text-gray-500">
-                              <Link
-                                href={`/admin/profiles/${user.profileId}`}
-                                className="text-blue-600 hover:underline"
-                              >
-                                Zobacz profil
-                              </Link>
-                            </div>
+              <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-indigo-50">
+                <span className="text-xs text-indigo-800">Moderator</span>
+                <span className="font-bold text-indigo-800">
+                  {userStats.byRole.moderator}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-green-50">
+                <span className="text-xs text-green-800">Więzień</span>
+                <span className="font-bold text-green-800">
+                  {userStats.byRole.prisoner}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-yellow-50">
+                <span className="text-xs text-yellow-800">Partner</span>
+                <span className="font-bold text-yellow-800">
+                  {userStats.byRole.partner}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Formularz filtrowania i wyszukiwania */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+        <div className="p-5 border-b border-gray-100">
+          <h2 className="text-lg font-medium text-gray-800">
+            Filtrowanie i wyszukiwanie
+          </h2>
+        </div>
+        <div className="p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <label
+                htmlFor="search"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Szukaj użytkownika
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  id="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Email użytkownika..."
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Filtruj po roli
+              </label>
+              <select
+                id="role"
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="all">Wszystkie role</option>
+                <option value="admin">Admin</option>
+                <option value="moderator">Moderator</option>
+                <option value="prisoner">Więzień</option>
+                <option value="partner">Partner</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Filtruj po statusie
+              </label>
+              <select
+                id="status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="all">Wszystkie statusy</option>
+                <option value="active">Aktywni</option>
+                <option value="inactive">Nieaktywni</option>
+                <option value="locked">Zablokowani</option>
+                <option value="unverified">Niezweryfikowani</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="sort"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Sortuj według
+              </label>
+              <select
+                id="sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="email-asc">Email (A-Z)</option>
+                <option value="email-desc">Email (Z-A)</option>
+                <option value="role-asc">Rola (A-Z)</option>
+                <option value="role-desc">Rola (Z-A)</option>
+                <option value="createdAt-desc">Najnowsi</option>
+                <option value="createdAt-asc">Najstarsi</option>
+                <option value="lastLogin-desc">Ostatnio aktywni</option>
+                <option value="lastLogin-asc">Dawno nieaktywni</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lista użytkowników */}
+      {error ? (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      ) : isLoading ? (
+        <div className="flex justify-center my-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      ) : filteredUsers.length === 0 ? (
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 mx-auto text-gray-400 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-gray-500">
+            Nie znaleziono użytkowników pasujących do kryteriów.
+          </p>
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setRoleFilter("all");
+              setStatusFilter("all");
+            }}
+            className="mt-4 text-indigo-600 hover:text-indigo-800"
+          >
+            Wyczyść filtry
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-800">
+                Lista użytkowników
+              </h2>
+              <div className="text-sm text-gray-500">
+                Znaleziono: {filteredUsers.length} użytkowników
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email / ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Rola
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Rejestracja
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Akcje
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.email}
+                        </div>
+                        <div className="text-xs text-gray-500">{user.id}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2.5 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${
+                            user.role === "admin"
+                              ? "bg-purple-100 text-purple-800"
+                              : ""
+                          }
+                          ${
+                            user.role === "moderator"
+                              ? "bg-blue-100 text-blue-800"
+                              : ""
+                          }
+                          ${
+                            user.role === "prisoner"
+                              ? "bg-green-100 text-green-800"
+                              : ""
+                          }
+                          ${
+                            user.role === "partner"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : ""
+                          }
+                        `}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col space-y-1">
+                          {user.locked ? (
+                            <span className="px-2.5 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                              Zablokowany
+                            </span>
+                          ) : user.active ? (
+                            <span className="px-2.5 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Aktywny
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                              Nieaktywny
+                            </span>
                           )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${
-                              user.role === "admin"
-                                ? "bg-red-100 text-red-800"
-                                : user.role === "moderator"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : user.role === "prisoner"
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
+                          {!user.verified && (
+                            <span className="px-2.5 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              Niezweryfikowany
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex items-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 mr-1.5 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            {user.role === "admin"
-                              ? "Administrator"
-                              : user.role === "moderator"
-                              ? "Moderator"
-                              : user.role === "prisoner"
-                              ? "Więźniarka"
-                              : "Partner"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex flex-col space-y-1">
-                            {user.locked ? (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                Zablokowany
-                              </span>
-                            ) : user.active ? (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Aktywny
-                              </span>
-                            ) : (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                Nieaktywny
-                              </span>
-                            )}
-                            {!user.verified && (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                Niezweryfikowany
-                              </span>
-                            )}
-                            {user.locked && user.lockedUntil && (
-                              <span className="text-xs text-gray-500">
-                                Do{" "}
-                                {new Date(
-                                  user.lockedUntil
-                                ).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
                           {new Date(user.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.lastLogin
-                            ? new Date(user.lastLogin).toLocaleDateString()
-                            : "Nigdy"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            {/* Szybkie akcje */}
-                            {!user.locked ? (
-                              <button
-                                onClick={() =>
-                                  handleToggleLock(user.id, user.locked)
-                                }
-                                className="text-red-600 hover:text-red-900"
-                                disabled={actionInProgress === user.id}
-                                title="Zablokuj konto"
-                              >
+                        </div>
+                        {user.lastLogin && (
+                          <div className="flex items-center mt-1.5 text-xs text-gray-400">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3.5 w-3.5 mr-1 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            Ost. logowanie:{" "}
+                            {new Date(user.lastLogin).toLocaleDateString()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => handleEditUser(user)}
+                            className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                            disabled={actionInProgress === user.id}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 mr-1"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                            Edytuj
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleToggleLock(user.id, user.locked)
+                            }
+                            className={`flex items-center ${
+                              user.locked
+                                ? "text-green-600 hover:text-green-900"
+                                : "text-red-600 hover:text-red-900"
+                            }`}
+                            disabled={actionInProgress === user.id}
+                          >
+                            {user.locked ? (
+                              <>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                  />
-                                </svg>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() =>
-                                  handleToggleLock(user.id, user.locked)
-                                }
-                                className="text-green-600 hover:text-green-900"
-                                disabled={actionInProgress === user.id}
-                                title="Odblokuj konto"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
+                                  className="h-4 w-4 mr-1"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -891,45 +920,13 @@ export default function AdminUsersPage() {
                                     d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
                                   />
                                 </svg>
-                              </button>
-                            )}
-
-                            {user.active ? (
-                              <button
-                                onClick={() =>
-                                  handleToggleActive(user.id, user.active)
-                                }
-                                className="text-yellow-600 hover:text-yellow-900"
-                                disabled={actionInProgress === user.id}
-                                title="Dezaktywuj konto"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                                  />
-                                </svg>
-                              </button>
+                                Odblokuj
+                              </>
                             ) : (
-                              <button
-                                onClick={() =>
-                                  handleToggleActive(user.id, user.active)
-                                }
-                                className="text-green-600 hover:text-green-900"
-                                disabled={actionInProgress === user.id}
-                                title="Aktywuj konto"
-                              >
+                              <>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
+                                  className="h-4 w-4 mr-1"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -938,92 +935,141 @@ export default function AdminUsersPage() {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                                   />
                                 </svg>
-                              </button>
+                                Zablokuj
+                              </>
                             )}
-
-                            <button
-                              onClick={() => handleEditUser(user)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              disabled={actionInProgress === user.id}
-                              title="Edytuj użytkownika"
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-600 hover:text-red-900 flex items-center"
+                            disabled={actionInProgress === user.id}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 mr-1"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                />
-                              </svg>
-                            </button>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                            Usuń
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                            <button
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="text-red-600 hover:text-red-900"
-                              disabled={actionInProgress === user.id}
-                              title="Usuń użytkownika"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
+          {/* Paginacja */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex justify-between items-center">
+            <div className="text-sm text-gray-700">
+              Pokazuję {indexOfFirstItem + 1} -{" "}
+              {Math.min(indexOfLastItem, filteredUsers.length)} z{" "}
+              {filteredUsers.length} użytkowników
+            </div>
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                &laquo;
+              </button>
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                &lsaquo;
+              </button>
+              {/* Numery stron */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === pageNum
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                &rsaquo;
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                &raquo;
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
-                            {actionInProgress === user.id && (
-                              <span className="inline-flex items-center">
-                                <svg
-                                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                  ></circle>
-                                  <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                  ></path>
-                                </svg>
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-64">
+      {/* Modal edycji użytkownika */}
+      {showEditModal && currentUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">
+                Edytuj użytkownika
+              </h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 text-gray-300 mb-4"
+                  className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -1031,256 +1077,95 @@ export default function AdminUsersPage() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-                <p className="text-gray-500 text-lg">
-                  Brak użytkowników spełniających kryteria wyszukiwania
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setRoleFilter("all");
-                    setStatusFilter("all");
-                  }}
-                  className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  Wyczyść filtry
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Paginacja */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mb-6">
-              <nav className="flex items-center bg-white rounded-lg shadow-sm px-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => {
-                    // Pokaż tylko kilka stron dookoła bieżącej strony
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-2 mx-1 rounded-md ${
-                            currentPage === page
-                              ? "bg-blue-600 text-white"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    } else if (
-                      page === currentPage - 2 ||
-                      page === currentPage + 2
-                    ) {
-                      return (
-                        <span key={page} className="px-4 py-2">
-                          ...
-                        </span>
-                      );
-                    }
-                    return null;
-                  }
-                )}
-
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </nav>
+              </button>
             </div>
-          )}
+
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="flex items-center mb-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-gray-400 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                  />
+                </svg>
+                <p className="text-gray-700 font-medium">{currentUser.email}</p>
+              </div>
+              <div className="text-xs text-gray-500">ID: {currentUser.id}</div>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rola użytkownika
+              </label>
+              <select
+                value={editForm.role}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, role: e.target.value })
+                }
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="admin">Admin</option>
+                <option value="moderator">Moderator</option>
+                <option value="prisoner">Więzień</option>
+                <option value="partner">Partner</option>
+              </select>
+            </div>
+
+            <div className="flex space-x-4 mb-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={editForm.active}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, active: e.target.checked })
+                  }
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">Aktywny</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={editForm.locked}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, locked: e.target.checked })
+                  }
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">Zablokowany</span>
+              </label>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Anuluj
+              </button>
+              <button
+                onClick={handleSaveUser}
+                disabled={isLoading}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
+              >
+                {isLoading ? "Zapisywanie..." : "Zapisz zmiany"}
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* Modal edycji użytkownika */}
-        {showEditModal && currentUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Edycja użytkownika
-                </h3>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="mb-4">
-                <p className="text-sm text-gray-600">
-                  Email:{" "}
-                  <span className="font-medium">{currentUser.email}</span>
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  ID: {currentUser.id}
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Rola
-                  </label>
-                  <select
-                    value={editForm.role}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, role: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="prisoner">Więźniarka</option>
-                    <option value="partner">Partner</option>
-                    <option value="admin">Administrator</option>
-                    <option value="moderator">Moderator</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="active"
-                    checked={editForm.active}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, active: e.target.checked })
-                    }
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="active"
-                    className="ml-2 block text-sm text-gray-700"
-                  >
-                    Aktywny
-                  </label>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="locked"
-                    checked={editForm.locked}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, locked: e.target.checked })
-                    }
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="locked"
-                    className="ml-2 block text-sm text-gray-700"
-                  >
-                    Zablokowany
-                  </label>
-                </div>
-
-                {editForm.locked && (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-xs text-yellow-700">
-                      <strong>Uwaga:</strong> Blokowanie konta spowoduje, że
-                      użytkownik nie będzie mógł się zalogować przez 7 dni.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  disabled={isLoading}
-                >
-                  Anuluj
-                </button>
-                <button
-                  onClick={handleSaveUser}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center"
-                  disabled={isLoading}
-                >
-                  {isLoading && (
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  )}
-                  {isLoading ? "Zapisywanie..." : "Zapisz zmiany"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </AdminLayout>
-    </>
+      )}
+    </div>
   );
 }

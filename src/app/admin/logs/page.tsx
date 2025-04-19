@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import AdminLayout from "@/frontend/components/admin/AdminLayout";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 
 // Interfejs dla plików logów
@@ -111,11 +110,9 @@ export default function AdminLogsPage() {
 
   if (userLoading || (isLoading && !logFiles.length)) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
@@ -124,91 +121,89 @@ export default function AdminLogsPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Logi systemowe</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Logi systemowe</h1>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Lista plików logów */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h2 className="text-lg font-semibold mb-3">Pliki logów</h2>
+
+            {logFiles.length === 0 ? (
+              <p className="text-gray-500 text-sm">
+                Brak dostępnych plików logów
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {logFiles.map((file) => (
+                  <li key={file.name}>
+                    <button
+                      onClick={() => handleSelectFile(file.name)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedFile === file.name
+                          ? "bg-blue-50 text-blue-700"
+                          : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="font-medium">{file.name}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {formatFileSize(file.size)} •{" "}
+                        {new Date(file.modified).toLocaleString()}
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-        )}
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Lista plików logów */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h2 className="text-lg font-semibold mb-3">Pliki logów</h2>
-
-              {logFiles.length === 0 ? (
-                <p className="text-gray-500 text-sm">
-                  Brak dostępnych plików logów
-                </p>
-              ) : (
-                <ul className="space-y-2">
-                  {logFiles.map((file) => (
-                    <li key={file.name}>
-                      <button
-                        onClick={() => handleSelectFile(file.name)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          selectedFile === file.name
-                            ? "bg-blue-50 text-blue-700"
-                            : "hover:bg-gray-50"
-                        }`}
-                      >
-                        <div className="font-medium">{file.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {formatFileSize(file.size)} •{" "}
-                          {new Date(file.modified).toLocaleString()}
-                        </div>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+        {/* Zawartość pliku logów */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-lg shadow-md p-4 h-[70vh] flex flex-col">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold">
+                {selectedFile ? selectedFile : "Zawartość logów"}
+              </h2>
+              {selectedFile && (
+                <button
+                  onClick={() => setSelectedFile(null)}
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Zamknij
+                </button>
               )}
             </div>
-          </div>
 
-          {/* Zawartość pliku logów */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-md p-4 h-[70vh] flex flex-col">
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold">
-                  {selectedFile ? selectedFile : "Zawartość logów"}
-                </h2>
-                {selectedFile && (
-                  <button
-                    onClick={() => setSelectedFile(null)}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    Zamknij
-                  </button>
-                )}
-              </div>
-
-              <div className="overflow-auto flex-grow font-mono text-xs bg-gray-50 p-3 rounded">
-                {isLoading && selectedFile ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                  </div>
-                ) : !selectedFile ? (
-                  <div className="flex items-center justify-center h-full text-gray-500">
-                    Wybierz plik logów z listy po lewej stronie
-                  </div>
-                ) : logContent ? (
-                  <pre className="whitespace-pre-wrap break-words">
-                    {logContent}
-                  </pre>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
-                    Brak zawartości w wybranym pliku logów
-                  </div>
-                )}
-              </div>
+            <div className="overflow-auto flex-grow font-mono text-xs bg-gray-50 p-3 rounded">
+              {isLoading && selectedFile ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : !selectedFile ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Wybierz plik logów z listy po lewej stronie
+                </div>
+              ) : logContent ? (
+                <pre className="whitespace-pre-wrap break-words">
+                  {logContent}
+                </pre>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Brak zawartości w wybranym pliku logów
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 }
