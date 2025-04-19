@@ -17,6 +17,31 @@ export default function RegisterPage() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isRegistrationEnabled, setIsRegistrationEnabled] = useState(true);
+  const [isCheckingRegistration, setIsCheckingRegistration] = useState(true);
+
+  // Sprawdź, czy rejestracja jest włączona
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      try {
+        setIsCheckingRegistration(true);
+        const response = await fetch("/api/settings/registration");
+
+        if (response.ok) {
+          const data = await response.json();
+          setIsRegistrationEnabled(data.enabled);
+        }
+      } catch (error) {
+        console.error("Błąd sprawdzania statusu rejestracji:", error);
+        // W razie błędu pozwalamy na rejestrację
+        setIsRegistrationEnabled(true);
+      } finally {
+        setIsCheckingRegistration(false);
+      }
+    };
+
+    checkRegistrationStatus();
+  }, []);
 
   // Efekt obsługujący błędy
   useEffect(() => {
@@ -40,6 +65,11 @@ export default function RegisterPage() {
     role: "prisoner" | "partner";
     acceptTerms: boolean;
   }) => {
+    if (!isRegistrationEnabled) {
+      setError("Rejestracja jest obecnie wyłączona. Spróbuj ponownie później.");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Hasła nie są identyczne");
       return;
@@ -74,6 +104,18 @@ export default function RegisterPage() {
     }
   };
 
+  if (isCheckingRegistration) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow container mx-auto px-4 py-16 mb-16 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -84,21 +126,35 @@ export default function RegisterPage() {
             Zarejestruj się
           </h1>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-              {error}
-            </div>
-          )}
-
-          {success ? (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
-              {success}
+          {!isRegistrationEnabled ? (
+            <div className="bg-slate-50 border border-slate-200 text-slate-700 px-4 py-3 rounded mb-6">
+              <p className="font-semibold">
+                Rejestracja jest obecnie niedostępna
+              </p>
+              <p className="mt-2">
+                System rejestracji nowych użytkowników został tymczasowo
+                wyłączony.
+              </p>
             </div>
           ) : (
-            <RegisterForm
-              onSubmit={handleRegister}
-              isSubmitting={isSubmitting}
-            />
+            <>
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+                  {error}
+                </div>
+              )}
+
+              {success ? (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
+                  {success}
+                </div>
+              ) : (
+                <RegisterForm
+                  onSubmit={handleRegister}
+                  isSubmitting={isSubmitting}
+                />
+              )}
+            </>
           )}
 
           <div className="mt-6 text-center">

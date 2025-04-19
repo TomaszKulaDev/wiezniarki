@@ -5,6 +5,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { profileApi } from "@/frontend/store/apis/profileApi";
 import { authApi } from "@/frontend/store/apis/authApi";
 import { statsApi } from "@/frontend/store/apis/statsApi";
+import { settingsApi } from "@/frontend/store/apis/settingsApi";
 
 // Importy slices
 import profileReducer from "@/frontend/store/slices/profileSlice";
@@ -18,6 +19,7 @@ export const store = configureStore({
     [profileApi.reducerPath]: profileApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [statsApi.reducerPath]: statsApi.reducer,
+    [settingsApi.reducerPath]: settingsApi.reducer,
 
     // Feature reducers
     profile: profileReducer,
@@ -29,7 +31,8 @@ export const store = configureStore({
     getDefaultMiddleware().concat(
       profileApi.middleware,
       authApi.middleware,
-      statsApi.middleware
+      statsApi.middleware,
+      settingsApi.middleware
     ),
   devTools: process.env.NODE_ENV !== "production",
 });

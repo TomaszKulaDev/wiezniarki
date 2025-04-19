@@ -58,6 +58,12 @@ export default function AdminUsersPage() {
     locked: false,
   });
 
+  // Ustawienia rejestracji
+  const [registrationEnabled, setRegistrationEnabled] = useState(true);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(null);
+
   // Przekieruj, jeśli użytkownik nie jest administratorem
   useEffect(() => {
     if (user && user.role !== "admin") {
@@ -122,6 +128,28 @@ export default function AdminUsersPage() {
       fetchUsers();
     }
   }, [user]);
+
+  // Pobierz ustawienia rejestracji
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setRegistrationLoading(true);
+        // Tworzymy nowy endpoint, który nie wymaga autoryzacji
+        const response = await fetch("/api/settings/registration");
+        
+        if (response.ok) {
+          const data = await response.json();
+          setRegistrationEnabled(data.enabled);
+        }
+      } catch (error) {
+        console.error("Błąd podczas pobierania ustawień rejestracji:", error);
+      } finally {
+        setRegistrationLoading(false);
+      }
+    };
+    
+    fetchSettings();
+  }, []);
 
   // Filtrowanie i sortowanie użytkowników
   useEffect(() => {
@@ -400,6 +428,40 @@ export default function AdminUsersPage() {
     document.body.removeChild(link);
   };
 
+  // Funkcja do przełączania ustawień rejestracji
+  const handleToggleRegistration = async () => {
+    try {
+      setRegistrationLoading(true);
+      setRegistrationError(null);
+      setRegistrationSuccess(null);
+      
+      // Tworzymy nowy endpoint do aktualizacji ustawień
+      const response = await fetch("/api/settings/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          enabled: !registrationEnabled
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Błąd podczas aktualizacji ustawień");
+      }
+      
+      // Aktualizuj stan
+      setRegistrationEnabled(!registrationEnabled);
+      setRegistrationSuccess("Ustawienia rejestracji zostały zaktualizowane");
+      
+    } catch (error) {
+      console.error("Błąd aktualizacji ustawień rejestracji:", error);
+      setRegistrationError("Wystąpił błąd podczas aktualizacji ustawień rejestracji");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
   if (userLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -464,6 +526,54 @@ export default function AdminUsersPage() {
               />
             </svg>
             Odśwież
+          </button>
+        </div>
+      </div>
+
+      {/* Sekcja ustawień rejestracji */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">Ustawienia rejestracji</h2>
+        
+        {registrationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            {registrationError}
+          </div>
+        )}
+        
+        {registrationSuccess && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+            {registrationSuccess}
+          </div>
+        )}
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-700">
+              {registrationEnabled 
+                ? "Rejestracja nowych użytkowników jest aktualnie włączona." 
+                : "Rejestracja nowych użytkowników jest aktualnie wyłączona."}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              To ustawienie wpływa tylko na możliwość wypełnienia formularza rejestracji przez nowych użytkowników.
+            </p>
+          </div>
+          
+          <button
+            onClick={handleToggleRegistration}
+            disabled={registrationLoading}
+            className={`px-4 py-2 rounded-md text-white transition-colors ${
+              registrationLoading
+                ? "bg-gray-400 cursor-not-allowed" 
+                : registrationEnabled 
+                  ? "bg-red-500 hover:bg-red-600" 
+                  : "bg-green-500 hover:bg-green-600"
+            }`}
+          >
+            {registrationLoading 
+              ? "Aktualizowanie..." 
+              : registrationEnabled 
+                ? "Wyłącz rejestrację" 
+                : "Włącz rejestrację"}
           </button>
         </div>
       </div>
@@ -917,7 +1027,7 @@ export default function AdminUsersPage() {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+                                    d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                                   />
                                 </svg>
                                 Odblokuj
