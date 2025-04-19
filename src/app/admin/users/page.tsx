@@ -173,15 +173,22 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const fetchCleanupSettings = async () => {
       try {
-        const response = await fetch("/api/admin/settings");
+        // Używamy nowego, publicznie dostępnego endpointu
+        const response = await fetch("/api/settings/database", {
+          credentials: "include",
+        });
+
         if (response.ok) {
           const data = await response.json();
-          if (
-            data.database &&
-            typeof data.database.cleanupInterval === "number"
-          ) {
-            setCleanupInterval(data.database.cleanupInterval);
+          if (typeof data.cleanupInterval === "number") {
+            setCleanupInterval(data.cleanupInterval);
           }
+        } else {
+          console.error(
+            "Nie udało się pobrać ustawień cleanupInterval:",
+            response.status,
+            await response.text()
+          );
         }
       } catch (error) {
         console.error("Błąd podczas pobierania ustawień czyszczenia:", error);
@@ -512,37 +519,46 @@ export default function AdminUsersPage() {
       setCleanupError(null);
       setCleanupSuccess(null);
 
-      // Pobierz aktualne ustawienia
-      const settingsResponse = await fetch("/api/admin/settings");
-      const currentSettings = await settingsResponse.json();
+      // Sprawdź, czy wartość jest prawidłowa
+      if (isNaN(cleanupInterval) || cleanupInterval <= 0) {
+        setCleanupError("Wprowadź prawidłową liczbę dni (większą od 0)");
+        return;
+      }
 
-      // Przygotuj zaktualizowane ustawienia
-      const updatedSettings = {
-        ...currentSettings,
-        database: {
-          ...currentSettings.database,
-          cleanupInterval: cleanupInterval,
-        },
-      };
-
-      // Zapisz zaktualizowane ustawienia
-      const response = await fetch("/api/admin/settings", {
+      // Używamy nowego endpointu
+      const response = await fetch("/api/settings/database", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedSettings),
+        body: JSON.stringify({ cleanupInterval }),
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error("Błąd podczas aktualizacji ustawień czyszczenia");
+        const errorText = await response.text();
+        let errorMessage = `Błąd (${response.status})`;
+
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Jeśli nie możemy sparsować JSON, użyjemy surowego tekstu
+          errorMessage = errorText || errorMessage;
+        }
+
+        throw new Error(errorMessage);
       }
 
-      setCleanupSuccess("Ustawienia czyszczenia kont zostały zaktualizowane");
+      setCleanupSuccess(
+        `Ustawienie czyszczenia kont zaktualizowane do ${cleanupInterval} dni`
+      );
     } catch (error) {
       console.error("Błąd aktualizacji ustawień czyszczenia:", error);
       setCleanupError(
-        "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"
+        error instanceof Error
+          ? error.message
+          : "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"
       );
     } finally {
       setCleanupLoading(false);
@@ -555,8 +571,7 @@ export default function AdminUsersPage() {
       setLoadingInactiveUsers(true);
       setInactiveUsersError(null);
 
-      // Pobieramy wszystkie konta i filtrujemy je po stronie klienta,
-      // aby móc zastosować złożoną logikę
+      // Pobieramy wszystkie konta i filtrujemy je po stronie klienta
       const response = await fetch(`/api/admin/users`);
 
       if (!response.ok) {
@@ -582,7 +597,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Funkcja do ręcznej weryfikacji konta przez administratora
+  // Funkcja do ręcznej weryfikacji konta
   const handleVerifyUser = async (userId: string) => {
     try {
       setActionInProgress(userId);
@@ -601,7 +616,7 @@ export default function AdminUsersPage() {
         throw new Error("Błąd podczas weryfikacji konta użytkownika");
       }
 
-      // Pobierz odpowiedź, aby sprawdzić, czy aktualizacja się powiodła
+      // Pobierz odpowiedź
       const updatedUser = await response.json();
 
       // Odśwież listę nieaktywnych użytkowników
@@ -775,9 +790,10 @@ export default function AdminUsersPage() {
               id="cleanup-interval"
               min="1"
               value={cleanupInterval}
-              onChange={(e) =>
-                setCleanupInterval(parseInt(e.target.value) || 30)
-              }
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                setCleanupInterval(isNaN(value) ? 30 : Math.max(1, value));
+              }}
               className="w-24 border border-gray-300 rounded-md px-3 py-2"
             />
             <button
