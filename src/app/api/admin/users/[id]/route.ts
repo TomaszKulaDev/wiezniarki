@@ -4,11 +4,15 @@ import { mongodbService } from "@/backend/services/mongodbService";
 import { dbName } from "@/backend/utils/mongodb";
 import { User } from "@/backend/models/User";
 
+// Funkcja pomocnicza do wyodrębniania ID z URL
+function getIdFromUrl(request: NextRequest): string | null {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split("/");
+  return pathParts[pathParts.length - 1] || null;
+}
+
 // Aktualizuj użytkownika
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -20,7 +24,14 @@ export async function PATCH(
       );
     }
 
-    const userId = params.id;
+    const userId = getIdFromUrl(request);
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "ID użytkownika jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Sprawdź czy użytkownik istnieje
     const user = await mongodbService.findDocument<User>(dbName, "users", {
@@ -103,10 +114,7 @@ export async function PATCH(
 }
 
 // Usuń użytkownika
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -118,7 +126,14 @@ export async function DELETE(
       );
     }
 
-    const userId = params.id;
+    const userId = getIdFromUrl(request);
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "ID użytkownika jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Sprawdź czy użytkownik istnieje
     const user = await mongodbService.findDocument<User>(dbName, "users", {
@@ -171,10 +186,7 @@ export async function DELETE(
 }
 
 // Pobierz szczegóły pojedynczego użytkownika
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -186,7 +198,14 @@ export async function GET(
       );
     }
 
-    const userId = params.id;
+    const userId = getIdFromUrl(request);
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "ID użytkownika jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Pobierz użytkownika
     const user = await mongodbService.findDocument<User>(dbName, "users", {
@@ -200,11 +219,31 @@ export async function GET(
       );
     }
 
-    // Usuń wrażliwe dane
+    // Usuń wrażliwe dane przed zwróceniem
     const { passwordHash, verificationCode, resetPasswordToken, ...safeUser } =
       user;
 
-    return NextResponse.json(safeUser);
+    // Pobierz tokeny użytkownika
+    const tokens = await mongodbService.findDocuments(
+      dbName,
+      "tokens",
+      { userId: user.id },
+      { limit: 10, sort: { createdAt: -1 } }
+    );
+
+    // Pobierz profil jeśli jest połączony
+    let profile = null;
+    if (user.profileId) {
+      profile = await mongodbService.findDocument(dbName, "profiles", {
+        id: user.profileId,
+      });
+    }
+
+    return NextResponse.json({
+      ...safeUser,
+      tokens: tokens || [],
+      profile: profile,
+    });
   } catch (error) {
     console.error("Błąd podczas pobierania użytkownika:", error);
     return NextResponse.json(
