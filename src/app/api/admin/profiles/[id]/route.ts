@@ -5,14 +5,15 @@ import { dbName } from "@/backend/utils/mongodb";
 import { Profile } from "@/backend/models/Profile";
 import { User } from "@/backend/models/User";
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
+// Funkcja pomocnicza do wyodrębniania ID z URL
+function getIdFromUrl(request: NextRequest): string | null {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split("/");
+  return pathParts[pathParts.length - 1] || null;
+}
 
 // Pobierz szczegóły profilu
-export async function GET(request: NextRequest, context: RouteContext) {
+export async function GET(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -24,7 +25,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const profileId = context.params.id;
+    const profileId = getIdFromUrl(request);
+
+    if (!profileId) {
+      return NextResponse.json(
+        { message: "ID profilu jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Pobierz profil
     const profile = await mongodbService.findDocument<Profile>(
@@ -70,7 +78,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 // Usuń profil
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function DELETE(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -82,7 +90,14 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const profileId = context.params.id;
+    const profileId = getIdFromUrl(request);
+
+    if (!profileId) {
+      return NextResponse.json(
+        { message: "ID profilu jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Sprawdź czy profil istnieje
     const profile = await mongodbService.findDocument<Profile>(
@@ -127,7 +142,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 }
 
 // Aktualizuj profil
-export async function PATCH(request: NextRequest, context: RouteContext) {
+export async function PATCH(request: NextRequest) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -139,7 +154,14 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const profileId = context.params.id;
+    const profileId = getIdFromUrl(request);
+
+    if (!profileId) {
+      return NextResponse.json(
+        { message: "ID profilu jest wymagane" },
+        { status: 400 }
+      );
+    }
 
     // Sprawdź czy profil istnieje
     const profile = await mongodbService.findDocument<Profile>(
