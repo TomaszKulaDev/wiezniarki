@@ -5,11 +5,14 @@ import { dbName } from "@/backend/utils/mongodb";
 import { Profile } from "@/backend/models/Profile";
 import { User } from "@/backend/models/User";
 
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 // Pobierz szczegóły profilu
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, context: RouteContext) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -21,7 +24,7 @@ export async function GET(
       );
     }
 
-    const profileId = params.id;
+    const profileId = context.params.id;
 
     // Pobierz profil
     const profile = await mongodbService.findDocument<Profile>(
@@ -67,10 +70,7 @@ export async function GET(
 }
 
 // Usuń profil
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -82,7 +82,7 @@ export async function DELETE(
       );
     }
 
-    const profileId = params.id;
+    const profileId = context.params.id;
 
     // Sprawdź czy profil istnieje
     const profile = await mongodbService.findDocument<Profile>(
@@ -127,10 +127,7 @@ export async function DELETE(
 }
 
 // Aktualizuj profil
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     // Weryfikacja uprawnień administratora
     const authResult = await authMiddleware(request, ["admin"]);
@@ -142,7 +139,7 @@ export async function PATCH(
       );
     }
 
-    const profileId = params.id;
+    const profileId = context.params.id;
 
     // Sprawdź czy profil istnieje
     const profile = await mongodbService.findDocument<Profile>(
