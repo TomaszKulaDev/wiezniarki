@@ -83,7 +83,13 @@ export default function AdminSettingsPage() {
     if (user && user.role === "admin") {
       fetchSettings();
     }
-  }, [user]);
+  }, [
+    user,
+    router,
+    settings.maintenance,
+    settings.database,
+    settings.notifications,
+  ]);
 
   // Obsługa zmian w formularzach
   const handleChange = (
