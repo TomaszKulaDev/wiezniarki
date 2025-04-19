@@ -10,10 +10,6 @@ interface SystemSettings {
     enabled: boolean;
     message: string;
   };
-  registration: {
-    enabled: boolean;
-    requireVerification: boolean;
-  };
   database: {
     cleanupInterval: number; // w dniach
     backupEnabled: boolean;
@@ -32,10 +28,6 @@ export default function AdminSettingsPage() {
     maintenance: {
       enabled: false,
       message: "Trwają prace konserwacyjne. Prosimy spróbować później.",
-    },
-    registration: {
-      enabled: true,
-      requireVerification: true,
     },
     database: {
       cleanupInterval: 30,
@@ -72,7 +64,11 @@ export default function AdminSettingsPage() {
         }
 
         const data = await response.json();
-        setSettings(data);
+        setSettings({
+          maintenance: data.maintenance || settings.maintenance,
+          database: data.database || settings.database,
+          notifications: data.notifications || settings.notifications,
+        });
       } catch (error) {
         console.error("Błąd pobierania ustawień:", error);
         setError(
@@ -111,15 +107,28 @@ export default function AdminSettingsPage() {
       setError(null);
       setSuccess(null);
 
-      const response = await fetch("/api/admin/settings", {
+      // Pobierz aktualne ustawienia, aby nie utracić sekcji registration
+      const response = await fetch("/api/admin/settings");
+      const currentSettings = await response.json();
+
+      // Zachowaj sekcję registration z aktualnych ustawień
+      const updatedSettings = {
+        ...settings,
+        registration: currentSettings.registration || {
+          enabled: true,
+          requireVerification: true,
+        },
+      };
+
+      const saveResponse = await fetch("/api/admin/settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(updatedSettings),
       });
 
-      if (!response.ok) {
+      if (!saveResponse.ok) {
         throw new Error("Błąd podczas zapisywania ustawień systemowych");
       }
 
@@ -209,52 +218,6 @@ export default function AdminSettingsPage() {
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
             />
-          </div>
-        </div>
-      </div>
-
-      {/* Ustawienia rejestracji */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Ustawienia rejestracji</h2>
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="registration-enabled"
-              checked={settings.registration.enabled}
-              onChange={(e) =>
-                handleChange("registration", "enabled", e.target.checked)
-              }
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label
-              htmlFor="registration-enabled"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Pozwalaj na rejestrację nowych użytkowników
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="registration-verification"
-              checked={settings.registration.requireVerification}
-              onChange={(e) =>
-                handleChange(
-                  "registration",
-                  "requireVerification",
-                  e.target.checked
-                )
-              }
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label
-              htmlFor="registration-verification"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Wymagaj weryfikacji adresu email
-            </label>
           </div>
         </div>
       </div>
