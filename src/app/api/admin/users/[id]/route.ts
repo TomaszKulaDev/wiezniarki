@@ -11,6 +11,74 @@ function getIdFromUrl(request: NextRequest): string | null {
   return pathParts[pathParts.length - 1] || null;
 }
 
+// Pobierz szczegóły pojedynczego użytkownika
+export async function GET(request: NextRequest) {
+  try {
+    // Weryfikacja uprawnień administratora
+    const authResult = await authMiddleware(request, ["admin"]);
+
+    if (!authResult.success) {
+      return NextResponse.json(
+        { message: authResult.message || "Brak uprawnień" },
+        { status: authResult.status || 403 }
+      );
+    }
+
+    const userId = getIdFromUrl(request);
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "ID użytkownika jest wymagane" },
+        { status: 400 }
+      );
+    }
+
+    // Pobierz użytkownika
+    const user = await mongodbService.findDocument<User>(dbName, "users", {
+      id: userId,
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Użytkownik nie istnieje" },
+        { status: 404 }
+      );
+    }
+
+    // Usuń wrażliwe dane przed zwróceniem
+    const { passwordHash, verificationCode, resetPasswordToken, ...safeUser } =
+      user;
+
+    // Pobierz tokeny użytkownika - tymczasowe rozwiązanie, aby uzyskać tylko 10 najnowszych tokenów
+    const collection = await mongodbService.getCollection(dbName, "tokens");
+    const tokens = await collection
+      .find({ userId: user.id })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .toArray();
+
+    // Pobierz profil jeśli jest połączony
+    let profile = null;
+    if (user.profileId) {
+      profile = await mongodbService.findDocument(dbName, "profiles", {
+        id: user.profileId,
+      });
+    }
+
+    return NextResponse.json({
+      ...safeUser,
+      tokens: tokens || [],
+      profile: profile,
+    });
+  } catch (error) {
+    console.error("Błąd podczas pobierania użytkownika:", error);
+    return NextResponse.json(
+      { message: "Wystąpił błąd podczas pobierania użytkownika" },
+      { status: 500 }
+    );
+  }
+}
+
 // Aktualizuj użytkownika
 export async function PATCH(request: NextRequest) {
   try {
@@ -180,74 +248,6 @@ export async function DELETE(request: NextRequest) {
     console.error("Błąd podczas usuwania użytkownika:", error);
     return NextResponse.json(
       { message: "Wystąpił błąd podczas usuwania użytkownika" },
-      { status: 500 }
-    );
-  }
-}
-
-// Pobierz szczegóły pojedynczego użytkownika
-export async function GET(request: NextRequest) {
-  try {
-    // Weryfikacja uprawnień administratora
-    const authResult = await authMiddleware(request, ["admin"]);
-
-    if (!authResult.success) {
-      return NextResponse.json(
-        { message: authResult.message || "Brak uprawnień" },
-        { status: authResult.status || 403 }
-      );
-    }
-
-    const userId = getIdFromUrl(request);
-
-    if (!userId) {
-      return NextResponse.json(
-        { message: "ID użytkownika jest wymagane" },
-        { status: 400 }
-      );
-    }
-
-    // Pobierz użytkownika
-    const user = await mongodbService.findDocument<User>(dbName, "users", {
-      id: userId,
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Użytkownik nie istnieje" },
-        { status: 404 }
-      );
-    }
-
-    // Usuń wrażliwe dane przed zwróceniem
-    const { passwordHash, verificationCode, resetPasswordToken, ...safeUser } =
-      user;
-
-    // Pobierz tokeny użytkownika
-    const tokens = await mongodbService.findDocuments(
-      dbName,
-      "tokens",
-      { userId: user.id },
-      { limit: 10, sort: { createdAt: -1 } }
-    );
-
-    // Pobierz profil jeśli jest połączony
-    let profile = null;
-    if (user.profileId) {
-      profile = await mongodbService.findDocument(dbName, "profiles", {
-        id: user.profileId,
-      });
-    }
-
-    return NextResponse.json({
-      ...safeUser,
-      tokens: tokens || [],
-      profile: profile,
-    });
-  } catch (error) {
-    console.error("Błąd podczas pobierania użytkownika:", error);
-    return NextResponse.json(
-      { message: "Wystąpił błąd podczas pobierania użytkownika" },
       { status: 500 }
     );
   }
