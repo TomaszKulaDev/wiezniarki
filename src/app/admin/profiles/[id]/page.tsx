@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import AdminLayout from "@/frontend/components/admin/AdminLayout";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import Image from "next/image";
@@ -19,12 +19,10 @@ interface ProfileDetails extends Profile {
   };
 }
 
-export default function AdminProfileDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function AdminProfileDetailsPage() {
   const router = useRouter();
+  const params = useParams();
+  const profileId = params.id as string;
   const { data: currentUser, isLoading: userLoading } =
     useGetCurrentUserQuery();
 
@@ -51,7 +49,7 @@ export default function AdminProfileDetailsPage({
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/admin/profiles/${params.id}`);
+        const response = await fetch(`/api/admin/profiles/${profileId}`);
 
         if (!response.ok) {
           throw new Error("Błąd podczas pobierania szczegółów profilu");
@@ -70,10 +68,10 @@ export default function AdminProfileDetailsPage({
       }
     };
 
-    if (currentUser && currentUser.role === "admin") {
+    if (currentUser && currentUser.role === "admin" && profileId) {
       fetchProfileDetails();
     }
-  }, [currentUser, params.id]);
+  }, [currentUser, profileId]);
 
   // Obsługa zmian w formularzu
   const handleChange = (
@@ -110,7 +108,7 @@ export default function AdminProfileDetailsPage({
       setError(null);
       setSuccess(null);
 
-      const response = await fetch(`/api/admin/profiles/${params.id}`, {
+      const response = await fetch(`/api/admin/profiles/${profileId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +149,7 @@ export default function AdminProfileDetailsPage({
     try {
       setIsLoading(true);
 
-      const response = await fetch(`/api/admin/profiles/${params.id}`, {
+      const response = await fetch(`/api/admin/profiles/${profileId}`, {
         method: "DELETE",
       });
 

@@ -590,7 +590,7 @@ export default function Navbar() {
                   <li>
                     <Link
                       href="/admin/dashboard"
-                      className={`block text-sm font-medium hover:text-primary transition flex items-center gap-1 ${
+                      className={`text-sm font-medium hover:text-primary transition flex items-center gap-1 ${
                         pathname.startsWith("/admin")
                           ? "text-primary font-bold"
                           : "text-gray-700"
