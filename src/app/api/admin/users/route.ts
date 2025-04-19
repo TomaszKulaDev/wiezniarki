@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get("limit") || "10");
 
     // Buduj zapytanie filtru
-    let filter: any = {};
+    const filter: any = {};
 
     if (role && role !== "all") {
       filter.role = role;
