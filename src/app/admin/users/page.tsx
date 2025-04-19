@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
+import {
+  useGetDatabaseSettingsQuery,
+  useUpdateDatabaseSettingsMutation,
+  useLazyGetInactiveUsersQuery,
+  useVerifyUserMutation,
+} from "@/frontend/store/apis/settingsApi";
 import Link from "next/link";
 
 // Interfejs dla użytkownika (uproszczony)
@@ -68,19 +74,69 @@ export default function AdminUsersPage() {
     null
   );
 
-  // Ustawienia czyszczenia kont
-  const [cleanupInterval, setCleanupInterval] = useState(30);
-  const [cleanupLoading, setCleanupLoading] = useState(false);
-  const [cleanupError, setCleanupError] = useState<string | null>(null);
-  const [cleanupSuccess, setCleanupSuccess] = useState<string | null>(null);
+  // RTK Query hooki zamiast bezpośredniego fetch
+  const { data: databaseSettings, isLoading: isDatabaseSettingsLoading } =
+    useGetDatabaseSettingsQuery(undefined, {
+      // Skip wykonanie zapytania, jeśli użytkownik nie jest adminem
+      skip: !user || user.role !== "admin",
+    });
 
-  // Stan dla nieaktywnych kont
-  const [inactiveUsers, setInactiveUsers] = useState<UserListItem[]>([]);
+  const [
+    updateDatabaseSettings,
+    {
+      isLoading: isUpdatingDatabaseSettings,
+      isSuccess: isDatabaseSettingsUpdateSuccess,
+      error: databaseSettingsUpdateError,
+      reset: resetDatabaseSettingsUpdate,
+    },
+  ] = useUpdateDatabaseSettingsMutation();
+
+  // Zamiast useGetInactiveUsersQuery, użyj triggera
+  const [
+    triggerGetInactiveUsers,
+    {
+      data: inactiveUsers,
+      isLoading: isInactiveUsersLoading,
+      isSuccess: isInactiveUsersSuccess,
+    },
+  ] = useLazyGetInactiveUsersQuery();
+
+  const [verifyUser, { isLoading: isVerifyingUser }] = useVerifyUserMutation();
+
+  // Lokalny stan dla czyszczenia kont
+  const [cleanupInterval, setCleanupInterval] = useState<number>(30);
   const [showInactiveUsers, setShowInactiveUsers] = useState(false);
-  const [loadingInactiveUsers, setLoadingInactiveUsers] = useState(false);
-  const [inactiveUsersError, setInactiveUsersError] = useState<string | null>(
-    null
-  );
+
+  // Ustaw wartość cleanupInterval z pobranych ustawień
+  useEffect(() => {
+    if (
+      databaseSettings &&
+      typeof databaseSettings.cleanupInterval === "number"
+    ) {
+      setCleanupInterval(databaseSettings.cleanupInterval);
+    }
+  }, [databaseSettings]);
+
+  // Resetuj komunikaty po sukcesie/błędzie
+  useEffect(() => {
+    if (isDatabaseSettingsUpdateSuccess || databaseSettingsUpdateError) {
+      const timer = setTimeout(() => {
+        resetDatabaseSettingsUpdate();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [
+    isDatabaseSettingsUpdateSuccess,
+    databaseSettingsUpdateError,
+    resetDatabaseSettingsUpdate,
+  ]);
+
+  // Pokażmy nieaktywnych użytkowników po ich pobraniu
+  useEffect(() => {
+    if (isInactiveUsersSuccess && inactiveUsers) {
+      setShowInactiveUsers(true);
+    }
+  }, [isInactiveUsersSuccess, inactiveUsers]);
 
   // Przekieruj, jeśli użytkownik nie jest administratorem
   useEffect(() => {
@@ -168,37 +224,6 @@ export default function AdminUsersPage() {
 
     fetchSettings();
   }, []);
-
-  // Pobierz ustawienia czyszczenia kont
-  useEffect(() => {
-    const fetchCleanupSettings = async () => {
-      try {
-        // Używamy nowego, publicznie dostępnego endpointu
-        const response = await fetch("/api/settings/database", {
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (typeof data.cleanupInterval === "number") {
-            setCleanupInterval(data.cleanupInterval);
-          }
-        } else {
-          console.error(
-            "Nie udało się pobrać ustawień cleanupInterval:",
-            response.status,
-            await response.text()
-          );
-        }
-      } catch (error) {
-        console.error("Błąd podczas pobierania ustawień czyszczenia:", error);
-      }
-    };
-
-    if (user && user.role === "admin") {
-      fetchCleanupSettings();
-    }
-  }, [user]);
 
   // Filtrowanie i sortowanie użytkowników
   useEffect(() => {
@@ -512,134 +537,37 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Funkcja do aktualizacji ustawień czyszczenia
+  // Funkcja do aktualizacji ustawień czyszczenia kont - użyj RTK Query zamiast fetch
   const handleUpdateCleanupInterval = async () => {
-    try {
-      setCleanupLoading(true);
-      setCleanupError(null);
-      setCleanupSuccess(null);
-
-      // Sprawdź, czy wartość jest prawidłowa
-      if (isNaN(cleanupInterval) || cleanupInterval <= 0) {
-        setCleanupError("Wprowadź prawidłową liczbę dni (większą od 0)");
-        return;
-      }
-
-      // Używamy nowego endpointu
-      const response = await fetch("/api/settings/database", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cleanupInterval }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Błąd (${response.status})`;
-
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // Jeśli nie możemy sparsować JSON, użyjemy surowego tekstu
-          errorMessage = errorText || errorMessage;
-        }
-
-        throw new Error(errorMessage);
-      }
-
-      setCleanupSuccess(
-        `Ustawienie czyszczenia kont zaktualizowane do ${cleanupInterval} dni`
-      );
-    } catch (error) {
-      console.error("Błąd aktualizacji ustawień czyszczenia:", error);
-      setCleanupError(
-        error instanceof Error
-          ? error.message
-          : "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"
-      );
-    } finally {
-      setCleanupLoading(false);
+    if (isNaN(cleanupInterval) || cleanupInterval <= 0) {
+      return; // Walidacja
     }
+
+    await updateDatabaseSettings({ cleanupInterval });
   };
 
-  // Funkcja do pobierania nieaktywnych kont
-  const fetchInactiveUsers = async () => {
-    try {
-      setLoadingInactiveUsers(true);
-      setInactiveUsersError(null);
-
-      // Pobieramy wszystkie konta i filtrujemy je po stronie klienta
-      const response = await fetch(`/api/admin/users`);
-
-      if (!response.ok) {
-        throw new Error("Błąd podczas pobierania kont użytkowników");
-      }
-
-      const data = await response.json();
-
-      // Filtrujemy konta, które są niezweryfikowane LUB zablokowane
-      const inactive = (data.users || []).filter(
-        (user: UserListItem) => !user.verified || user.locked
-      );
-
-      setInactiveUsers(inactive);
-      setShowInactiveUsers(true);
-    } catch (error) {
-      console.error("Błąd pobierania nieaktywnych kont:", error);
-      setInactiveUsersError(
-        "Wystąpił błąd podczas pobierania nieaktywnych kont"
-      );
-    } finally {
-      setLoadingInactiveUsers(false);
-    }
+  // Funkcja pobierania nieaktywnych użytkowników
+  const handleFetchInactiveUsers = () => {
+    triggerGetInactiveUsers();
   };
 
-  // Funkcja do ręcznej weryfikacji konta
+  // Funkcja weryfikacji użytkownika - użyj RTK Query zamiast fetch
   const handleVerifyUser = async (userId: string) => {
     try {
       setActionInProgress(userId);
-
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          verified: true,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Błąd podczas weryfikacji konta użytkownika");
-      }
-
-      // Pobierz odpowiedź
-      const updatedUser = await response.json();
-
-      // Odśwież listę nieaktywnych użytkowników
-      fetchInactiveUsers();
-
-      // Pokaż komunikat sukcesu
-      setCleanupSuccess(
-        `Konto użytkownika ${updatedUser.email} zostało pomyślnie zweryfikowane`
-      );
-
-      setTimeout(() => {
-        setCleanupSuccess(null);
-      }, 3000);
+      await verifyUser(userId).unwrap();
+      // Po weryfikacji odśwież listę
+      triggerGetInactiveUsers();
     } catch (error) {
       console.error("Błąd weryfikacji konta:", error);
-      setCleanupError("Wystąpił błąd podczas weryfikacji konta użytkownika");
-
-      setTimeout(() => {
-        setCleanupError(null);
-      }, 3000);
     } finally {
       setActionInProgress(null);
     }
+  };
+
+  // Możesz też dodać funkcję do resetowania zapytania, jeśli potrzebujesz
+  const resetInactiveUsers = () => {
+    setShowInactiveUsers(false);
   };
 
   if (userLoading) {
@@ -765,15 +693,18 @@ export default function AdminUsersPage() {
           Czyszczenie nieaktywnych kont
         </h2>
 
-        {cleanupError && (
+        {databaseSettingsUpdateError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {cleanupError}
+            {databaseSettingsUpdateError instanceof Error
+              ? databaseSettingsUpdateError.message
+              : "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"}
           </div>
         )}
 
-        {cleanupSuccess && (
+        {isDatabaseSettingsUpdateSuccess && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            {cleanupSuccess}
+            Ustawienie czyszczenia kont zostało zaktualizowane do{" "}
+            {cleanupInterval} dni.
           </div>
         )}
 
@@ -798,14 +729,14 @@ export default function AdminUsersPage() {
             />
             <button
               onClick={handleUpdateCleanupInterval}
-              disabled={cleanupLoading}
+              disabled={isUpdatingDatabaseSettings}
               className={`px-4 py-2 rounded-md text-white transition-colors ${
-                cleanupLoading
+                isUpdatingDatabaseSettings
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600"
               }`}
             >
-              {cleanupLoading ? "Aktualizowanie..." : "Zapisz"}
+              {isUpdatingDatabaseSettings ? "Aktualizowanie..." : "Zapisz"}
             </button>
           </div>
           <p className="mt-2 text-sm text-gray-500">
@@ -820,15 +751,15 @@ export default function AdminUsersPage() {
               Nieaktywne konta użytkowników
             </h3>
             <button
-              onClick={fetchInactiveUsers}
-              disabled={loadingInactiveUsers}
+              onClick={handleFetchInactiveUsers}
+              disabled={isInactiveUsersLoading}
               className={`px-3 py-1 rounded-md text-white text-sm transition-colors ${
-                loadingInactiveUsers
+                isInactiveUsersLoading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-500 hover:bg-indigo-600"
               }`}
             >
-              {loadingInactiveUsers ? (
+              {isInactiveUsersLoading ? (
                 <span className="flex items-center">
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -858,13 +789,7 @@ export default function AdminUsersPage() {
             </button>
           </div>
 
-          {inactiveUsersError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {inactiveUsersError}
-            </div>
-          )}
-
-          {showInactiveUsers && (
+          {showInactiveUsers && inactiveUsers && (
             <div className="mt-3">
               {inactiveUsers.length === 0 ? (
                 <div className="text-gray-600 text-sm bg-gray-50 p-4 rounded-md">
@@ -926,7 +851,10 @@ export default function AdminUsersPage() {
                             {!user.verified && (
                               <button
                                 onClick={() => handleVerifyUser(user.id)}
-                                disabled={actionInProgress === user.id}
+                                disabled={
+                                  actionInProgress === user.id ||
+                                  isVerifyingUser
+                                }
                                 className="text-green-500 hover:text-green-700 mr-2"
                                 title="Zweryfikuj konto"
                               >

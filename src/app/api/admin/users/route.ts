@@ -16,38 +16,50 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Pobierz parametry zapytania
-    const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "0"); // 0 oznacza wszystkie
-    const search = searchParams.get("search") || "";
-    const role = searchParams.get("role") || "";
-    const status = searchParams.get("status") || "";
-    const sortBy = searchParams.get("sortBy") || "createdAt-desc";
+    // Pobierz parametry z URL
+    const url = new URL(request.url);
+    const inactiveFilter = url.searchParams.get("inactive") === "true";
 
-    // Przygotuj filtr
-    const filter: any = {};
+    // Standardowe filtry z istniejącego kodu
+    const role = url.searchParams.get("role");
+    const search = url.searchParams.get("search");
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
 
-    // Filtrowanie po wyszukiwaniu
-    if (search) {
-      filter.email = { $regex: search, $options: "i" };
-    }
+    // Buduj zapytanie filtru
+    let filter: any = {};
 
-    // Filtrowanie po roli
     if (role && role !== "all") {
       filter.role = role;
     }
 
-    // Filtrowanie po statusie
-    if (status === "active") {
-      filter.active = true;
-      filter.locked = false;
-    } else if (status === "inactive") {
-      filter.active = false;
-    } else if (status === "locked") {
-      filter.locked = true;
-    } else if (status === "unverified") {
-      filter.verified = false;
+    if (search) {
+      filter.email = { $regex: search, $options: "i" };
+    }
+
+    // Jeśli żądamy nieaktywnych użytkowników, nie stosujemy paginacji
+    // i używamy specjalnego filtru
+    if (inactiveFilter) {
+      // Zwracamy użytkowników, którzy są niezweryfikowani LUB zablokowani
+      const collection = await mongodbService.getCollection(dbName, "users");
+      const users = await collection
+        .find({
+          $or: [{ verified: false }, { locked: true }],
+        })
+        .toArray();
+
+      // Usuń wrażliwe dane
+      const safeUsers = users.map((user) => {
+        const {
+          passwordHash,
+          verificationCode,
+          resetPasswordToken,
+          ...safeUser
+        } = user;
+        return safeUser;
+      });
+
+      return NextResponse.json({ users: safeUsers });
     }
 
     // Pobierz kolekcję użytkowników
@@ -57,6 +69,7 @@ export async function GET(request: NextRequest) {
     const totalUsers = await collection.countDocuments(filter);
 
     // Przygotuj sortowanie
+    const sortBy = url.searchParams.get("sortBy") || "createdAt-desc";
     const [sortField, sortDirection] = sortBy.split("-");
     const sort: any = {};
 
