@@ -8,6 +8,7 @@ import {
   useUpdateDatabaseSettingsMutation,
   useLazyGetInactiveUsersQuery,
   useVerifyUserMutation,
+  useGetRegistrationStatusQuery,
 } from "@/frontend/store/apis/settingsApi";
 import Link from "next/link";
 
@@ -204,26 +205,8 @@ export default function AdminUsersPage() {
   }, [user]);
 
   // Pobierz ustawienia rejestracji
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        setRegistrationLoading(true);
-        // Tworzymy nowy endpoint, który nie wymaga autoryzacji
-        const response = await fetch("/api/settings/registration");
-
-        if (response.ok) {
-          const data = await response.json();
-          setRegistrationEnabled(data.enabled);
-        }
-      } catch (error) {
-        console.error("Błąd podczas pobierania ustawień rejestracji:", error);
-      } finally {
-        setRegistrationLoading(false);
-      }
-    };
-
-    fetchSettings();
-  }, []);
+  const { data: registrationData, isLoading: isCheckingRegistration } =
+    useGetRegistrationStatusQuery();
 
   // Filtrowanie i sortowanie użytkowników
   useEffect(() => {
