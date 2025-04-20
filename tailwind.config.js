@@ -6,21 +6,35 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/frontend/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: "#1e50a0", // Ciemny niebieski kolor
-        "primary-dark": "#163b78", // Ciemniejszy wariant dla hover
-        secondary: "#d1213d", // czerwony
-        accent: "#f6f9fc", // jasny niebieski
-        muted: "#f5f5f5", // jasny szary
-        border: "#e5e5e5", // szary do obramowań
+        primary: "#1e50a0",
+        "primary-dark": "#163b78",
+        secondary: "#d1213d",
+        accent: "#f6f9fc",
+        muted: "#f5f5f5",
+        border: "#e5e5e5",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
         mono: ["var(--font-geist-mono)"],
       },
+      backgroundColor: {
+        DEFAULT: "#ffffff",
+      },
+      textColor: {
+        DEFAULT: "#1a1a1a",
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addBase }) {
+      addBase({
+        html: { backgroundColor: "#ffffff" },
+        body: { backgroundColor: "#ffffff", color: "#1a1a1a" },
+      });
+    },
+  ],
 };

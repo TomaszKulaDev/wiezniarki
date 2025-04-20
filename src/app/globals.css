@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
+/* Usuwamy zmienne dla tła i używamy bezpośrednio stałych wartości */
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a; /* Kolor czarny dla tekstu */
-  --primary: #1e50a0; /* Kolor niebieski podobny do gov.pl */
+  --foreground: #1a1a1a;
+  --primary: #1e50a0;
   --primary-foreground: #ffffff;
-  --secondary: #d1213d; /* Kolor czerwony nawiązujący do barw narodowych */
+  --secondary: #d1213d;
   --secondary-foreground: #ffffff;
   --accent: #f6f9fc;
   --border: #e5e5e5;
@@ -13,30 +13,28 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a1a;
-    --foreground: #1a1a1a; /* Zmieniono na czarny, był #f5f5f5 */
-    --primary: #2b62ba;
-    --primary-foreground: #ffffff;
-    --secondary: #e54458;
-    --secondary-foreground: #ffffff;
-    --accent: #2a2a2a;
-    --border: #444444;
-    --muted: #2a2a2a;
-  }
+/* Całkowicie usuwamy sekcję prefers-color-scheme */
+
+html,
+body {
+  /* Ustawiamy bezpośrednio białe tło - nie używamy zmiennych */
+  background-color: #ffffff !important;
+  color: #1a1a1a;
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+/* Dodajemy jawny reset dla trybu ciemnego */
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+  }
 }
 
 * {
@@ -79,5 +77,5 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
-  background-color: var(--background);
+  background-color: #ffffff;
 }

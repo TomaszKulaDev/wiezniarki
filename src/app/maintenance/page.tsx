@@ -143,7 +143,10 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div
+      className="min-h-screen bg-white"
+      style={{ backgroundColor: "#ffffff" }}
+    >
       {/* Nagłówek strony - taki jak w other pages */}
       <section className="bg-primary py-5">
         <div className="container mx-auto px-4">
