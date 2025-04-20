@@ -123,8 +123,8 @@ export default function Navbar() {
   const { data: user, isLoading } = useGetCurrentUserQuery();
 
   // Funkcja do pobierania nazwy strony na podstawie ścieżki
-  const getPageNameFromPath = (path: string) => {
-    if (path === "/") return "";
+  const getPageNameFromPath = (path: string | null) => {
+    if (!path || path === "/") return "";
 
     const pathSegments = {
       "/regulamin": "Regulamin",
