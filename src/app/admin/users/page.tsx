@@ -105,40 +105,8 @@ export default function AdminUsersPage() {
 
   const [verifyUser, { isLoading: isVerifyingUser }] = useVerifyUserMutation();
 
-  // Lokalny stan dla czyszczenia kont
-  const [cleanupInterval, setCleanupInterval] = useState<number>(30);
+  // Brakuje zmiennej stanu showInactiveUsers
   const [showInactiveUsers, setShowInactiveUsers] = useState(false);
-
-  // Ustaw wartość cleanupInterval z pobranych ustawień
-  useEffect(() => {
-    if (
-      databaseSettings &&
-      typeof databaseSettings.cleanupInterval === "number"
-    ) {
-      setCleanupInterval(databaseSettings.cleanupInterval);
-    }
-  }, [databaseSettings]);
-
-  // Resetuj komunikaty po sukcesie/błędzie
-  useEffect(() => {
-    if (isDatabaseSettingsUpdateSuccess || databaseSettingsUpdateError) {
-      const timer = setTimeout(() => {
-        resetDatabaseSettingsUpdate();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [
-    isDatabaseSettingsUpdateSuccess,
-    databaseSettingsUpdateError,
-    resetDatabaseSettingsUpdate,
-  ]);
-
-  // Pokażmy nieaktywnych użytkowników po ich pobraniu
-  useEffect(() => {
-    if (isInactiveUsersSuccess && inactiveUsers) {
-      setShowInactiveUsers(true);
-    }
-  }, [isInactiveUsersSuccess, inactiveUsers]);
 
   // Przekieruj, jeśli użytkownik nie jest administratorem
   useEffect(() => {
@@ -508,15 +476,6 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Funkcja do aktualizacji ustawień czyszczenia kont - użyj RTK Query zamiast fetch
-  const handleUpdateCleanupInterval = async () => {
-    if (isNaN(cleanupInterval) || cleanupInterval <= 0) {
-      return; // Walidacja
-    }
-
-    await updateDatabaseSettings({ cleanupInterval });
-  };
-
   // Funkcja pobierania nieaktywnych użytkowników
   const handleFetchInactiveUsers = () => {
     triggerGetInactiveUsers();
@@ -536,16 +495,18 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Możesz też dodać funkcję do resetowania zapytania, jeśli potrzebujesz
-  const resetInactiveUsers = () => {
-    setShowInactiveUsers(false);
-  };
-
   useEffect(() => {
     if (registrationData) {
       setRegistrationEnabled(registrationData.enabled);
     }
   }, [registrationData]);
+
+  // Dodatkowo, upewnijmy się, że mamy odpowiedni useEffect:
+  useEffect(() => {
+    if (isInactiveUsersSuccess && inactiveUsers) {
+      setShowInactiveUsers(true);
+    }
+  }, [isInactiveUsersSuccess, inactiveUsers]);
 
   if (userLoading) {
     return (
@@ -667,60 +628,28 @@ export default function AdminUsersPage() {
       {/* Sekcja czyszczenia nieaktywnych kont */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">
-          Czyszczenie nieaktywnych kont
+          Zarządzanie nieaktywnymi kontami
         </h2>
 
         {databaseSettingsUpdateError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {databaseSettingsUpdateError instanceof Error
               ? databaseSettingsUpdateError.message
-              : "Wystąpił błąd podczas aktualizacji ustawień czyszczenia"}
+              : "Wystąpił błąd podczas aktualizacji ustawień"}
           </div>
         )}
 
         {isDatabaseSettingsUpdateSuccess && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            Ustawienie czyszczenia kont zostało zaktualizowane do{" "}
-            {cleanupInterval} dni.
+            Ustawienia zostały zaktualizowane.
           </div>
         )}
 
-        <div className="mb-4">
-          <label
-            htmlFor="cleanup-interval"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Częstotliwość czyszczenia nieaktywnych kont (dni)
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="number"
-              id="cleanup-interval"
-              min="1"
-              value={cleanupInterval}
-              onChange={(e) => {
-                const value = parseInt(e.target.value);
-                setCleanupInterval(isNaN(value) ? 30 : Math.max(1, value));
-              }}
-              className="w-24 border border-gray-300 rounded-md px-3 py-2"
-            />
-            <button
-              onClick={handleUpdateCleanupInterval}
-              disabled={isUpdatingDatabaseSettings}
-              className={`px-4 py-2 rounded-md text-white transition-colors ${
-                isUpdatingDatabaseSettings
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
-            >
-              {isUpdatingDatabaseSettings ? "Aktualizowanie..." : "Zapisz"}
-            </button>
-          </div>
-          <p className="mt-2 text-sm text-gray-500">
-            Konta, które nie zostały aktywowane w tym czasie, zostaną
-            automatycznie usunięte.
-          </p>
-        </div>
+        <p className="text-gray-700 mb-4">
+          Ta sekcja umożliwia zarządzanie nieaktywnymi kontami użytkowników.
+          Konta niezweryfikowane można ręcznie weryfikować lub usuwać według
+          potrzeb.
+        </p>
 
         <div className="mt-6">
           <div className="flex justify-between items-center mb-3">
