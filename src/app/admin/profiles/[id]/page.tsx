@@ -21,7 +21,7 @@ interface ProfileDetails extends Profile {
 export default function AdminProfileDetailsPage() {
   const router = useRouter();
   const params = useParams();
-  const profileId = params.id as string;
+  const profileId = params?.id as string;
   const { data: currentUser, isLoading: userLoading } =
     useGetCurrentUserQuery();
 
