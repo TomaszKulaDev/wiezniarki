@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const router = useRouter();
   const { data: user, isLoading } = useGetCurrentUserQuery();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
