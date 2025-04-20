@@ -92,7 +92,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     key={item.name}
                     href={item.href}
                     className={`px-2 py-1 rounded-md text-xs font-medium transition-colors duration-150 flex items-center ${
-                      pathname.startsWith(item.href)
+                      pathname?.startsWith(item.href)
                         ? "bg-blue-50 text-blue-700"
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }`}
@@ -177,7 +177,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     key={item.name}
                     href={item.href}
                     className={`flex items-center px-4 py-3 text-base font-medium rounded-md ${
-                      pathname.startsWith(item.href)
+                      pathname?.startsWith(item.href)
                         ? "bg-blue-50 text-blue-700"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
