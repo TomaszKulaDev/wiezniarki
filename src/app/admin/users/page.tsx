@@ -9,6 +9,7 @@ import {
   useLazyGetInactiveUsersQuery,
   useVerifyUserMutation,
   useGetRegistrationStatusQuery,
+  useUpdateRegistrationStatusMutation,
 } from "@/frontend/store/apis/settingsApi";
 import Link from "next/link";
 
@@ -486,29 +487,16 @@ export default function AdminUsersPage() {
   };
 
   // Funkcja do przełączania ustawień rejestracji
+  const [updateRegistration, { isLoading: isUpdatingRegistration }] =
+    useUpdateRegistrationStatusMutation();
+
   const handleToggleRegistration = async () => {
     try {
       setRegistrationLoading(true);
       setRegistrationError(null);
       setRegistrationSuccess(null);
 
-      // Tworzymy nowy endpoint do aktualizacji ustawień
-      const response = await fetch("/api/settings/registration", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          enabled: !registrationEnabled,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Błąd podczas aktualizacji ustawień");
-      }
-
-      // Aktualizuj stan
-      setRegistrationEnabled(!registrationEnabled);
+      await updateRegistration({ enabled: !registrationEnabled }).unwrap();
       setRegistrationSuccess("Ustawienia rejestracji zostały zaktualizowane");
     } catch (error) {
       console.error("Błąd aktualizacji ustawień rejestracji:", error);
@@ -552,6 +540,12 @@ export default function AdminUsersPage() {
   const resetInactiveUsers = () => {
     setShowInactiveUsers(false);
   };
+
+  useEffect(() => {
+    if (registrationData) {
+      setRegistrationEnabled(registrationData.enabled);
+    }
+  }, [registrationData]);
 
   if (userLoading) {
     return (

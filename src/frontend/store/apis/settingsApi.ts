@@ -71,6 +71,18 @@ export const settingsApi = createApi({
       providesTags: ["Settings"],
     }),
     
+    updateRegistrationStatus: builder.mutation<
+      { success: boolean; message: string },
+      { enabled: boolean }
+    >({
+      query: (data) => ({
+        url: "settings/registration",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
+    
     // Nowe endpointy:
     
     getDatabaseSettings: builder.query<DatabaseSettings, void>({
@@ -124,6 +136,7 @@ export const {
   useGetSystemSettingsQuery,
   useUpdateSystemSettingsMutation,
   useGetRegistrationStatusQuery,
+  useUpdateRegistrationStatusMutation,
   useGetDatabaseSettingsQuery,
   useUpdateDatabaseSettingsMutation,
   useGetInactiveUsersQuery,
