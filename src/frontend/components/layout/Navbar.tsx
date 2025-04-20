@@ -118,7 +118,7 @@ export default function Navbar() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [logoutMutation] = useLogoutMutation();
   const { data: user, isLoading } = useGetCurrentUserQuery();
 
