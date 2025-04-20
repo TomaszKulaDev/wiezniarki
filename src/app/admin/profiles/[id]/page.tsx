@@ -21,7 +21,7 @@ interface ProfileDetails extends Profile {
 export default function AdminProfileDetailsPage() {
   const router = useRouter();
   const params = useParams();
-  const profileId = params.id as string;
+  const profileId = params?.id ? (params.id as string) : "";
   const { data: currentUser, isLoading: userLoading } =
     useGetCurrentUserQuery();
 
@@ -34,12 +34,16 @@ export default function AdminProfileDetailsPage() {
   // Formularz edycji
   const [formData, setFormData] = useState<Partial<ProfileDetails>>({});
 
-  // Przekieruj, jeśli użytkownik nie jest administratorem
+  // Przekieruj, jeśli użytkownik nie jest administratorem lub brak profileId
   useEffect(() => {
     if (currentUser && currentUser.role !== "admin") {
       router.push("/dashboard");
     }
-  }, [currentUser, router]);
+    
+    if (!profileId) {
+      router.push("/admin/profiles");
+    }
+  }, [currentUser, router, profileId]);
 
   // Pobierz dane profilu
   useEffect(() => {
