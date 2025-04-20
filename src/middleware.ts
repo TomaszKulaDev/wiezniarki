@@ -9,22 +9,94 @@ const pathStartsWith = (path: string, prefixes: string[]): boolean => {
 export async function middleware(request: NextRequest) {
   // Utworzenie bazowej odpowiedzi
   const response = NextResponse.next();
+  const currentPath = request.nextUrl.pathname;
+
+  // Jeśli już jesteśmy na stronie maintenance, przepuść zapytanie
+  if (currentPath === "/maintenance") {
+    return response;
+  }
+
+  // Lista dozwolonych ścieżek (które są dostępne nawet w trybie konserwacji)
+  const allowedInMaintenance = [
+    "/api/auth/login",
+    "/api/auth/me",
+    "/api/auth/refresh",
+    "/api/settings/maintenance",
+    "/login",
+    "/_next",
+    "/favicon.ico",
+    "/logo.svg",
+  ];
+
+  // Jeśli jesteśmy na jednej z dozwolonych ścieżek, przepuść dalej
+  if (allowedInMaintenance.some((path) => currentPath.startsWith(path))) {
+    return response;
+  }
+
+  // Pobierz token dostępu z ciasteczek
+  const accessToken = request.cookies.get("accessToken")?.value;
+
+  // Sprawdź, czy użytkownik jest administratorem
+  let isAdmin = false;
+  if (accessToken) {
+    try {
+      const userResponse = await fetch(
+        `${request.nextUrl.origin}/api/auth/me`,
+        {
+          headers: {
+            Cookie: `accessToken=${accessToken}`,
+          },
+        }
+      );
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+
+        // Jeśli użytkownik jest administratorem, ustaw flagę
+        if (userData && userData.role === "admin") {
+          isAdmin = true;
+        }
+      }
+    } catch (error) {
+      console.error("Błąd sprawdzania statusu użytkownika:", error);
+    }
+  }
+
+  // Jeśli użytkownik jest administratorem, przepuść zapytanie
+  if (isAdmin) {
+    return response;
+  }
+
+  // Sprawdź, czy tryb konserwacji jest włączony
+  try {
+    const maintenanceResponse = await fetch(
+      `${request.nextUrl.origin}/api/settings/maintenance`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (maintenanceResponse.ok) {
+      const { enabled } = await maintenanceResponse.json();
+
+      // Jeśli tryb konserwacji jest włączony, przekieruj na stronę konserwacji
+      if (enabled) {
+        const maintenanceUrl = new URL("/maintenance", request.url);
+        return NextResponse.redirect(maintenanceUrl);
+      }
+    }
+  } catch (error) {
+    console.error("Błąd sprawdzania trybu konserwacji:", error);
+  }
 
   // Ścieżki chronione, które wymagają autoryzacji
-  const protectedPaths = ["/dashboard", "/profile"];
-  const currentPath = request.nextUrl.pathname;
+  const protectedPaths = ["/dashboard", "/profile", "/admin"];
 
   // Jeśli nie jesteśmy na chronionej ścieżce, po prostu przechodzimy dalej
   if (!pathStartsWith(currentPath, protectedPaths)) {
     return response;
   }
-
-  // Sprawdź tokeny w ciasteczkach
-  const accessToken = request.cookies.get("accessToken")?.value;
-
-  // Dodaj logowanie dla debugowania (możesz to usunąć w produkcji)
-  console.log(`Middleware uruchomione dla ścieżki: ${currentPath}`);
-  console.log(`Access token obecny: ${!!accessToken}`);
 
   // Jeśli mamy token dostępu, kontynuuj nawigację
   if (accessToken) {
@@ -94,7 +166,9 @@ export async function middleware(request: NextRequest) {
   return NextResponse.redirect(url);
 }
 
-// Dokładna konfiguracja matcher, aby działało tylko dla określonych ścieżek
+// Rozszerzona konfiguracja matcher, aby działało dla wszystkich ścieżek
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*"],
+  matcher: [
+    "/((?!api/settings/maintenance|_next/static|_next/image|favicon.ico|logo.svg).*)",
+  ],
 };

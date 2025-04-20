@@ -62,7 +62,13 @@ export const mongodbService = {
     update: any
   ) {
     const collection = await this.getCollection(dbName, collectionName);
-    return collection.updateOne(query, { $set: update });
+    
+    // Jeśli update nie ma operatorów MongoDB (jak $set), opakuj je w $set
+    if (!update.$set && !update.$push && !update.$pull && !update.$inc) {
+      update = { $set: update };
+    }
+    
+    return collection.updateOne(query, update);
   },
 
   // Usuń dokument

@@ -4,40 +4,21 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 
-// Interfejs dla ustawień systemowych
-interface SystemSettings {
-  maintenance: {
-    enabled: boolean;
-    message: string;
-  };
-  database: {
-    cleanupInterval: number; // w dniach
-    backupEnabled: boolean;
-  };
-  notifications: {
-    emailEnabled: boolean;
-    adminEmail: string;
-  };
+interface MaintenanceSettings {
+  enabled: boolean;
+  message: string;
 }
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
 
-  const [settings, setSettings] = useState<SystemSettings>({
-    maintenance: {
+  const [maintenanceSettings, setMaintenanceSettings] =
+    useState<MaintenanceSettings>({
       enabled: false,
       message: "Trwają prace konserwacyjne. Prosimy spróbować później.",
-    },
-    database: {
-      cleanupInterval: 30,
-      backupEnabled: true,
-    },
-    notifications: {
-      emailEnabled: true,
-      adminEmail: "admin@wiezniarki.pl",
-    },
-  });
+    });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,31 +31,33 @@ export default function AdminSettingsPage() {
     }
   }, [user, router]);
 
-  // Pobierz ustawienia systemowe
+  // Pobierz ustawienia trybu konserwacji
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch("/api/admin/settings");
+        // Używaj endpointu maintenance zamiast admin/settings
+        const response = await fetch("/api/settings/maintenance");
 
         if (!response.ok) {
-          throw new Error("Błąd podczas pobierania ustawień systemowych");
+          throw new Error("Błąd podczas pobierania ustawień");
         }
 
         const data = await response.json();
-        setSettings({
-          maintenance: data.maintenance || settings.maintenance,
-          database: data.database || settings.database,
-          notifications: data.notifications || settings.notifications,
+
+        setMaintenanceSettings({
+          enabled: !!data.enabled,
+          message:
+            data.message ||
+            "Trwają prace konserwacyjne. Prosimy spróbować później.",
         });
       } catch (error) {
         console.error("Błąd pobierania ustawień:", error);
         setError(
-          "Wystąpił błąd podczas pobierania ustawień systemowych. Używamy ustawień domyślnych."
+          "Wystąpił błąd podczas pobierania ustawień. Używamy ustawień domyślnych."
         );
-        // Używamy domyślnych ustawień zdefiniowanych w stanie
       } finally {
         setIsLoading(false);
       }
@@ -83,28 +66,7 @@ export default function AdminSettingsPage() {
     if (user && user.role === "admin") {
       fetchSettings();
     }
-  }, [
-    user,
-    router,
-    settings.maintenance,
-    settings.database,
-    settings.notifications,
-  ]);
-
-  // Obsługa zmian w formularzach
-  const handleChange = (
-    section: keyof SystemSettings,
-    field: string,
-    value: any
-  ) => {
-    setSettings((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value,
-      },
-    }));
-  };
+  }, [user]);
 
   // Zapisz ustawienia
   const handleSaveSettings = async () => {
@@ -113,37 +75,38 @@ export default function AdminSettingsPage() {
       setError(null);
       setSuccess(null);
 
-      // Pobierz aktualne ustawienia, aby nie utracić sekcji registration
-      const response = await fetch("/api/admin/settings");
-      const currentSettings = await response.json();
+      // Dodaj więcej szczegółów dla debugowania
+      console.log("Zapisywanie ustawień:", maintenanceSettings);
 
-      // Zachowaj sekcję registration z aktualnych ustawień
-      const updatedSettings = {
-        ...settings,
-        registration: currentSettings.registration || {
-          enabled: true,
-          requireVerification: true,
-        },
-      };
-
-      const saveResponse = await fetch("/api/admin/settings", {
+      const saveResponse = await fetch("/api/settings/maintenance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedSettings),
+        body: JSON.stringify(maintenanceSettings),
       });
 
+      // Zapisz odpowiedź, aby zobaczyć komunikat błędu
+      const responseData = await saveResponse.json();
+      console.log("Odpowiedź z API:", responseData);
+
       if (!saveResponse.ok) {
-        throw new Error("Błąd podczas zapisywania ustawień systemowych");
+        throw new Error(
+          responseData.message || "Błąd podczas zapisywania ustawień"
+        );
       }
 
-      setSuccess("Ustawienia systemowe zostały pomyślnie zaktualizowane");
+      setSuccess("Tryb konserwacji został pomyślnie zaktualizowany");
+
+      // Po zapisie, odśwież stronę po 2 sekundach, aby pokazać zmiany
+      if (maintenanceSettings.enabled) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
     } catch (error) {
       console.error("Błąd zapisywania ustawień:", error);
-      setError(
-        "Wystąpił błąd podczas zapisywania ustawień systemowych. Spróbuj ponownie."
-      );
+      setError("Wystąpił błąd podczas zapisywania ustawień. Spróbuj ponownie.");
     } finally {
       setIsSaving(false);
     }
@@ -162,47 +125,48 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Ustawienia Systemowe</h1>
-        <button
-          onClick={handleSaveSettings}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-          disabled={isSaving}
-        >
-          {isSaving ? "Zapisywanie..." : "Zapisz ustawienia"}
-        </button>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-          {success}
-        </div>
-      )}
-
-      {/* Tryb konserwacji */}
+    <div className="max-w-3xl mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Tryb konserwacji</h2>
-        <div className="space-y-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Tryb konserwacji</h1>
+          <button
+            onClick={handleSaveSettings}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+            disabled={isSaving}
+          >
+            {isSaving ? "Zapisywanie..." : "Zapisz ustawienia"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
+            {success}
+          </div>
+        )}
+
+        <div className="space-y-6">
           <div className="flex items-center">
             <input
               type="checkbox"
               id="maintenance-enabled"
-              checked={settings.maintenance.enabled}
+              checked={maintenanceSettings.enabled}
               onChange={(e) =>
-                handleChange("maintenance", "enabled", e.target.checked)
+                setMaintenanceSettings({
+                  ...maintenanceSettings,
+                  enabled: e.target.checked,
+                })
               }
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label
               htmlFor="maintenance-enabled"
-              className="ml-2 block text-sm text-gray-700"
+              className="ml-3 block text-sm font-medium text-gray-700"
             >
               Włącz tryb konserwacji (strona będzie niedostępna dla
               użytkowników)
@@ -218,104 +182,54 @@ export default function AdminSettingsPage() {
             </label>
             <textarea
               id="maintenance-message"
-              value={settings.maintenance.message}
+              value={maintenanceSettings.message}
               onChange={(e) =>
-                handleChange("maintenance", "message", e.target.value)
+                setMaintenanceSettings({
+                  ...maintenanceSettings,
+                  message: e.target.value,
+                })
               }
-              className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
+              rows={4}
+              className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Wpisz komunikat, który zostanie wyświetlony użytkownikom podczas konserwacji"
             />
-          </div>
-        </div>
-      </div>
-
-      {/* Ustawienia bazy danych */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Ustawienia bazy danych</h2>
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="db-cleanup"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Częstotliwość czyszczenia nieaktywnych kont (dni)
-            </label>
-            <input
-              type="number"
-              id="db-cleanup"
-              value={settings.database.cleanupInterval}
-              onChange={(e) =>
-                handleChange(
-                  "database",
-                  "cleanupInterval",
-                  parseInt(e.target.value)
-                )
-              }
-              min="1"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-            <p className="mt-1 text-sm text-gray-500">
-              Konta, które nie zostały aktywowane w tym czasie, zostaną usunięte
+            <p className="mt-2 text-sm text-gray-500">
+              Ten komunikat będzie widoczny dla wszystkich odwiedzających
+              stronę.
             </p>
           </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="db-backup"
-              checked={settings.database.backupEnabled}
-              onChange={(e) =>
-                handleChange("database", "backupEnabled", e.target.checked)
-              }
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label
-              htmlFor="db-backup"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Włącz automatyczne kopie zapasowe bazy danych
-            </label>
-          </div>
         </div>
-      </div>
 
-      {/* Ustawienia powiadomień */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Ustawienia powiadomień</h2>
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="email-enabled"
-              checked={settings.notifications.emailEnabled}
-              onChange={(e) =>
-                handleChange("notifications", "emailEnabled", e.target.checked)
-              }
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label
-              htmlFor="email-enabled"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Włącz powiadomienia email
-            </label>
-          </div>
-
-          <div>
-            <label
-              htmlFor="admin-email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email administratora do powiadomień
-            </label>
-            <input
-              type="email"
-              id="admin-email"
-              value={settings.notifications.adminEmail}
-              onChange={(e) =>
-                handleChange("notifications", "adminEmail", e.target.value)
-              }
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
-            />
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="bg-yellow-50 p-4 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">Uwaga</h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    Włączenie trybu konserwacji sprawi, że strona będzie
+                    niedostępna dla wszystkich użytkowników oprócz
+                    administratorów. Upewnij się, że komunikat zawiera
+                    informacje o przewidywanym czasie trwania prac.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

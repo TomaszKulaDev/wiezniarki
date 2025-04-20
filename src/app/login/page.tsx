@@ -20,6 +20,7 @@ export default function LoginPage() {
     { isLoading: isSubmitting, error: loginError, data: loginData },
   ] = useLoginMutation();
   const [error, setError] = useState("");
+  const [isMaintenance, setIsMaintenance] = useState(false);
 
   // Efekt czyszczący błędy
   useEffect(() => {
@@ -49,6 +50,22 @@ export default function LoginPage() {
       router.push("/");
     }
   }, [loginData, dispatch, router]);
+
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      try {
+        const response = await fetch("/api/settings/maintenance");
+        if (response.ok) {
+          const { enabled } = await response.json();
+          setIsMaintenance(enabled);
+        }
+      } catch (error) {
+        console.error("Błąd sprawdzania trybu konserwacji:", error);
+      }
+    };
+
+    checkMaintenance();
+  }, []);
 
   const handleLogin = async (formData: {
     email: string;
@@ -84,6 +101,15 @@ export default function LoginPage() {
       <main className="flex-grow container mx-auto px-4 py-20 mb-24">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-10 mb-28">
           <h1 className="text-2xl font-bold mb-6 text-center">Zaloguj się</h1>
+
+          {isMaintenance && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded">
+              <p className="text-sm">
+                <span className="font-medium">Uwaga:</span> Strona jest obecnie
+                w trybie konserwacji. Tylko administratorzy mają do niej dostęp.
+              </p>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
