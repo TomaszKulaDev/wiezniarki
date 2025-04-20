@@ -36,9 +36,6 @@ export async function GET(request: NextRequest) {
 // W tym przykładzie pomijamy autoryzację, ale w produkcji trzeba ją dodać
 export async function POST(request: NextRequest) {
   try {
-    // W rzeczywistej aplikacji tutaj powinna być weryfikacja, czy użytkownik
-    // jest administratorem - teraz pomijamy dla uproszczenia
-
     const body = await request.json();
 
     // Pobierz aktualne ustawienia
@@ -46,29 +43,22 @@ export async function POST(request: NextRequest) {
       name: "systemSettings",
     });
 
-    // Przygotuj dane do aktualizacji
-    let updatedSettings;
-
     if (settings) {
-      // Aktualizuj istniejące ustawienia
-      updatedSettings = {
-        ...settings,
-        registration: {
-          ...(settings.registration || {}),
-          enabled: body.enabled,
-        },
-        updatedAt: new Date(),
-      };
-
+      // Używamy $set dla istniejących ustawień
       await mongodbService.updateDocument(
         dbName,
         "settings",
         { name: "systemSettings" },
-        updatedSettings
+        {
+          $set: {
+            "registration.enabled": body.enabled,
+            updatedAt: new Date(),
+          },
+        }
       );
     } else {
       // Utwórz nowe ustawienia
-      updatedSettings = {
+      const defaultSettings = {
         name: "systemSettings",
         registration: {
           enabled: body.enabled,
@@ -90,7 +80,7 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date(),
       };
 
-      await mongodbService.insertDocument(dbName, "settings", updatedSettings);
+      await mongodbService.insertDocument(dbName, "settings", defaultSettings);
     }
 
     return NextResponse.json({
