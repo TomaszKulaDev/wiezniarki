@@ -1,10 +1,50 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Cache dla statusu maintenance
+const maintenanceCache = {
+  status: false,
+  lastChecked: 0,
+};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minut
+
 // Pomocnicza funkcja do sprawdzania, czy ścieżka zaczyna się od któregokolwiek z podanych prefiksów
 const pathStartsWith = (path: string, prefixes: string[]): boolean => {
   return prefixes.some((prefix) => path.startsWith(prefix));
 };
+
+async function checkMaintenanceStatus(request: NextRequest): Promise<boolean> {
+  const now = Date.now();
+
+  // Użyj cache jeśli nie minęło więcej niż 5 minut
+  if (now - maintenanceCache.lastChecked < CACHE_DURATION) {
+    return maintenanceCache.status;
+  }
+
+  try {
+    const maintenanceResponse = await fetch(
+      `${request.nextUrl.origin}/api/settings/maintenance`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (maintenanceResponse.ok) {
+      const { enabled } = await maintenanceResponse.json();
+
+      // Aktualizuj cache
+      maintenanceCache.status = enabled;
+      maintenanceCache.lastChecked = now;
+
+      return enabled;
+    }
+  } catch (error) {
+    console.error("Błąd sprawdzania trybu konserwacji:", error);
+  }
+
+  return false;
+}
 
 export async function middleware(request: NextRequest) {
   // Utworzenie bazowej odpowiedzi
@@ -51,8 +91,6 @@ export async function middleware(request: NextRequest) {
 
       if (userResponse.ok) {
         const userData = await userResponse.json();
-
-        // Jeśli użytkownik jest administratorem, ustaw flagę
         if (userData && userData.role === "admin") {
           isAdmin = true;
         }
@@ -67,27 +105,11 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Sprawdź, czy tryb konserwacji jest włączony
-  try {
-    const maintenanceResponse = await fetch(
-      `${request.nextUrl.origin}/api/settings/maintenance`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    if (maintenanceResponse.ok) {
-      const { enabled } = await maintenanceResponse.json();
-
-      // Jeśli tryb konserwacji jest włączony, przekieruj na stronę konserwacji
-      if (enabled) {
-        const maintenanceUrl = new URL("/maintenance", request.url);
-        return NextResponse.redirect(maintenanceUrl);
-      }
-    }
-  } catch (error) {
-    console.error("Błąd sprawdzania trybu konserwacji:", error);
+  // Sprawdź status maintenance z cache
+  const isMaintenanceMode = await checkMaintenanceStatus(request);
+  if (isMaintenanceMode) {
+    const maintenanceUrl = new URL("/maintenance", request.url);
+    return NextResponse.redirect(maintenanceUrl);
   }
 
   // Ścieżki chronione, które wymagają autoryzacji
