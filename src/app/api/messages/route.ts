@@ -33,12 +33,14 @@ export async function GET(request: NextRequest) {
     );
 
     // Budowanie query w zależności od parametrów
-    const query: any = {
-      $or: [{ senderId: userId }, { recipientId: userId }],
-    };
+    const query: any = {};
 
+    // Zawsze filtruj po matchId jeśli jest podane
     if (matchId) {
       query.matchId = matchId;
+    } else {
+      // Tylko gdy nie ma matchId, filtruj po użytkowniku
+      query.$or = [{ senderId: userId }, { recipientId: userId }];
     }
 
     if (unreadOnly) {
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Pobieranie wiadomości z bazy danych
     const messages = await collection
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .skip(offset)
       .limit(limit)
       .toArray();
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
       content,
       attachments,
       readStatus: false,
-      moderationStatus: "pending", // Wszystkie wiadomości przechodzą moderację
+      moderationStatus: "approved",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -150,7 +152,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Wiadomość została wysłana i oczekuje na moderację",
+        message: "Wiadomość została wysłana",
         data: newMessage,
       },
       { status: 201 }

@@ -1,46 +1,77 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import MessageItem from "@/frontend/components/messages/MessageItem";
 import MessageForm from "@/frontend/components/messages/MessageForm";
-
-interface Message {
-  id: string;
-  matchId: string;
-  senderId: string;
-  senderType: "prisoner" | "partner";
-  recipientId: string;
-  content: string;
-  attachments?: string[];
-  readStatus: boolean;
-  moderationStatus: "pending" | "approved" | "rejected";
-  moderationReason?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface ConversationPartner {
-  id: string;
-  name: string;
-  image?: string;
-  role: string;
-}
+import {
+  useGetMessagesQuery,
+  useSendMessageMutation,
+  useMarkAsReadMutation,
+} from "@/frontend/store/apis/messageApi";
+import { useGetMatchPartnerQuery } from "@/frontend/store/apis/matchApi";
 
 export default function ConversationPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
   const { data: user, isLoading: userLoading } = useGetCurrentUserQuery();
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [partner, setPartner] = useState<ConversationPartner | null>(null);
-  const [isSending, setIsSending] = useState(false);
+  // Pobieranie wiadomości z RTK Query
+  const {
+    data: messagesData,
+    isLoading: isMessagesLoading,
+    error: messagesError,
+    refetch: refetchMessages,
+  } = useGetMessagesQuery(
+    { matchId: id },
+    // Nie wykonuj zapytania, jeśli nie ma ID lub użytkownika
+    {
+      skip: !id || !user,
+      // Automatyczne odświeżanie co 3 sekundy
+      pollingInterval: 3000,
+    }
+  );
+
+  // Pobieranie informacji o partnerze z RTK Query
+  const {
+    data: partnerData,
+    isLoading: isPartnerLoading,
+    error: partnerError,
+    refetch: refetchPartner,
+  } = useGetMatchPartnerQuery(id, {
+    skip: !id || !user,
+    // Dodajemy dłuższe cachowanie gdy zapytanie się powiedzie
+    keepUnusedDataFor: 300, // 5 minut
+  });
+
+  // Mutacje do wysyłania i oznaczania wiadomości
+  const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
+  const [markAsRead] = useMarkAsReadMutation();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Automatycznie przekieruj na listę konwersacji, jeśli nie można pobrać danych partnera po 3 próbach
+  const [partnerErrorCount, setPartnerErrorCount] = useState(0);
+
+  // Tryb debug - pokaż dodatkowe informacje
+  const [debugMode, setDebugMode] = useState(false);
+
+  useEffect(() => {
+    if (partnerError) {
+      setPartnerErrorCount((prev) => prev + 1);
+    } else {
+      setPartnerErrorCount(0);
+    }
+
+    if (partnerErrorCount >= 3) {
+      console.error(
+        "Nie udało się pobrać danych partnera po 3 próbach, przekierowuję..."
+      );
+      router.push("/dashboard/messages");
+    }
+  }, [partnerError, partnerErrorCount, router]);
 
   useEffect(() => {
     // Przekieruj, jeśli użytkownik nie jest zalogowany
@@ -50,95 +81,104 @@ export default function ConversationPage() {
   }, [user, userLoading, router]);
 
   useEffect(() => {
-    if (user && id) {
-      fetchMessages();
-      fetchPartnerInfo();
-    }
-  }, [user, id]);
-
-  useEffect(() => {
     // Przewiń do ostatniej wiadomości po załadowaniu lub dodaniu nowej
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messagesData?.messages) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messagesData?.messages]);
 
-  const fetchMessages = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  useEffect(() => {
+    // Oznaczanie nieprzeczytanych wiadomości jako przeczytane
+    if (messagesData?.messages && user) {
+      console.log("Dostępne wiadomości:", messagesData.messages.length);
+      console.log("ID bieżącego użytkownika:", user.id);
 
-      const response = await fetch(`/api/messages?matchId=${id}`);
+      messagesData.messages.forEach((message) => {
+        console.log(
+          `Wiadomość ${message.id} - od ${message.senderId} do ${message.recipientId}, status: ${message.readStatus}`
+        );
 
-      if (!response.ok) {
-        throw new Error("Nie udało się pobrać wiadomości");
+        if (
+          message.recipientId === user.id &&
+          !message.readStatus &&
+          message.moderationStatus === "approved"
+        ) {
+          console.log("Oznaczam wiadomość jako przeczytaną:", message.id);
+          markAsRead(message.id)
+            .unwrap()
+            .then(() => console.log("Oznaczenie wiadomości powiodło się"))
+            .catch((err) => console.error("Błąd oznaczania wiadomości:", err));
+        }
+      });
+    }
+  }, [messagesData?.messages, user, markAsRead]);
+
+  useEffect(() => {
+    // Automatyczne odświeżanie wiadomości co 5 sekund
+    const interval = setInterval(() => {
+      if (id && user) {
+        console.log("Automatyczne odświeżanie wiadomości...");
+        refetchMessages();
       }
+    }, 5000);
 
-      const data = await response.json();
-      setMessages(data.messages);
-    } catch (error) {
-      console.error("Błąd pobierania wiadomości:", error);
-      setError(
-        "Wystąpił błąd podczas ładowania wiadomości. Spróbuj odświeżyć stronę."
+    return () => clearInterval(interval);
+  }, [id, user, refetchMessages]);
+
+  useEffect(() => {
+    // Jeśli wystąpił błąd przy pobieraniu partnera, ponów próbę
+    if (partnerError) {
+      console.error(
+        "Błąd podczas pobierania informacji o partnerze:",
+        partnerError
       );
-    } finally {
-      setIsLoading(false);
+      // Ponów próbę po 2 sekundach
+      const timeout = setTimeout(() => {
+        console.log("Ponawiam próbę pobrania informacji o partnerze...");
+        refetchPartner();
+      }, 2000);
+
+      return () => clearTimeout(timeout);
     }
-  };
-
-  const fetchPartnerInfo = async () => {
-    try {
-      const response = await fetch(`/api/matches/${id}/partner`);
-
-      if (!response.ok) {
-        throw new Error("Nie udało się pobrać informacji o partnerze");
-      }
-
-      const data = await response.json();
-      setPartner(data.partner);
-    } catch (error) {
-      console.error("Błąd pobierania informacji o partnerze:", error);
-    }
-  };
+  }, [partnerError, refetchPartner]);
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim() || !user || !partner) return;
+    if (!content.trim() || !user) return;
+
+    // Jeśli nie mamy danych partnera, ponów próbę ich pobrania
+    if (!partnerData?.partner) {
+      console.log("Brak danych partnera, ponawiam próbę...");
+      await refetchPartner();
+
+      // Jeśli nadal nie mamy danych partnera, pokaż błąd
+      if (!partnerData?.partner) {
+        console.error("Nie można wysłać wiadomości: brak danych partnera");
+        alert("Nie można wysłać wiadomości. Spróbuj odświeżyć stronę.");
+        return;
+      }
+    }
 
     try {
-      setIsSending(true);
+      // Użyj mutacji z RTK Query zamiast fetch
+      await sendMessage({
+        matchId: id,
+        recipientId: partnerData.partner.id,
+        content: content.trim(),
+      }).unwrap();
 
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          matchId: id,
-          recipientId: partner.id,
-          content: content.trim(),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Nie udało się wysłać wiadomości");
-      }
-
-      const data = await response.json();
-
-      // Dodaj nową wiadomość do listy
-      setMessages((prev) => [...prev, data.data]);
-
-      // Odśwież listę wiadomości po krótkim opóźnieniu
-      setTimeout(fetchMessages, 500);
+      // Odśwież wiadomości po wysłaniu
+      refetchMessages();
     } catch (error) {
       console.error("Błąd wysyłania wiadomości:", error);
       alert("Nie udało się wysłać wiadomości. Spróbuj ponownie.");
-    } finally {
-      setIsSending(false);
     }
   };
 
-  if (userLoading || isLoading) {
+  const isLoading = userLoading || isMessagesLoading || isPartnerLoading;
+  const partner = partnerData?.partner;
+  const messages = messagesData?.messages || [];
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -146,16 +186,58 @@ export default function ConversationPage() {
     );
   }
 
-  if (error) {
+  if (messagesError) {
     return (
       <div className="bg-red-50 p-4 rounded-lg">
-        <p className="text-red-600">{error}</p>
+        <p className="text-red-600">
+          Wystąpił błąd podczas ładowania wiadomości. Spróbuj odświeżyć stronę.
+        </p>
         <button
-          onClick={fetchMessages}
+          onClick={() => refetchMessages()}
           className="mt-2 bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
         >
           Spróbuj ponownie
         </button>
+      </div>
+    );
+  }
+
+  // Obsługa błędu pobierania danych partnera
+  if (partnerError && !partner) {
+    return (
+      <div className="bg-red-50 p-4 rounded-lg">
+        <p className="text-red-600">
+          Wystąpił błąd podczas ładowania danych partnera.
+        </p>
+        <div className="mt-2 flex flex-col md:flex-row gap-2">
+          <button
+            onClick={() => refetchPartner()}
+            className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
+          >
+            Spróbuj ponownie
+          </button>
+          <button
+            onClick={() => router.push("/dashboard/messages")}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Wróć do wiadomości
+          </button>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+          >
+            {debugMode ? "Ukryj szczegóły" : "Pokaż szczegóły"}
+          </button>
+        </div>
+
+        {debugMode && (
+          <div className="mt-4 bg-gray-800 text-white p-4 rounded overflow-auto max-h-60">
+            <p>Match ID: {id}</p>
+            <p>User ID: {user?.id}</p>
+            <p>Error: {JSON.stringify(partnerError)}</p>
+            <p>Messages count: {messages.length}</p>
+          </div>
+        )}
       </div>
     );
   }
@@ -185,9 +267,10 @@ export default function ConversationPage() {
           </Link>
           <h1 className="text-2xl font-bold">
             {partner ? partner.name : "Konwersacja"}
+            {partnerError && " (Nie można załadować danych)"}
           </h1>
         </div>
-        {partner && (
+        {partner && !partnerError && (
           <Link
             href={`/profiles/${partner.id}`}
             className="text-primary hover:underline"
@@ -238,11 +321,6 @@ export default function ConversationPage() {
             onSendMessage={handleSendMessage}
             isLoading={isSending}
           />
-
-          <div className="p-2 bg-gray-50 text-xs text-gray-500 text-center">
-            Wszystkie wiadomości przechodzą weryfikację przez moderatorów przed
-            dostarczeniem do odbiorcy.
-          </div>
         </div>
       </div>
     </div>

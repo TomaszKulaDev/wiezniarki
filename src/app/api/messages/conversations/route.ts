@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "@/backend/middleware/authMiddleware";
 import { mongodbService } from "@/backend/services/mongodbService";
 import { dbName } from "@/backend/utils/mongodb";
-import { Message } from "@/backend/models/Message";
 import { Match } from "@/backend/models/Match";
-import { User } from "@/backend/models/User";
 import { Profile } from "@/backend/models/Profile";
+import { Message } from "@/backend/models/Message";
 
-// GET - Pobierz wszystkie konwersacje (matche) dla zalogowanego użytkownika
+// GET - Pobierz listę konwersacji użytkownika
 export async function GET(request: NextRequest) {
   try {
     // Weryfikacja autoryzacji
@@ -21,118 +20,83 @@ export async function GET(request: NextRequest) {
 
     const { userId } = authResult;
 
-    // Pobierz matche użytkownika
-    const matchesCollection = await mongodbService.getCollection(
+    // Pobierz wszystkie dopasowania (matche) tego użytkownika
+    const matches = await mongodbService.findDocuments<Match>(
       dbName,
-      "matches"
-    );
-    const matches = await matchesCollection
-      .find({
+      "matches",
+      {
         $or: [{ prisonerId: userId }, { partnerId: userId }],
-        status: "accepted", // Tylko zaakceptowane matche
-      })
-      .sort({ lastInteraction: -1 }) // Najnowsze konwersacje na górze
-      .toArray();
-
-    // Jeśli nie ma matchów, zwróć pustą tablicę konwersacji
-    if (matches.length === 0) {
-      return NextResponse.json({ conversations: [] });
-    }
-
-    // Przygotuj dane do pobierania wiadomości i informacji o użytkownikach
-    const matchIds = matches.map((match) => match.id);
-    const partnerIds = matches.map((match) =>
-      match.prisonerId === userId ? match.partnerId : match.prisonerId
+        status: "accepted", // Tylko zaakceptowane dopasowania
+      }
     );
 
-    // Pobierz ostatnie wiadomości dla każdego matcha
-    const messagesCollection = await mongodbService.getCollection(
-      dbName,
-      "messages"
-    );
-
-    // Pobierz informacje o użytkownikach (partnerach)
-    const usersCollection = await mongodbService.getCollection(dbName, "users");
-    const partners = await usersCollection
-      .find({
-        id: { $in: partnerIds },
-      })
-      .project({ passwordHash: 0, verificationCode: 0, resetPasswordToken: 0 })
-      .toArray();
-
-    // Pobierz profile użytkowników
-    const profilesCollection = await mongodbService.getCollection(
-      dbName,
-      "profiles"
-    );
-    const profiles = await profilesCollection
-      .find({
-        userId: { $in: partnerIds },
-      })
-      .toArray();
-
-    // Pobierz liczbę nieprzeczytanych wiadomości dla każdego matcha
+    // Przygotuj listę konwersacji
     const conversations = await Promise.all(
       matches.map(async (match) => {
-        // Określ ID partnera
+        // Określamy ID partnera
         const partnerId =
           match.prisonerId === userId ? match.partnerId : match.prisonerId;
 
-        // Znajdź partnera
-        const partner = partners.find((user) => user.id === partnerId);
-
-        // Znajdź profil partnera
-        const profile = profiles.find(
-          (profile) => profile.userId === partnerId
+        // Pobierz profil partnera - najpierw próbujemy po userId
+        let partnerProfile = await mongodbService.findDocument<Profile>(
+          dbName,
+          "profiles",
+          {
+            userId: partnerId,
+          }
         );
 
-        // Pobierz ostatnią wiadomość
-        const lastMessage = await messagesCollection
-          .find({
-            matchId: match.id,
-            moderationStatus: "approved", // Tylko zatwierdzone wiadomości
-          })
-          .sort({ createdAt: -1 })
-          .limit(1)
-          .toArray();
-
-        // Policz nieprzeczytane wiadomości
-        const unreadCount = await messagesCollection.countDocuments({
-          matchId: match.id,
-          recipientId: userId,
-          readStatus: false,
-          moderationStatus: "approved",
-        });
-
-        // Przygotuj nazwę partnera
-        let partnerName = "Użytkownik";
-        if (profile && profile.firstName) {
-          partnerName = profile.firstName;
-          if (profile.lastName) {
-            partnerName += " " + profile.lastName.charAt(0) + ".";
-          }
-        } else if (partner) {
-          partnerName = partner.email.split("@")[0];
+        // Jeśli nie znaleziono po userId, próbujemy znaleźć po id
+        if (!partnerProfile) {
+          partnerProfile = await mongodbService.findDocument<Profile>(
+            dbName,
+            "profiles",
+            {
+              id: partnerId,
+            }
+          );
         }
+
+        // Pobierz ostatnią wiadomość
+        const lastMessages = await mongodbService.findDocuments<Message>(
+          dbName,
+          "messages",
+          { matchId: match.id, moderationStatus: "approved" },
+          { sort: { createdAt: -1 }, limit: 1 }
+        );
+
+        const lastMessage = lastMessages.length > 0 ? lastMessages[0] : null;
+
+        // Pobierz liczbę nieprzeczytanych wiadomości
+        const unreadCount = await mongodbService.countDocuments(
+          dbName,
+          "messages",
+          {
+            matchId: match.id,
+            recipientId: userId,
+            readStatus: false,
+            moderationStatus: "approved",
+          }
+        );
+
+        const partnerName = partnerProfile
+          ? `${partnerProfile.firstName} ${partnerProfile.lastName}`
+          : "Użytkownik";
 
         return {
           matchId: match.id,
           partnerId,
           partnerName,
-          partnerImg: profile?.photos?.[0] || null,
-          lastMessage: lastMessage[0]?.content || "Rozpocznij konwersację...",
-          lastMessageDate: lastMessage[0]?.createdAt || match.createdAt,
+          partnerImg: partnerProfile?.photoUrl,
+          lastMessage: lastMessage?.content || "Brak wiadomości",
+          lastMessageDate: lastMessage?.createdAt || match.lastInteraction,
           unreadCount,
-          status: match.status,
         };
       })
     );
 
-    // Sortuj konwersacje - najpierw te z nieprzeczytanymi wiadomościami, potem według daty
+    // Sortuj konwersacje według daty ostatniej wiadomości (od najnowszej)
     conversations.sort((a, b) => {
-      if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-      if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
-
       return (
         new Date(b.lastMessageDate).getTime() -
         new Date(a.lastMessageDate).getTime()

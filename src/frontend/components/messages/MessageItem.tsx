@@ -27,6 +27,17 @@ export default function MessageItem({ message, isOwn }: MessageProps) {
   // Dla wiadomości oczekujących na moderację dodajemy wskaźnik statusu
   const isPending = isOwn && message.moderationStatus === "pending";
 
+  // Dodajemy console.log dla debugowania - ważne, dodajemy więcej informacji
+  console.log("Renderowanie wiadomości:", {
+    id: message.id,
+    content: message.content.substring(0, 20) + "...",
+    isOwn,
+    senderId: message.senderId,
+    readStatus: message.readStatus,
+    moderationStatus: message.moderationStatus,
+    createdAt: new Date(message.createdAt),
+  });
+
   return (
     <div className={containerClasses}>
       <div>

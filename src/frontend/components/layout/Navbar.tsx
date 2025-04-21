@@ -18,6 +18,7 @@ import {
   useLogoutMutation,
   useGetCurrentUserQuery,
 } from "@/frontend/store/apis/authApi";
+import MessageNotification from "@/frontend/components/messages/MessageNotification";
 
 // Komponent obudowujący przyciski logowania/rejestracji
 // Ten komponent będzie renderowany dopiero po sprawdzeniu autoryzacji
@@ -410,6 +411,18 @@ export default function Navbar() {
                     Kontakt
                   </Link>
                 </li>
+                {isLoggedIn && (
+                  <li>
+                    <Link
+                      href="/dashboard/messages"
+                      className="flex items-center"
+                    >
+                      <MessageNotification
+                        userId={currentUser?.id || undefined}
+                      />
+                    </Link>
+                  </li>
+                )}
                 <li
                   style={{
                     opacity: isLoggedIn ? 1 : 0,

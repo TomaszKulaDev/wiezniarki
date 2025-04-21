@@ -1,58 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import { useGetUnreadCountQuery } from "@/frontend/store/apis/messageApi";
 
 interface MessageNotificationProps {
-  userId: string;
+  userId?: string;
 }
 
 export default function MessageNotification({
   userId,
 }: MessageNotificationProps) {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  // Pobierz liczbę nieprzeczytanych wiadomości używając RTK Query
+  const { data, isLoading, refetch } = useGetUnreadCountQuery(undefined, {
+    // Pomijaj, jeśli nie ma ID użytkownika
+    skip: !userId,
+    // Odświeżaj co 30 sekund
+    pollingInterval: 30000,
+  });
 
+  const unreadCount = data?.count || 0;
+
+  // Efekt do ustawienia tytułu strony z licznikiem nieprzeczytanych wiadomości
   useEffect(() => {
-    if (!userId) return;
+    if (unreadCount > 0) {
+      document.title = `(${unreadCount}) Nowe wiadomości - Więźniarki`;
+    } else {
+      document.title = "Więźniarki";
+    }
 
-    // Pobierz liczbę nieprzeczytanych wiadomości
-    const fetchUnreadCount = async () => {
-      try {
-        const response = await fetch("/api/messages/unread-count");
-        if (response.ok) {
-          const data = await response.json();
-          setUnreadCount(data.count);
-        }
-      } catch (error) {
-        console.error(
-          "Błąd pobierania liczby nieprzeczytanych wiadomości:",
-          error
-        );
-      } finally {
-        setIsLoading(false);
-      }
+    return () => {
+      document.title = "Więźniarki";
     };
+  }, [unreadCount]);
 
-    fetchUnreadCount();
-
-    // Ustawienie interwału odświeżania co 60 sekund
-    const interval = setInterval(fetchUnreadCount, 60000);
-
-    // Czyszczenie interwału przy odmontowaniu komponentu
-    return () => clearInterval(interval);
-  }, [userId]);
-
-  if (isLoading || unreadCount === 0) {
+  if (isLoading || !userId || unreadCount === 0) {
     return null;
   }
 
   return (
     <Link href="/dashboard/messages" className="relative inline-block">
-      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-        {unreadCount > 9 ? "9+" : unreadCount}
-      </span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 text-primary"
+        className="h-6 w-6 text-gray-600 hover:text-primary transition-colors"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -61,9 +49,14 @@ export default function MessageNotification({
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
         />
       </svg>
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
     </Link>
   );
 }

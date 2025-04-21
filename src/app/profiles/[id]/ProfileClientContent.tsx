@@ -8,8 +8,10 @@ import ProfileAbout from "./components/ProfileAbout";
 import ProfileGoals from "./components/ProfileGoals";
 import ProfileSidebar from "./components/ProfileSidebar";
 import ProfileContact from "./components/ProfileContact";
+import ProfileContactForm from "./components/ProfileContactForm";
 import { useState } from "react";
 import { useGetProfileByIdQuery } from "@/frontend/store/apis/profileApi";
+import { useGetCurrentUserQuery } from "@/frontend/store/apis/authApi";
 
 export default function ProfileClientContent({
   initialProfile,
@@ -21,6 +23,10 @@ export default function ProfileClientContent({
   const { data: profile = initialProfile } = useGetProfileByIdQuery(
     initialProfile.id
   );
+  // Sprawdzamy czy użytkownik jest zalogowany
+  const { data: currentUser, isLoading: userLoading } =
+    useGetCurrentUserQuery();
+
   const [showContactForm, setShowContactForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"about" | "interests" | "goals">(
     "about"
@@ -91,12 +97,21 @@ export default function ProfileClientContent({
       </div>
 
       {/* Formularz kontaktowy */}
-      {showContactForm && (
-        <ProfileContact
-          profile={profile}
-          onClose={() => setShowContactForm(false)}
-        />
-      )}
+      {showContactForm &&
+        (currentUser ? (
+          // Jeśli użytkownik jest zalogowany, pokaż formularz kontaktowy
+          <ProfileContactForm
+            profile={profile}
+            currentUser={currentUser}
+            onClose={() => setShowContactForm(false)}
+          />
+        ) : (
+          // Jeśli użytkownik nie jest zalogowany, pokaż komunikat o konieczności logowania
+          <ProfileContact
+            profile={profile}
+            onClose={() => setShowContactForm(false)}
+          />
+        ))}
     </div>
   );
 }

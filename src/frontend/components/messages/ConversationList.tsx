@@ -1,15 +1,7 @@
 import React from "react";
 import Image from "next/image";
-
-interface Conversation {
-  matchId: string;
-  partnerId: string;
-  partnerName: string;
-  partnerImg?: string;
-  lastMessage: string;
-  lastMessageDate: Date;
-  unreadCount: number;
-}
+import Link from "next/link";
+import { Conversation } from "@/frontend/store/apis/messageApi";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -22,89 +14,102 @@ export default function ConversationList({
   selectedMatchId,
   onSelectConversation,
 }: ConversationListProps) {
-  return (
-    <div className="h-full">
-      <div className="p-4 border-b">
-        <h3 className="font-semibold">Konwersacje</h3>
+  // Funkcja pomocnicza do formatowania daty
+  const formatDate = (date: Date): string => {
+    const dateObj = new Date(date);
+    const now = new Date();
+    const diffDays = Math.floor(
+      (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffDays === 0) {
+      // Dzisiaj - pokaż godzinę
+      return dateObj.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else if (diffDays === 1) {
+      // Wczoraj
+      return "wczoraj";
+    } else if (diffDays < 7) {
+      // W tym tygodniu - pokaż dzień tygodnia
+      return dateObj.toLocaleDateString([], { weekday: "short" });
+    } else {
+      // Dawniej - pokaż datę
+      return dateObj.toLocaleDateString([], {
+        day: "numeric",
+        month: "short",
+      });
+    }
+  };
+
+  if (conversations.length === 0) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        <p>Brak konwersacji</p>
       </div>
-      <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
+    );
+  }
+
+  return (
+    <div className="h-[70vh] overflow-y-auto">
+      <div className="p-4 border-b">
+        <h2 className="font-semibold text-gray-800">Konwersacje</h2>
+      </div>
+      <ul className="divide-y">
         {conversations.map((conversation) => (
-          <div
+          <li
             key={conversation.matchId}
-            className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition ${
-              selectedMatchId === conversation.matchId ? "bg-gray-100" : ""
+            className={`hover:bg-gray-50 transition-colors ${
+              selectedMatchId === conversation.matchId ? "bg-blue-50" : ""
             }`}
-            onClick={() => onSelectConversation(conversation.matchId)}
           >
-            <div className="flex items-center">
-              <div className="flex-shrink-0 mr-3">
+            <button
+              onClick={() => onSelectConversation(conversation.matchId)}
+              className="w-full p-4 text-left flex items-center"
+            >
+              {/* Avatar */}
+              <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                 {conversation.partnerImg ? (
                   <Image
                     src={conversation.partnerImg}
                     alt={conversation.partnerName}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">
-                      {conversation.partnerName.charAt(0)}
-                    </span>
+                  <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-semibold">
+                    {conversation.partnerName.charAt(0)}
                   </div>
                 )}
               </div>
-              <div className="flex-grow min-w-0">
-                <div className="flex justify-between items-baseline">
-                  <h4 className="font-medium truncate">
+
+              {/* Informacje */}
+              <div className="ml-4 flex-grow min-w-0">
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="font-semibold text-gray-800 truncate">
                     {conversation.partnerName}
-                  </h4>
-                  <span className="text-xs text-gray-500 ml-2 whitespace-nowrap">
+                  </h3>
+                  <span className="text-xs text-gray-500">
                     {formatDate(conversation.lastMessageDate)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 truncate">
-                  {conversation.lastMessage}
-                </p>
-              </div>
-              {conversation.unreadCount > 0 && (
-                <div className="ml-2 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                  {conversation.unreadCount}
+                <div className="flex items-center">
+                  <p className="text-sm text-gray-600 truncate flex-grow">
+                    {conversation.lastMessage}
+                  </p>
+                  {conversation.unreadCount > 0 && (
+                    <span className="ml-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
+                      {conversation.unreadCount}
+                    </span>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
-}
-
-// Funkcja pomocnicza do formatowania daty
-function formatDate(date: Date): string {
-  const now = new Date();
-  const messageDate = new Date(date);
-
-  // Jeśli wiadomość jest z dzisiaj, pokaż tylko godzinę
-  if (
-    messageDate.getDate() === now.getDate() &&
-    messageDate.getMonth() === now.getMonth() &&
-    messageDate.getFullYear() === now.getFullYear()
-  ) {
-    return messageDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  // Jeśli wiadomość jest z tego tygodnia, pokaż dzień tygodnia
-  const diffDays = Math.round(
-    (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  if (diffDays < 7) {
-    return messageDate.toLocaleDateString([], { weekday: "short" });
-  }
-
-  // W przeciwnym razie pokaż datę
-  return messageDate.toLocaleDateString();
 }

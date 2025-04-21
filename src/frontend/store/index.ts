@@ -6,6 +6,8 @@ import { profileApi } from "@/frontend/store/apis/profileApi";
 import { authApi } from "@/frontend/store/apis/authApi";
 import { statsApi } from "@/frontend/store/apis/statsApi";
 import { settingsApi } from "@/frontend/store/apis/settingsApi";
+import { messageApi } from "@/frontend/store/apis/messageApi";
+import { matchApi } from "@/frontend/store/apis/matchApi";
 
 // Importy slices
 import profileReducer from "@/frontend/store/slices/profileSlice";
@@ -20,6 +22,8 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [statsApi.reducerPath]: statsApi.reducer,
     [settingsApi.reducerPath]: settingsApi.reducer,
+    [messageApi.reducerPath]: messageApi.reducer,
+    [matchApi.reducerPath]: matchApi.reducer,
 
     // Feature reducers
     profile: profileReducer,
@@ -32,7 +36,9 @@ export const store = configureStore({
       profileApi.middleware,
       authApi.middleware,
       statsApi.middleware,
-      settingsApi.middleware
+      settingsApi.middleware,
+      messageApi.middleware,
+      matchApi.middleware
     ),
   devTools: process.env.NODE_ENV !== "production",
 });

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "@/backend/middleware/authMiddleware";
-import { messageService } from "@/backend/services/messageService";
+import { mongodbService } from "@/backend/services/mongodbService";
+import { dbName } from "@/backend/utils/mongodb";
 
+// GET - Pobierz liczbę nieprzeczytanych wiadomości dla zalogowanego użytkownika
 export async function GET(request: NextRequest) {
   try {
     // Weryfikacja autoryzacji
@@ -16,7 +18,11 @@ export async function GET(request: NextRequest) {
     const { userId } = authResult;
 
     // Pobierz liczbę nieprzeczytanych wiadomości
-    const count = await messageService.getUnreadMessageCount(userId);
+    const count = await mongodbService.countDocuments(dbName, "messages", {
+      recipientId: userId,
+      readStatus: false,
+      moderationStatus: "approved",
+    });
 
     return NextResponse.json({ count });
   } catch (error) {

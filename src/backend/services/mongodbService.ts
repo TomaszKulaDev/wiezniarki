@@ -27,10 +27,21 @@ export const mongodbService = {
   async findDocuments<T = Document>(
     dbName: string,
     collectionName: string,
-    query: any = {}
+    query: any = {},
+    options: any = {}
   ): Promise<T[]> {
     const collection = await this.getCollection(dbName, collectionName);
-    const result = await collection.find(query).toArray();
+    let cursor = collection.find(query);
+
+    if (options.sort) {
+      cursor = cursor.sort(options.sort);
+    }
+
+    if (options.limit) {
+      cursor = cursor.limit(options.limit);
+    }
+
+    const result = await cursor.toArray();
     return result as unknown as T[];
   },
 
@@ -62,12 +73,12 @@ export const mongodbService = {
     update: any
   ) {
     const collection = await this.getCollection(dbName, collectionName);
-    
+
     // Jeśli update nie ma operatorów MongoDB (jak $set), opakuj je w $set
     if (!update.$set && !update.$push && !update.$pull && !update.$inc) {
       update = { $set: update };
     }
-    
+
     return collection.updateOne(query, update);
   },
 
@@ -81,5 +92,15 @@ export const mongodbService = {
   async deleteDocuments(dbName: string, collectionName: string, query: any) {
     const collection = await this.getCollection(dbName, collectionName);
     return collection.deleteMany(query);
+  },
+
+  // Policz dokumenty
+  async countDocuments(
+    dbName: string,
+    collectionName: string,
+    query: any = {}
+  ) {
+    const collection = await this.getCollection(dbName, collectionName);
+    return collection.countDocuments(query);
   },
 };
