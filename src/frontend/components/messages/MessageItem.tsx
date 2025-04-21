@@ -1,162 +1,109 @@
 import React from "react";
 import Image from "next/image";
 
-interface MessageProps {
-  message: {
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: Date;
-    readStatus: boolean;
-    moderationStatus: "pending" | "approved" | "rejected";
-  };
-  isOwn: boolean;
+// Zaktualizowany interfejs MessageProps
+interface Message {
+  id: string;
+  content: string;
+  senderId: string;
+  createdAt: Date;
+  readStatus: boolean;
+  moderationStatus: "pending" | "approved" | "rejected";
 }
 
-export default function MessageItem({ message, isOwn }: MessageProps) {
-  // Formatuj datę
-  const formattedDate = formatDateTime(new Date(message.createdAt));
+interface MessageProps {
+  message: Message;
+  isOwn: boolean;
+  isLastInGroup: boolean; // Dodana nowa właściwość
+  showTimestamp: boolean; // Dodana nowa właściwość
+}
 
-  // Ustaw dodatkowe style dla własnych wiadomości
-  const containerClasses = isOwn ? "flex justify-end" : "flex justify-start";
-
-  const bubbleClasses = isOwn
-    ? "bg-primary text-white rounded-lg rounded-tr-none px-4 py-2 max-w-[80%] break-words"
-    : "bg-gray-100 text-gray-800 rounded-lg rounded-tl-none px-4 py-2 max-w-[80%] break-words";
-
-  // Dla wiadomości oczekujących na moderację dodajemy wskaźnik statusu
-  const isPending = isOwn && message.moderationStatus === "pending";
-
-  // Dodajemy console.log dla debugowania - ważne, dodajemy więcej informacji
-  console.log("Renderowanie wiadomości:", {
-    id: message.id,
-    content: message.content.substring(0, 20) + "...",
-    isOwn,
-    senderId: message.senderId,
-    readStatus: message.readStatus,
-    moderationStatus: message.moderationStatus,
-    createdAt: new Date(message.createdAt),
-  });
+export default function MessageItem({
+  message,
+  isOwn,
+  isLastInGroup,
+  showTimestamp,
+}: MessageProps) {
+  const formattedTime = new Date(message.createdAt).toLocaleTimeString(
+    "pl-PL",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 
   return (
-    <div className={containerClasses}>
-      <div>
-        <div className={bubbleClasses}>
-          <p>{message.content}</p>
-          <div className="flex items-center justify-end mt-1 space-x-1">
-            <span className="text-xs opacity-70">{formattedDate}</span>
+    <div
+      className={`
+      flex 
+      ${isOwn ? "justify-end" : "justify-start"}
+      ${isLastInGroup ? "mb-[4px]" : "mb-[2px]"}
+      relative
+      group
+    `}
+    >
+      <div className="max-w-[65%]">
+        {/* Wiadomość */}
+        <div
+          className={`
+          px-[12px]
+          py-[6px]
+          text-[14px]
+          leading-[20px]
+          ${
+            isOwn
+              ? "bg-[#0095F6] text-white rounded-[18px] rounded-br-[4px]"
+              : "bg-[#E9E9E9] text-black rounded-[18px] rounded-bl-[4px]"
+          }
+        `}
+        >
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        </div>
 
+        {/* Timestamp - widoczny tylko dla ostatniej wiadomości w grupie lub przy hover */}
+        {(showTimestamp || isLastInGroup) && (
+          <div
+            className={`
+            text-[11px]
+            text-[#8E8E8E]
+            mt-[3px]
+            leading-[13px]
+            select-none
+            ${isOwn ? "text-right mr-[8px]" : "ml-[8px]"}
+            ${
+              !isLastInGroup &&
+              "opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            }
+          `}
+          >
+            {formattedTime}
             {isOwn && (
-              <>
-                {isPending ? (
-                  <span className="text-xs opacity-70 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    Weryfikacja
-                  </span>
-                ) : message.readStatus ? (
-                  <span className="text-xs opacity-70">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </span>
+              <span className="ml-1 inline-flex items-center">
+                {message.moderationStatus === "pending" ? (
+                  <svg
+                    className="w-[14px] h-[14px] text-[#8E8E8E]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                    <path strokeWidth="2" d="M12 6v6l4 2" />
+                  </svg>
                 ) : (
-                  <span className="text-xs opacity-70">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </span>
+                  <svg
+                    className="w-[14px] h-[14px] text-[#8E8E8E]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path strokeWidth="2" d="M20 6L9 17l-5-5" />
+                  </svg>
                 )}
-              </>
+              </span>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
-  );
-}
-
-// Funkcja pomocnicza do formatowania daty
-function formatDateTime(date: Date): string {
-  const now = new Date();
-  const messageDate = new Date(date);
-
-  // Format godziny
-  const timeFormat = messageDate.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  // Jeśli wiadomość jest z dzisiaj, pokaż tylko godzinę
-  if (
-    messageDate.getDate() === now.getDate() &&
-    messageDate.getMonth() === now.getMonth() &&
-    messageDate.getFullYear() === now.getFullYear()
-  ) {
-    return timeFormat;
-  }
-
-  // Jeśli wiadomość jest z wczoraj
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (
-    messageDate.getDate() === yesterday.getDate() &&
-    messageDate.getMonth() === yesterday.getMonth() &&
-    messageDate.getFullYear() === yesterday.getFullYear()
-  ) {
-    return `wczoraj, ${timeFormat}`;
-  }
-
-  // Jeśli wiadomość jest z tego roku, pokaż dzień i miesiąc
-  if (messageDate.getFullYear() === now.getFullYear()) {
-    return (
-      messageDate.toLocaleDateString([], {
-        day: "numeric",
-        month: "short",
-      }) + `, ${timeFormat}`
-    );
-  }
-
-  // W przeciwnym razie pokaż pełną datę
-  return (
-    messageDate.toLocaleDateString([], {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }) + `, ${timeFormat}`
   );
 }
