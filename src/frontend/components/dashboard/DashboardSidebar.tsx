@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "@/backend/models/User";
+import { useState, useEffect } from "react";
+import { messageService } from "@/backend/services/messageService";
 
 interface DashboardSidebarProps {
   user: Omit<User, "passwordHash">;
@@ -8,6 +10,34 @@ interface DashboardSidebarProps {
 
 export default function DashboardSidebar({ user }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      const fetchUnreadCount = async () => {
+        try {
+          const response = await fetch("/api/messages/unread-count");
+          if (response.ok) {
+            const data = await response.json();
+            setUnreadCount(data.count);
+          }
+        } catch (error) {
+          console.error(
+            "Błąd pobierania liczby nieprzeczytanych wiadomości:",
+            error
+          );
+        }
+      };
+
+      fetchUnreadCount();
+
+      // Ustawienie interwału odświeżania co 60 sekund
+      const interval = setInterval(fetchUnreadCount, 60000);
+
+      // Czyszczenie interwału przy odmontowaniu komponentu
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const menuItems = [
     { name: "Panel główny", href: "/dashboard", icon: "home" },
@@ -16,7 +46,7 @@ export default function DashboardSidebar({ user }: DashboardSidebarProps) {
       name: "Wiadomości",
       href: "/dashboard/messages",
       icon: "message",
-      badge: 2,
+      badge: unreadCount > 0 ? unreadCount : undefined,
     },
     { name: "Dopasowania", href: "/dashboard/matches", icon: "heart" },
   ];

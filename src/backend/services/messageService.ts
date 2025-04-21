@@ -1,5 +1,7 @@
 import { Message } from "../models/Message";
 import { matchingService } from "./matchingService";
+import { mongodbService } from "./mongodbService";
+import { dbName } from "../utils/mongodb";
 
 // Symulacja danych - w rzeczywistym projekcie użylibyśmy bazy danych
 const messages: Message[] = [];
@@ -7,27 +9,45 @@ const messages: Message[] = [];
 export const messageService = {
   // Pobierz wszystkie wiadomości
   async getAllMessages(): Promise<Message[]> {
+    const messages = await mongodbService.findDocuments<Message>(
+      dbName,
+      "messages"
+    );
     return messages;
   },
 
   // Pobierz wiadomość po ID
   async getMessageById(id: string): Promise<Message | null> {
-    const message = messages.find((m) => m.id === id);
-    return message || null;
+    const message = await mongodbService.findDocument<Message>(
+      dbName,
+      "messages",
+      { id }
+    );
+    return message;
   },
 
   // Pobierz wiadomości dla danego matchu
   async getMessagesByMatchId(matchId: string): Promise<Message[]> {
-    return messages
-      .filter((m) => m.matchId === matchId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    const messages = await mongodbService.findDocuments<Message>(
+      dbName,
+      "messages",
+      { matchId },
+      { sort: { createdAt: 1 } }
+    );
+    return messages;
   },
 
   // Pobierz wiadomości dla danego użytkownika (więźniarki lub partnera)
   async getMessagesByUserId(userId: string): Promise<Message[]> {
-    return messages
-      .filter((m) => m.senderId === userId || m.recipientId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Od najnowszych
+    const messages = await mongodbService.findDocuments<Message>(
+      dbName,
+      "messages",
+      {
+        $or: [{ senderId: userId }, { recipientId: userId }],
+      },
+      { sort: { createdAt: -1 } }
+    );
+    return messages;
   },
 
   // Utwórz nową wiadomość
@@ -40,7 +60,10 @@ export const messageService = {
     attachments?: string[];
   }): Promise<Message> {
     // Sprawdź, czy match istnieje
-    const match = await matchingService.getMatchById(messageData.matchId);
+    const match = await mongodbService.findDocument(dbName, "matches", {
+      id: messageData.matchId,
+    });
+
     if (!match) {
       throw new Error("Match nie istnieje");
     }
@@ -89,26 +112,51 @@ export const messageService = {
       updatedAt: new Date(),
     };
 
-    messages.push(newMessage);
+    // Zapisz wiadomość w bazie danych
+    await mongodbService.insertDocument(dbName, "messages", newMessage);
 
     // Zaktualizuj licznik wiadomości w matchu
-    await matchingService.incrementMessageCount(messageData.matchId);
+    await mongodbService.updateDocument(
+      dbName,
+      "matches",
+      { id: messageData.matchId },
+      {
+        messageCount: (match.messageCount || 0) + 1,
+        lastInteraction: new Date(),
+        updatedAt: new Date(),
+      }
+    );
 
     return newMessage;
   },
 
   // Oznacz wiadomość jako przeczytaną
   async markMessageAsRead(id: string): Promise<Message | null> {
-    const messageIndex = messages.findIndex((m) => m.id === id);
+    const message = await mongodbService.findDocument<Message>(
+      dbName,
+      "messages",
+      { id }
+    );
 
-    if (messageIndex === -1) {
+    if (!message) {
       return null;
     }
 
-    messages[messageIndex].readStatus = true;
-    messages[messageIndex].updatedAt = new Date();
+    await mongodbService.updateDocument(
+      dbName,
+      "messages",
+      { id },
+      {
+        readStatus: true,
+        updatedAt: new Date(),
+      }
+    );
 
-    return messages[messageIndex];
+    return {
+      ...message,
+      readStatus: true,
+      updatedAt: new Date(),
+    };
   },
 
   // Aktualizuj status moderacji wiadomości
@@ -117,47 +165,116 @@ export const messageService = {
     status: Message["moderationStatus"],
     reason?: string
   ): Promise<Message | null> {
-    const messageIndex = messages.findIndex((m) => m.id === id);
+    const message = await mongodbService.findDocument<Message>(
+      dbName,
+      "messages",
+      { id }
+    );
 
-    if (messageIndex === -1) {
+    if (!message) {
       return null;
     }
 
-    messages[messageIndex].moderationStatus = status;
+    const update: Partial<Message> = {
+      moderationStatus: status,
+      updatedAt: new Date(),
+    };
 
     if (status === "rejected" && reason) {
-      messages[messageIndex].moderationReason = reason;
+      update.moderationReason = reason;
     }
 
-    messages[messageIndex].updatedAt = new Date();
+    await mongodbService.updateDocument(dbName, "messages", { id }, update);
 
-    return messages[messageIndex];
+    return {
+      ...message,
+      ...update,
+    };
   },
 
   // Usuń wiadomość
   async deleteMessage(id: string): Promise<boolean> {
-    const messageIndex = messages.findIndex((m) => m.id === id);
+    const message = await mongodbService.findDocument<Message>(
+      dbName,
+      "messages",
+      { id }
+    );
 
-    if (messageIndex === -1) {
+    if (!message) {
       return false;
     }
 
-    messages.splice(messageIndex, 1);
+    await mongodbService.deleteDocument(dbName, "messages", { id });
     return true;
   },
 
   // Pobierz nieprzeczytane wiadomości dla użytkownika
   async getUnreadMessagesByUserId(userId: string): Promise<Message[]> {
-    return messages.filter(
-      (m) =>
-        m.recipientId === userId &&
-        !m.readStatus &&
-        m.moderationStatus === "approved"
+    const messages = await mongodbService.findDocuments<Message>(
+      dbName,
+      "messages",
+      {
+        recipientId: userId,
+        readStatus: false,
+        moderationStatus: "approved",
+      }
     );
+    return messages;
   },
 
   // Pobierz wiadomości oczekujące na moderację
   async getPendingModerationMessages(): Promise<Message[]> {
-    return messages.filter((m) => m.moderationStatus === "pending");
+    const messages = await mongodbService.findDocuments<Message>(
+      dbName,
+      "messages",
+      { moderationStatus: "pending" }
+    );
+    return messages;
+  },
+
+  // Pobierz liczbę nieprzeczytanych wiadomości dla użytkownika
+  async getUnreadMessageCount(userId: string): Promise<number> {
+    const count = await mongodbService.countDocuments(dbName, "messages", {
+      recipientId: userId,
+      readStatus: false,
+      moderationStatus: "approved",
+    });
+    return count;
+  },
+
+  // Pobierz statystyki wiadomości dla administratora
+  async getMessageStats(): Promise<{
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+    last24h: number;
+  }> {
+    const collection = await mongodbService.getCollection(dbName, "messages");
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const total = await collection.countDocuments();
+    const pending = await collection.countDocuments({
+      moderationStatus: "pending",
+    });
+    const approved = await collection.countDocuments({
+      moderationStatus: "approved",
+    });
+    const rejected = await collection.countDocuments({
+      moderationStatus: "rejected",
+    });
+    const last24h = await collection.countDocuments({
+      createdAt: { $gte: yesterday },
+    });
+
+    return {
+      total,
+      pending,
+      approved,
+      rejected,
+      last24h,
+    };
   },
 };
