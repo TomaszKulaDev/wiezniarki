@@ -26,6 +26,36 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(url.searchParams.get("offset") || "0");
     const unreadOnly = url.searchParams.get("unread") === "true";
 
+    // Jeśli podano matchId, sprawdź czy użytkownik ma do niego dostęp
+    if (matchId) {
+      const match = await mongodbService.findDocument(dbName, "matches", {
+        id: matchId,
+      });
+
+      if (!match) {
+        return NextResponse.json(
+          { message: "Match nie istnieje" },
+          { status: 404 }
+        );
+      }
+
+      // Sprawdź czy użytkownik jest uczestnikiem tego matcha
+      if (match.prisonerId !== userId && match.partnerId !== userId) {
+        return NextResponse.json(
+          { message: "Brak dostępu do tej konwersacji" },
+          { status: 403 }
+        );
+      }
+
+      // Sprawdź czy match jest aktywny
+      if (match.status !== "accepted") {
+        return NextResponse.json(
+          { message: "Ta konwersacja nie jest aktywna" },
+          { status: 403 }
+        );
+      }
+    }
+
     // Kolekcja wiadomości
     const collection = await mongodbService.getCollection<Message>(
       dbName,
@@ -35,18 +65,20 @@ export async function GET(request: NextRequest) {
     // Budowanie query w zależności od parametrów
     const query: any = {};
 
-    // Zawsze filtruj po matchId jeśli jest podane
+    // Zawsze filtruj po użytkowniku
+    query.$and = [{ $or: [{ senderId: userId }, { recipientId: userId }] }];
+
+    // Jeśli podano matchId, dodaj go do warunków
     if (matchId) {
-      query.matchId = matchId;
-    } else {
-      // Tylko gdy nie ma matchId, filtruj po użytkowniku
-      query.$or = [{ senderId: userId }, { recipientId: userId }];
+      query.$and.push({ matchId });
     }
 
     if (unreadOnly) {
-      query.readStatus = false;
-      query.recipientId = userId;
-      query.moderationStatus = "approved";
+      query.$and.push({
+        readStatus: false,
+        recipientId: userId,
+        moderationStatus: "approved",
+      });
     }
 
     // Pobieranie wiadomości z bazy danych
