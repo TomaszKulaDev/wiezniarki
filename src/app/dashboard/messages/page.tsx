@@ -83,7 +83,7 @@ export default function MessagesPage() {
       <MainLayout>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-16 w-12 border-t-2 border-b-2 border-primary"></div>
             <p className="text-gray-600">Ładowanie wiadomości...</p>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function MessagesPage() {
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-3 h-[calc(80vh-200px)]">
+                <div className="grid grid-cols-1 md:grid-cols-3 h-[calc(95vh-120px)]">
                   {/* Lista konwersacji */}
                   <div
                     className={`md:col-span-1 border-r border-gray-200 ${
