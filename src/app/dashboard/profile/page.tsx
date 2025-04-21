@@ -32,24 +32,35 @@ export default function ProfilePage() {
   // Lokalne ID profilu, które będzie używane zamiast user.profileId
   const [localProfileId, setLocalProfileId] = useState<string | null>(null);
 
-  // Znajdź profil po jego ID, używając lokalnego ID jeśli dostępne
-  const profileId = localProfileId || user?.profileId || "none";
+  // Znajdź profil po jego ID, używając user.profileId z pierwszeństwem
+  const profileId = user?.profileId || localProfileId || "none";
   const { data: profile, isLoading: profileLoading } = useGetProfileByIdQuery(
     profileId,
     { skip: profileId === "none" }
   );
 
-  // Sprawdź, czy klucz lokalny "createdProfileId" istnieje
+  // Sprawdź, czy klucz lokalny "createdProfileId" istnieje - używamy klucza specyficznego dla użytkownika
   useEffect(() => {
-    const savedProfileId = localStorage.getItem("createdProfileId");
-    if (savedProfileId) {
-      setLocalProfileId(savedProfileId);
+    if (user) {
+      const userProfileKey = `createdProfileId_${user.id}`;
+      const savedProfileId = localStorage.getItem(userProfileKey);
+      if (savedProfileId) {
+        setLocalProfileId(savedProfileId);
+      }
     }
-  }, []);
+  }, [user]);
 
   // Sprawdź czy użytkownik ma już profil w bazie danych
   useEffect(() => {
     if (user && allProfiles && allProfiles.length > 0) {
+      // Sprawdź najpierw czy user.profileId jest ustawione
+      if (user.profileId) {
+        setLocalProfileId(user.profileId);
+        // Zapisujemy w localStorage z kluczem specyficznym dla użytkownika
+        localStorage.setItem(`createdProfileId_${user.id}`, user.profileId);
+        return;
+      }
+
       // Jeśli mamy nowego użytkownika i listę profili, znajdźmy profil
       // który może należeć do tego użytkownika (na podstawie innych pól)
       const userEmail = user.email;
@@ -64,7 +75,11 @@ export default function ProfilePage() {
 
       if (possibleUserProfile) {
         setLocalProfileId(possibleUserProfile.id);
-        localStorage.setItem("createdProfileId", possibleUserProfile.id);
+        // Zapisujemy w localStorage z kluczem specyficznym dla użytkownika
+        localStorage.setItem(
+          `createdProfileId_${user.id}`,
+          possibleUserProfile.id
+        );
       }
     }
   }, [user, allProfiles]);
@@ -212,8 +227,10 @@ export default function ProfilePage() {
         const newProfile = await createProfile(profileDataToCreate).unwrap();
         console.log("Utworzono profil:", newProfile);
 
-        // Zapisz ID profilu w localStorage dla trwałości
-        localStorage.setItem("createdProfileId", newProfile.id);
+        // Zapisz ID profilu w localStorage dla trwałości z kluczem specyficznym dla użytkownika
+        if (user) {
+          localStorage.setItem(`createdProfileId_${user.id}`, newProfile.id);
+        }
         setLocalProfileId(newProfile.id);
 
         // Aktualizacja powiązania
@@ -253,7 +270,9 @@ export default function ProfilePage() {
       await deleteProfile(profile.id).unwrap();
 
       // Wyczyszczenie ID profilu z localStorage
-      localStorage.removeItem("createdProfileId");
+      if (user) {
+        localStorage.removeItem(`createdProfileId_${user.id}`);
+      }
 
       // Zresetuj lokalny stan - to wystarczy do wymuszenia ponownego renderowania
       setLocalProfileId(null);

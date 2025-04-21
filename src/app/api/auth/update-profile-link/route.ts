@@ -29,24 +29,12 @@ export async function PATCH(request: NextRequest) {
       console.log("Szukanie po email:", user ? "znaleziono" : "nie znaleziono");
     }
 
-    // TRZECIA PRÓBA: Pokaż dostępne dokumenty dla diagnostyki
+    // Jeśli użytkownik nadal nie jest znaleziony, zwróć błąd 404
     if (!user) {
-      const allUsers = await mongodbService.findDocuments(dbName, "users", {});
-      console.log(
-        "Wszystkie dostępne ID użytkowników:",
-        allUsers.map((u) => ({ id: u.id, email: u.email }))
+      return NextResponse.json(
+        { message: "Użytkownik nie został znaleziony" },
+        { status: 404 }
       );
-
-      // Sprawdź, czy możemy znaleźć użytkownika po email z pierwszego dokumentu
-      if (allUsers.length > 0) {
-        user = allUsers[0]; // Użyj pierwszego dostępnego użytkownika (tylko dla MVP)
-        console.log("Użycie pierwszego dostępnego użytkownika:", user.email);
-      } else {
-        return NextResponse.json(
-          { message: "Użytkownik nie został znaleziony" },
-          { status: 404 }
-        );
-      }
     }
 
     // Sprawdź czy profil istnieje
