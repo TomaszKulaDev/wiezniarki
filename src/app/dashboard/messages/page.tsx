@@ -242,7 +242,7 @@ export default function MessagesPage() {
 
                   {/* Widok konwersacji */}
                   <div
-                    className={`md:col-span-2 flex flex-col ${
+                    className={`md:col-span-2 flex flex-col h-full ${
                       !selectedMatchId && "hidden md:flex"
                     }`}
                   >
@@ -276,7 +276,7 @@ export default function MessagesPage() {
                     ) : (
                       <>
                         {/* Nagłówek konwersacji */}
-                        <div className="p-4 border-b border-gray-200 bg-white">
+                        <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
                           <div className="flex items-center space-x-4">
                             <button
                               onClick={() => setSelectedMatchId(null)}
@@ -336,60 +336,65 @@ export default function MessagesPage() {
                           </div>
                         </div>
 
-                        {/* Wiadomości */}
-                        <div className="flex-1 overflow-y-auto bg-white px-[20px]">
-                          <div className="py-[20px]">
-                            {isMessagesLoading ? (
-                              <div className="flex justify-center items-center h-full">
-                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#0095F6]"></div>
-                              </div>
-                            ) : !messagesData?.messages?.length ? (
-                              <div className="flex flex-col items-center justify-center h-full">
-                                <p className="text-[#8E8E8E] text-[14px]">
-                                  Brak wiadomości. Rozpocznij konwersację!
-                                </p>
-                              </div>
-                            ) : (
-                              <div>
-                                {messagesData.messages.map(
-                                  (message, index, array) => {
-                                    // Sprawdź czy to ostatnia wiadomość w grupie
-                                    const nextMessage = array[index + 1];
-                                    const isLastInGroup =
-                                      !nextMessage ||
-                                      nextMessage.senderId !==
-                                        message.senderId ||
-                                      new Date(
-                                        nextMessage.createdAt
-                                      ).getTime() -
-                                        new Date(message.createdAt).getTime() >
-                                        60000;
+                        {/* Kontener wiadomości */}
+                        <div className="flex-1 relative">
+                          <div className="absolute inset-0 overflow-y-scroll">
+                            <div className="px-4 py-4">
+                              {isMessagesLoading ? (
+                                <div className="flex justify-center items-center min-h-[400px]">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#0095F6]"></div>
+                                </div>
+                              ) : !messagesData?.messages?.length ? (
+                                <div className="flex flex-col items-center justify-center min-h-[400px]">
+                                  <p className="text-[#8E8E8E] text-[14px]">
+                                    Brak wiadomości. Rozpocznij konwersację!
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  {messagesData.messages.map(
+                                    (message, index, array) => {
+                                      const nextMessage = array[index + 1];
+                                      const isLastInGroup =
+                                        !nextMessage ||
+                                        nextMessage.senderId !==
+                                          message.senderId ||
+                                        new Date(
+                                          nextMessage.createdAt
+                                        ).getTime() -
+                                          new Date(
+                                            message.createdAt
+                                          ).getTime() >
+                                          60000;
 
-                                    return (
-                                      <MessageItem
-                                        key={message.id}
-                                        message={message}
-                                        isOwn={message.senderId === user?.id}
-                                        isLastInGroup={isLastInGroup}
-                                        showTimestamp={
-                                          index === array.length - 1
-                                        } // Pokaż czas dla ostatniej wiadomości
-                                      />
-                                    );
-                                  }
-                                )}
-                              </div>
-                            )}
+                                      return (
+                                        <MessageItem
+                                          key={message.id}
+                                          message={message}
+                                          isOwn={message.senderId === user?.id}
+                                          isLastInGroup={isLastInGroup}
+                                          showTimestamp={
+                                            index === array.length - 1
+                                          }
+                                        />
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
 
                         {/* Formularz wiadomości */}
-                        <MessageForm
-                          onSendMessage={(content) => {
-                            // Implementacja wysyłania wiadomości
-                          }}
-                          isLoading={false}
-                        />
+                        <div className="border-t border-gray-200 bg-white flex-shrink-0">
+                          <MessageForm
+                            onSendMessage={(content) => {
+                              // Implementacja wysyłania wiadomości
+                            }}
+                            isLoading={false}
+                          />
+                        </div>
                       </>
                     )}
                   </div>
