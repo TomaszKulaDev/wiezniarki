@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Cache dla statusu maintenance
+// Cache dla statusu maintenance - przechowuje informację o trybie konserwacji
+// Używamy cache'owania aby zredukować liczbę zapytań do API
+// status: boolean - czy tryb konserwacji jest włączony
+// lastChecked: number - timestamp ostatniego sprawdzenia statusu
 const maintenanceCache = {
   status: false,
   lastChecked: 0,
 };
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minut
+
+// Czas przez jaki cache pozostaje ważny (30 minut)
+// Po tym czasie zostanie wykonane nowe zapytanie do API
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minut
 
 // Pomocnicza funkcja do sprawdzania, czy ścieżka zaczyna się od któregokolwiek z podanych prefiksów
 const pathStartsWith = (path: string, prefixes: string[]): boolean => {
