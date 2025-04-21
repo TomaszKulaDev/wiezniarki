@@ -52,64 +52,65 @@ export default function ConversationList({
   }
 
   return (
-    <div className="h-[70vh] overflow-y-auto">
-      <div className="p-4 border-b">
-        <h2 className="font-semibold text-gray-800">Konwersacje</h2>
-      </div>
-      <ul className="divide-y">
+    <div className="h-[600px] overflow-y-auto">
+      <div className="divide-y divide-gray-100">
         {conversations.map((conversation) => (
-          <li
+          <button
             key={conversation.matchId}
-            className={`hover:bg-gray-50 transition-colors ${
+            onClick={() => onSelectConversation(conversation.matchId)}
+            className={`w-full text-left p-4 hover:bg-gray-50 transition-colors duration-200 flex items-start space-x-3 ${
               selectedMatchId === conversation.matchId ? "bg-blue-50" : ""
             }`}
           >
-            <button
-              onClick={() => onSelectConversation(conversation.matchId)}
-              className="w-full p-4 text-left flex items-center"
-            >
-              {/* Avatar */}
-              <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                {conversation.partnerImg ? (
-                  <Image
-                    src={conversation.partnerImg}
-                    alt={conversation.partnerName}
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-semibold">
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              {conversation.partnerImg ? (
+                <img
+                  src={conversation.partnerImg}
+                  alt={conversation.partnerName}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-lg font-medium text-gray-600">
                     {conversation.partnerName.charAt(0)}
-                  </div>
-                )}
-              </div>
-
-              {/* Informacje */}
-              <div className="ml-4 flex-grow min-w-0">
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="font-semibold text-gray-800 truncate">
-                    {conversation.partnerName}
-                  </h3>
-                  <span className="text-xs text-gray-500">
-                    {formatDate(conversation.lastMessageDate)}
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <p className="text-sm text-gray-600 truncate flex-grow">
-                    {conversation.lastMessage}
-                  </p>
-                  {conversation.unreadCount > 0 && (
-                    <span className="ml-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
-                      {conversation.unreadCount}
-                    </span>
+              )}
+            </div>
+
+            {/* Informacje o konwersacji */}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="text-sm font-semibold text-gray-900 truncate">
+                  {conversation.partnerName}
+                </h3>
+                <span className="text-xs text-gray-500">
+                  {new Date(conversation.lastMessageDate).toLocaleDateString(
+                    "pl-PL",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
                   )}
-                </div>
+                </span>
               </div>
-            </button>
-          </li>
+              <p className="text-sm text-gray-600 truncate">
+                {conversation.lastMessage}
+              </p>
+
+              {/* Badge z nieprzeczytanymi */}
+              {conversation.unreadCount > 0 && (
+                <div className="mt-1">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary text-white">
+                    {conversation.unreadCount}
+                  </span>
+                </div>
+              )}
+            </div>
+          </button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
